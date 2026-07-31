@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>Customers</title>
+  <%-include('../includes/head')%>
+</head>
+<body>
+
+  <!-- Desktop Sidebar -->
+  <%-include('../includes/desktop-sidebar')%>
+
+  <!-- Mobile Sidebar -->
+  <%-include('../includes/mobile-sidebar')%>
+
+  <div class="main-wrapper">
+    <!-- Topbar -->
+    <%-include('../includes/topbar')%>
+
+    <main class="container-fluid p-3 p-lg-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+          <h2 class="fw-bold mb-3">เพิ่มลูกค้าในระบบ</h2>
+          <form action="" method="post" style="width: 500px;">
+            <div class="form-group mb-3">
+                <label for="customer_name">ชื่อลูกค้าที่แสดงในระบบ: </label>
+                <input type="text" name="customer_name" class="form-control" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="customer_id">รหัสลูกค้าที่แสดงในระบบ: </label>
+                <input type="text" name="customer_id" class="form-control" required>
+            </div>
+            <div class="form-group mb-3">                
+                <label for="location">พิกัดที่อยู่: </label>
+                <input type="text" name="location" class="form-control" required>
+            </div>
+
+            <input type="submit" value="เพิ่มลูกค้า" class="btn btn-primary">
+          </form>
+        </div>
+      </div>
+
+      <!-- Container -->
+    </main>
+  </div>
+
+  <%-include('../includes/footer')%>
+</body>
+</html>

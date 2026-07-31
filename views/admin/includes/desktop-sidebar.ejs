@@ -1,0 +1,25 @@
+<aside class="sidebar desktop-sidebar d-none d-lg-flex flex-column">
+    <div class="brand">
+    Sunny's Logistic
+    </div>
+
+    <div class="p-3 flex-grow-1 overflow-auto">
+        <div class="small text-uppercase text-secondary px-3 mb-2">เมนูหลัก</div>
+        <%-include('menu')%>
+
+        <div class="small text-uppercase text-secondary px-3 mt-4 mb-2">ระบบ</div>
+        <nav class="nav flex-column">
+            <a class="nav-link <% if(locals.page == 'settings') { %>active<%}%>" href="/admin/settings"><i class="bi bi-gear"></i> ตั้งค่า</a>
+            <a class="nav-link <% if(locals.page == 'help') { %>active<%}%>" href="/admin/help"><i class="bi bi-question-circle"></i> ช่วยเหลือ</a>
+        </nav>
+    </div>
+
+    <div class="p-3 border-top border-secondary border-opacity-25">
+        <div class="d-flex align-items-center gap-3">
+        <div class="min-w-0">
+            <div class="fw-semibold text-truncate"><%=auth.user.full_name%></div>
+            <small class="text-secondary">ผู้ดูแลระบบ</small>
+        </div>
+        </div>
+    </div>
+</aside>

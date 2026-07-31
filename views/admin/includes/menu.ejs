@@ -1,0 +1,7 @@
+<nav class="nav flex-column">
+    <a class="nav-link <% if(locals.page == 'dashboard') { %>active<%}%>" href="/admin"><i class="bi bi-speedometer2"></i> ภาพรวม</a>
+    <a class="nav-link <% if(locals.page == 'trucks') { %>active<%}%>" href="/admin/trucks"><i class="bi bi-truck"></i> รถในระบบ</a>
+    <a class="nav-link <% if(locals.page == 'customers') { %>active<%}%>" href="/admin/customers"><i class="bi bi-people"></i> ลูกค้า</a>
+    <a class="nav-link <% if(locals.page == 'routes') { %>active<%}%>" href="/admin/routes"><i class="bi bi-map"></i> คิวส่งของ</a>
+    <a class="nav-link <% if(locals.page == 'users') { %>active<%}%>" href="/admin/users"><i class="bi bi-people"></i> ผู้ใช้งานระบบ</a>
+</nav>

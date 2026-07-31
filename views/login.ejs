@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>เข้าสู่ระบบ</title>
+    <script src="/js/helper.js"></script>
+    <link rel="stylesheet" href="/css/login.css">
+
+    <style>
+        .login-banner {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px;
+            color: #ffffff;
+            background:
+                linear-gradient(
+                    135deg,
+                    rgba(0, 74, 173, 0.95),
+                    rgba(0, 172, 193, 0.86)
+                ),
+                url("<%=settings.company_banner%>")
+                center / cover;
+        }
+    </style>
+</head>
+<body>
+    <main class="login-container">
+        <section class="login-banner">
+            <div class="banner-content">
+                <div class="logo"><img src="<%=settings.company_logo%>" alt="" width="50"></div>
+                <h1>ยินดีต้อนรับ</h1>
+                <p>
+                    เข้าสู่ระบบผู้ดูแลระบบและพนักงานปฏิบัติการ ระบบจัดการการขนส่งสินค้า <%=settings.company_name%>
+                </p>
+            </div>
+        </section>
+        <section class="login-form-section">
+            <div class="login-form-wrapper">
+                <h2>เข้าสู่ระบบ</h2>
+                <p class="subtitle">กรอกข้อมูลบัญชีของคุณเพื่อดำเนินการต่อ</p>
+                <div class="form-group">
+                    <label for="email">ชื่อผู้ใช้งาน</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input
+                            type="text"
+                            id="username"
+                            name="username"
+                            placeholder="example"
+                            autocomplete="username"
+                            required
+                        >
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="password">รหัสผ่าน</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input
+                            class="password-input"
+                            type="password"
+                            id="password"
+                            name="password"
+                            placeholder="กรอกรหัสผ่าน"
+                            autocomplete="current-password"
+                            required
+                        >
+                        <button
+                            class="password-toggle"
+                            type="button"
+                            id="togglePassword"
+                            aria-label="แสดงหรือซ่อนรหัสผ่าน"
+                        >👁</button>
+                    </div>
+                </div>
+                <div class="form-options">
+                    <label class="remember-me">
+                        <input type="checkbox" name="remember" id="remember">
+                        จดจำการเข้าสู่ระบบ
+                    </label>
+                    <a class="forgot-password" href="/forgetPassword">
+                        ลืมรหัสผ่าน?
+                    </a>
+                </div>
+                <button class="login-button" type="submit" onclick="loginToSystem()">
+                    เข้าสู่ระบบ
+                </button>
+                <!-- <div class="divider">หรือ</div> -->
+
+                <!-- <p class="register-text">
+                    ยังไม่มีบัญชี?
+                    <a href="#">สมัครสมาชิก</a>
+                </p> -->
+                <p class="copyright">
+                    Developed By Jirakit Pawnsakunrungrot
+                </p>
+            </div>
+        </section>
+    </main>
+    <script>
+        const passwordInput = document.getElementById("password");
+        const togglePassword = document.getElementById("togglePassword");
+
+        togglePassword.addEventListener("click", function () {
+            const isPassword = passwordInput.type === "password";
+
+            passwordInput.type = isPassword ? "text" : "password";
+            togglePassword.textContent = isPassword ? "🙈" : "👁";
+        });
+
+        function loginToSystem() {
+            if(document.getElementById('username').value == "" || document.getElementById('password').value == "") {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'โปรดกรอกชื่อผู้ใช้และรหัสผ่าน',
+                })
+                return;
+            }
+            const username = document.getElementById('username').value
+            const password = document.getElementById('password').value
+            fetch(`/api/login`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    username: username,
+                    password: password
+                }),
+            })
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error(`เซิร์ฟเวอร์ตอบกลับด้วยสถานะ: ${res.status}`);
+                }
+                return res.json();
+            })
+            .then(data => {
+                if (data.status == 'success') {
+                    setCookie('auth', data.token);
+                    Swal.fire({
+                        icon: 'success',
+                        title: "เข้าสู่ระบบสมบูรณ์"
+                    })
+                    window.location.reload()
+                } else {
+                    Swal.fire({
+                        icon: 'error',
+                        title: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"
+                    })
+                }
+            })
+            .catch(error => {
+                console.error("❌ เกิดข้อผิดพลาดในการ Fetch ข้อมูล:", error);
+            });
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html>

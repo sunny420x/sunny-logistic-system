@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>Customers</title>
+  <%-include('includes/head')%>
+</head>
+<body>
+
+  <!-- Desktop Sidebar -->
+  <%-include('includes/desktop-sidebar')%>
+
+  <!-- Mobile Sidebar -->
+  <%-include('includes/mobile-sidebar')%>
+
+  <div class="main-wrapper">
+    <!-- Topbar -->
+    <%-include('includes/topbar')%>
+
+    <main class="container-fluid p-3 p-lg-4">
+      <h2 class="fw-bold mb-3">คิวส่งของ <button class="btn btn-outline-primary" onclick="window.location.href='/admin/routes/add'">เพิ่มคิวส่งของ</button></h2>
+      <table class="table">
+        <thead>
+          <th>#</th>
+          <th>ชื่อลูกค้า</th>
+          <th>รหัสลูกค้า</th>
+          <th>ทะเบียนรถ</th>
+          <th>พนักงานปฏิบัติการ</th>
+          <th>พิกัดที่อยู่</th>
+          <th>วันที่</th>
+          <th>จัดการ</th>
+        </thead>
+        <tbody>
+          <% routes.forEach(row => { %>
+          <tr>
+            <td><%=row.id%></td>
+            <td><%=row.customer_id%></td>
+            <td><%=row.customer_name%></td>
+            <td><a href="/admin/trucks/edit/<%=row.truck_id%>" class="badge bg-secondary fw-normal" style="text-decoration: none;"><%=row.license_plate%></a></td>
+            <td><a href="/admin/users/edit/<%=row.driver_id%>" class="badge bg-secondary fw-normal" style="text-decoration: none;"><%=row.driver_full_name%></a></td>
+            <td><%=row.location%></td>
+            <td><%=moment(row.date).format("DD/MM/YY")%></td>
+            <td><button class="btn btn-outline-primary" onclick="window.location.href='/admin/routes/edit/<%=row.id%>'">แก้ไข</button></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+      <!-- Container -->
+    </main>
+  </div>
+
+  <%-include('includes/footer')%>
+</body>
+</html>

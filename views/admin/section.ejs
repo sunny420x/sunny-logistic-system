@@ -1,0 +1,239 @@
+<!-- Summary Cards -->
+      <section class="row g-3 g-xl-4 mb-4">
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card dashboard-card h-100">
+            <div class="card-body d-flex justify-content-between align-items-start">
+              <div>
+                <div class="text-secondary mb-2">ยอดขายทั้งหมด</div>
+                <h3 class="fw-bold mb-2">฿428,900</h3>
+                <small class="text-success"><i class="bi bi-arrow-up"></i> 12.5% จากเดือนก่อน</small>
+              </div>
+              <div class="stat-icon bg-primary-subtle text-primary"><i class="bi bi-currency-dollar"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card dashboard-card h-100">
+            <div class="card-body d-flex justify-content-between align-items-start">
+              <div>
+                <div class="text-secondary mb-2">คำสั่งซื้อ</div>
+                <h3 class="fw-bold mb-2">1,284</h3>
+                <small class="text-success"><i class="bi bi-arrow-up"></i> 8.2% จากเดือนก่อน</small>
+              </div>
+              <div class="stat-icon bg-success-subtle text-success"><i class="bi bi-bag-check"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card dashboard-card h-100">
+            <div class="card-body d-flex justify-content-between align-items-start">
+              <div>
+                <div class="text-secondary mb-2">ลูกค้าใหม่</div>
+                <h3 class="fw-bold mb-2">326</h3>
+                <small class="text-success"><i class="bi bi-arrow-up"></i> 5.7% จากเดือนก่อน</small>
+              </div>
+              <div class="stat-icon bg-warning-subtle text-warning"><i class="bi bi-people"></i></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-sm-6 col-xl-3">
+          <div class="card dashboard-card h-100">
+            <div class="card-body d-flex justify-content-between align-items-start">
+              <div>
+                <div class="text-secondary mb-2">อัตราการคืนสินค้า</div>
+                <h3 class="fw-bold mb-2">2.4%</h3>
+                <small class="text-danger"><i class="bi bi-arrow-up"></i> 0.4% จากเดือนก่อน</small>
+              </div>
+              <div class="stat-icon bg-danger-subtle text-danger"><i class="bi bi-arrow-counterclockwise"></i></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Charts -->
+      <section class="row g-3 g-xl-4 mb-4">
+        <div class="col-12 col-xl-8">
+          <div class="card dashboard-card h-100">
+            <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="fw-bold mb-1">ยอดขายรายเดือน</h5>
+                <small class="text-secondary">เปรียบเทียบยอดขายตลอด 7 เดือน</small>
+              </div>
+              <div class="dropdown">
+                <button class="btn btn-sm btn-light dropdown-toggle" data-bs-toggle="dropdown">ปี 2026</button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li><a class="dropdown-item" href="#">ปี 2026</a></li>
+                  <li><a class="dropdown-item" href="#">ปี 2025</a></li>
+                </ul>
+              </div>
+            </div>
+            <div class="card-body px-4 pb-4">
+              <div class="chart-wrap"><canvas id="salesChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-xl-4">
+          <div class="card dashboard-card h-100">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+              <h5 class="fw-bold mb-1">ช่องทางการขาย</h5>
+              <small class="text-secondary">สัดส่วนยอดขายแต่ละช่องทาง</small>
+            </div>
+            <div class="card-body px-4 pb-4">
+              <div class="chart-wrap"><canvas id="channelChart"></canvas></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Orders and Progress -->
+      <section class="row g-3 g-xl-4">
+        <div class="col-12 col-xl-8">
+          <div class="card dashboard-card">
+            <div class="card-header bg-white border-0 pt-4 px-4 d-flex justify-content-between align-items-center">
+              <div>
+                <h5 class="fw-bold mb-1">คำสั่งซื้อล่าสุด</h5>
+                <small class="text-secondary">รายการคำสั่งซื้อที่เพิ่งเข้ามา</small>
+              </div>
+              <a href="#" class="btn btn-sm btn-outline-primary">ดูทั้งหมด</a>
+            </div>
+            <div class="card-body p-0">
+              <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th class="ps-4">เลขที่</th>
+                      <th>ลูกค้า</th>
+                      <th>วันที่</th>
+                      <th>ยอดรวม</th>
+                      <th>สถานะ</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="ps-4 fw-semibold">#ORD-1048</td>
+                      <td>สมชาย ใจดี</td>
+                      <td>30 ก.ค. 2026</td>
+                      <td>฿4,590</td>
+                      <td><span class="badge text-bg-success-subtle text-success">สำเร็จ</span></td>
+                    </tr>
+                    <tr>
+                      <td class="ps-4 fw-semibold">#ORD-1047</td>
+                      <td>กัญญา พรชัย</td>
+                      <td>30 ก.ค. 2026</td>
+                      <td>฿2,350</td>
+                      <td><span class="badge text-bg-warning-subtle text-warning">กำลังจัดส่ง</span></td>
+                    </tr>
+                    <tr>
+                      <td class="ps-4 fw-semibold">#ORD-1046</td>
+                      <td>บริษัท เอ บี ซี จำกัด</td>
+                      <td>29 ก.ค. 2026</td>
+                      <td>฿18,900</td>
+                      <td><span class="badge text-bg-primary-subtle text-primary">กำลังดำเนินการ</span></td>
+                    </tr>
+                    <tr>
+                      <td class="ps-4 fw-semibold">#ORD-1045</td>
+                      <td>วราภรณ์ มีสุข</td>
+                      <td>29 ก.ค. 2026</td>
+                      <td>฿1,790</td>
+                      <td><span class="badge text-bg-danger-subtle text-danger">ยกเลิก</span></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-12 col-xl-4">
+          <div class="card dashboard-card h-100">
+            <div class="card-header bg-white border-0 pt-4 px-4">
+              <h5 class="fw-bold mb-1">เป้าหมายประจำเดือน</h5>
+              <small class="text-secondary">ความคืบหน้าของเดือนกรกฎาคม</small>
+            </div>
+            <div class="card-body px-4">
+              <div class="mb-4">
+                <div class="d-flex justify-content-between mb-2"><span>ยอดขาย</span><strong>82%</strong></div>
+                <div class="progress"><div class="progress-bar" style="width:82%"></div></div>
+              </div>
+              <div class="mb-4">
+                <div class="d-flex justify-content-between mb-2"><span>ลูกค้าใหม่</span><strong>68%</strong></div>
+                <div class="progress"><div class="progress-bar bg-success" style="width:68%"></div></div>
+              </div>
+              <div class="mb-4">
+                <div class="d-flex justify-content-between mb-2"><span>คำสั่งซื้อสำเร็จ</span><strong>91%</strong></div>
+                <div class="progress"><div class="progress-bar bg-warning" style="width:91%"></div></div>
+              </div>
+              <div>
+                <div class="d-flex justify-content-between mb-2"><span>การตอบกลับลูกค้า</span><strong>76%</strong></div>
+                <div class="progress"><div class="progress-bar bg-info" style="width:76%"></div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+        <script>
+    Chart.defaults.font.family = 'system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+    Chart.defaults.color = '#64748b';
+
+    new Chart(document.getElementById('salesChart'), {
+      type: 'line',
+      data: {
+        labels: ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.'],
+        datasets: [{
+          label: 'ยอดขาย',
+          data: [185000, 220000, 198000, 275000, 310000, 365000, 428900],
+          borderColor: '#0d6efd',
+          backgroundColor: 'rgba(13,110,253,.10)',
+          fill: true,
+          tension: .4,
+          borderWidth: 3,
+          pointRadius: 4,
+          pointBackgroundColor: '#fff',
+          pointBorderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { display: false } },
+          y: {
+            beginAtZero: true,
+            ticks: {
+              callback: value => '฿' + (value / 1000) + 'k'
+            }
+          }
+        }
+      }
+    });
+
+    new Chart(document.getElementById('channelChart'), {
+      type: 'doughnut',
+      data: {
+        labels: ['เว็บไซต์', 'Shopee', 'Lazada', 'หน้าร้าน'],
+        datasets: [{
+          data: [42, 28, 18, 12],
+          backgroundColor: ['#0d6efd', '#198754', '#ffc107', '#6f42c1'],
+          borderWidth: 0,
+          hoverOffset: 6
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        cutout: '68%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { usePointStyle: true, padding: 18 }
+          }
+        }
+      }
+    });
+  </script>

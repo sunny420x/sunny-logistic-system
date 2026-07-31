@@ -1,0 +1,118 @@
+@import url('https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
+
+:root {
+    --sidebar-width: 260px;
+    --sidebar-bg: #111827;
+    --sidebar-muted: #94a3b8;
+    --page-bg: #f3f6fb;
+}
+
+body {
+    min-height: 100vh;
+    background: var(--page-bg);
+    color: #1f2937;
+    font-family: 'Kanit';
+}
+
+.sidebar {
+    width: var(--sidebar-width);
+    background: var(--sidebar-bg);
+    color: #fff;
+}
+
+.sidebar .brand {
+    height: 72px;
+    display: flex;
+    align-items: center;
+    padding: 0 1.25rem;
+    font-weight: 700;
+    font-size: 1.15rem;
+    border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.sidebar .nav-link {
+    color: var(--sidebar-muted);
+    border-radius: .75rem;
+    padding: .8rem 1rem;
+    margin-bottom: .25rem;
+    display: flex;
+    align-items: center;
+    gap: .8rem;
+}
+
+.sidebar .nav-link:hover,
+.sidebar .nav-link.active {
+    color: #fff;
+    background: rgba(255,255,255,.1);
+}
+
+.sidebar .nav-link i {
+    font-size: 1.1rem;
+}
+
+.desktop-sidebar {
+    position: fixed;
+    inset: 0 auto 0 0;
+    z-index: 1030;
+}
+
+.main-wrapper {
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+}
+
+.topbar {
+    min-height: 72px;
+    background: rgba(255,255,255,.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid #e5e7eb;
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+}
+
+.dashboard-card {
+    border: 0;
+    border-radius: 1rem;
+    box-shadow: 0 8px 24px rgba(15, 23, 42, .06);
+}
+
+.stat-icon {
+    width: 50px;
+    height: 50px;
+    border-radius: 1rem;
+    display: grid;
+    place-items: center;
+    font-size: 1.35rem;
+}
+
+.chart-wrap {
+    height: 315px;
+}
+
+.avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.table > :not(caption) > * > * {
+    padding: .95rem .75rem;
+    vertical-align: middle;
+}
+
+.progress {
+    height: 8px;
+    border-radius: 999px;
+}
+
+@media (max-width: 991.98px) {
+    .desktop-sidebar {
+    display: none;
+    }
+
+    .main-wrapper {
+    margin-left: 0;
+    }
+}
