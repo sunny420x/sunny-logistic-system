@@ -24,6 +24,10 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
+app.get('/', (req, res) => {
+    res.redirect('/login');
+});
+
 app.get('/login', async(req,res) => {
     if(req.cookies.auth) {
         const auth = await initUserToken(req.cookies.auth)
