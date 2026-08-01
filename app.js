@@ -48,7 +48,7 @@ app.get('/login', async(req,res) => {
 
 app.get("/logout", (req,res) => {
     res.clearCookie('auth')
-    res.redirect('/login')
+    res.redirect('/')
 })
 
 app.post('/api/login', async(req,res) => {
@@ -196,7 +196,22 @@ app.get('/admin', async(req,res) => {
         users:users,
     })
 })
+app.get('/admin/help', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('dashboard')) res.end("Permission denial") //Check Permission
 
+    const customers = await getCustomers() ?? [];
+    res.render('admin/help', {
+        auth: auth,
+        page: 'help'
+    })
+})
 
 // Customers
 app.get('/admin/customers', async(req,res) => {
@@ -209,7 +224,9 @@ app.get('/admin/customers', async(req,res) => {
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
 
-    const customers = await getCustomers() ?? [];
+    const search = req.query.q ?? null
+    const customers = await getCustomers(search) ?? [];
+
     res.render('admin/customers', {
         customers: customers,
         auth: auth,
@@ -306,9 +323,10 @@ app.get('/admin/routes', async(req,res) => {
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
 
-    const date = req.query.date ?? moment().format("YYYY-MM-DD")
+    const date = req.query.date ?? null
+    const search = req.query.q ?? null
    
-    const routes = await getRoutes(date)
+    const routes = await getRoutes(date, search)
     res.render('admin/routes', {
         routes: routes,
         auth: auth,
@@ -418,8 +436,10 @@ app.get('/admin/trucks', async(req,res) => {
     if(auth.status != 'success') res.redirect('/login')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
-   
-    const trucks = await getTrucks() ?? [];
+
+    const search = req.query.q ?? null
+    const trucks = await getTrucks(search) ?? [];
+
     res.render('admin/trucks', {
         trucks: trucks,
         auth: auth,
@@ -504,7 +524,9 @@ app.get('/admin/users', async(req,res) => {
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
    
-    const users = await getUsers() ?? [];
+    const search = req.query.q ?? null
+    const users = await getUsers(search) ?? [];
+
     res.render('admin/users', {
         users: users,
         auth: auth,

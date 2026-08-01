@@ -17,12 +17,12 @@
     <%-include('includes/topbar')%>
 
     <main class="container-fluid p-3 p-lg-4">
-      <h2 class="fw-bold mb-3">ลูกค้าในระบบ <button class="btn btn-outline-primary" onclick="window.location.href='/admin/customers/add'">เพิ่มลูกค้า</button></h2>
+      <h2 class="fw-bold mb-3">👨🏻‍💼 ลูกค้าในระบบ <button class="btn btn-outline-primary" onclick="window.location.href='/admin/customers/add'">➕ เพิ่มลูกค้า</button></h2>
       <table class="table">
         <thead>
           <th>#</th>
-          <th>ชื่อลูกค้า</th>
           <th>รหัสลูกค้า</th>
+          <th>ชื่อลูกค้า</th>
           <th>พิกัดที่อยู่</th>
           <th>จัดการ</th>
         </thead>
@@ -30,9 +30,9 @@
           <% customers.forEach(row => { %>
           <tr>
             <td><%=row.id%></td>
-            <td><%=row.customer_name%></td>
             <td><%=row.customer_id%></td>
-            <td><%=row.location%></td>
+            <td><%=row.customer_name%></td>
+            <td>📍 <a href="https://map.google.co.th/?q=<%=row.location.split(',')[1] %>,<%=row.location.split(',')[0] %>" target="_blank"><%=row.location%></a></td>
             <td><button class="btn btn-outline-primary" onclick="window.location.href='/admin/customers/edit/<%=row.id%>'">แก้ไข</button></td>
           </tr>
           <% }) %>

@@ -1,15 +1,20 @@
 const db = require('../database');
 
-function getRoutes(date = null) {
+function getRoutes(date = null, search = null) {
     let query = `SELECT r.id, r.date, c.customer_name, c.customer_id, c.location, r.status, t.license_plate, u.full_name as driver_full_name, r.driver_id, t.id as truck_id 
     FROM transition_records as r 
     JOIN customers as c ON c.id = r.customer_id 
     LEFT JOIN trucks as t ON t.id = r.truck_id
     JOIN users as u ON u.id = r.driver_id `
     return new Promise(resolve => {
-        if(date != null) {
-            query += "WHERE r.date = ? "
-            db.query(query+"ORDER BY r.date DESC", [date], (err, results) => {
+        if(date != null || search != null) {
+            if(date != null) {
+                query += "WHERE r.date = ? "
+            }
+            if(search != null) {
+                query += (date != null ? "AND" : "WHERE") + " (c.customer_name LIKE ? OR c.customer_id LIKE ?) "
+            }
+            db.query(query+"ORDER BY r.date DESC", [date, `%${search}%`, `%${search}%`], (err, results) => {
                 if(err) console.error(err);
                 resolve(results)
             })

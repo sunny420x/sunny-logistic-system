@@ -6,9 +6,18 @@
     <form class="d-none d-md-block flex-grow-1" style="max-width: 420px;">
     <div class="input-group">
         <span class="input-group-text bg-light border-0"><i class="bi bi-search"></i></span>
-        <input class="form-control bg-light border-0" type="search" placeholder="ค้นหา...">
+        <input class="form-control bg-light border-0" name="q" id="topbarSearch" type="search" placeholder="ค้นหา...">
     </div>
     </form>
+
+    <script>
+        document.getElementById('topbarSearch').value = getSearchQuery() ?? ''
+
+        function getSearchQuery() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('q');
+        }
+    </script>
 
     <div class="ms-auto d-flex align-items-center gap-2">
     <!-- <button class="btn btn-light position-relative">

@@ -1,8 +1,13 @@
 const db = require('../database');
 
-function getCustomers() {
+function getCustomers(search = null) {
     return new Promise(resolve => {
-        db.query("SELECT * FROM customers ORDER BY id DESC", (err, results) => {
+        let query = "SELECT * FROM customers ";
+        if(search != null) {
+            query += "WHERE customer_name LIKE ? OR customer_id LIKE ? OR location LIKE ? ";
+        }
+        query += "ORDER BY id DESC";
+        db.query(query, [ `%${search}%`, `%${search}%`, `%${search}%` ], (err, results) => {
             if(err) console.error(err);
             resolve(results)
         })

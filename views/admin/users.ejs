@@ -17,13 +17,13 @@
     <%-include('includes/topbar')%>
 
     <main class="container-fluid p-3 p-lg-4">
-      <h2 class="fw-bold mb-3">ผู้ใช้งานระบบ <button class="btn btn-outline-primary" onclick="window.location.href='/admin/users/add'">เพิ่มผู้ใช้งานระบบ</button></h2>
+      <h2 class="fw-bold mb-3">👨🏻‍💻 ผู้ใช้งานระบบ <button class="btn btn-outline-primary" onclick="window.location.href='/admin/users/add'">➕ เพิ่มผู้ใช้งานระบบ</button></h2>
       <table class="table">
         <thead>
           <th>#</th>
           <th>ชื่อผู้ใช้</th>
-          <th>ประเภท</th>
           <th>ชื่อเต็ม</th>
+          <th>ประเภท</th>
           <th>โทรศัพท์</th>
           <th>จัดการ</th>
         </thead>
@@ -32,8 +32,8 @@
           <tr>
             <td><%=row.id%></td>
             <td><%=row.username%></td>
-            <td><div class="badge bg-primary fw-normal"><%=row.user_type%></div></td>
             <td><%=row.full_name ?? "-"%></td>
+            <td><div class="badge bg-primary fw-normal"><%=row.user_type%></div></td>
             <td><%=row.phone_number ?? "-"%></td>
             <td><button class="btn btn-outline-primary" onclick="window.location.href='/admin/users/edit/<%=row.id%>'">แก้ไข</button></td>
           </tr>

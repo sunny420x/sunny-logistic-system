@@ -9,9 +9,14 @@ function getUserTypes() {
     })
 }
 
-function getUsers() {
+function getUsers(search = null) {
     return new Promise(resolve => {
-        db.query("SELECT u.id, u.username, u.full_name, ut.name as user_type, u.phone_number, u.type_id FROM users as u JOIN user_types as ut ON ut.id = u.type_id ORDER BY u.id DESC", (err, users) => {
+        let query = "SELECT u.id, u.username, u.full_name, ut.name as user_type, u.phone_number, u.type_id FROM users as u JOIN user_types as ut ON ut.id = u.type_id ";
+        if(search != null) {
+            query += "WHERE u.username LIKE ? OR u.full_name LIKE ? OR u.phone_number LIKE ? ";
+        }
+        query += "ORDER BY u.id DESC";
+        db.query(query, [ `%${search}%`, `%${search}%`, `%${search}%` ], (err, users) => {
             if(err) console.error(err);
             resolve(users)
         })

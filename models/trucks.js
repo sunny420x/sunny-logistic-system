@@ -1,8 +1,14 @@
 const db = require('../database');
 
-function getTrucks() {
+function getTrucks(search = null) {
     return new Promise(resolve => {
-        db.query("SELECT t.id, t.license_plate FROM trucks as t ORDER BY id DESC", (err, results) => {
+        let query = "SELECT t.id, t.license_plate FROM trucks as t LEFT JOIN location_records l ON t.id = l.truck_id ";
+        if(search != null) {
+            query += "WHERE t.license_plate LIKE ? ";
+        }
+        query += "GROUP BY t.id ORDER BY id DESC";
+        
+        db.query(query, [ `%${search}%` ], (err, results) => {
             if(err) console.error(err);
             resolve(results)
         })
