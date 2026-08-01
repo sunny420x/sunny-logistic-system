@@ -70,7 +70,8 @@ async function loadMyRoute() {
                 customerId: c.customer_id,
                 customerName: c.customer_name,
                 status: c.status,
-                coords: [lon, lat]
+                coords: [lon, lat],
+                distanceFromMe: null // เพิ่มตัวแปรเก็บระยะทาง
             };
         });
 
@@ -107,32 +108,32 @@ async function loadMyRoute() {
         let nextTarget = null;
 
         if (pendingCustomers.length > 0) {
-            // สร้างพิกัดสำหรับเช็คระยะทาง: [จุดปัจจุบัน, ลูกค้าคนที่ 1, ลูกค้าคนที่ 2, ...]
             const coordsString = [
                 `${startCoords[0]},${startCoords[1]}`,
                 ...pendingCustomers.map(c => `${c.coords[0]},${c.coords[1]}`)
             ].join(';');
 
-            // ใช้ OSRM Table API เพื่อหาระยะทางจากจุดปัจจุบันไปยังทุกจุดที่เหลือ
-            const tableUrl = `https://router.project-osrm.org/table/v1/driving/${coordsString}?sources=0`;
+            // เพิ่ม &annotations=distance เพื่อดึงระยะทางหน่วยเป็น "เมตร"
+            const tableUrl = `https://router.project-osrm.org/table/v1/driving/${coordsString}?sources=0&annotations=distance`;
             const tableResponse = await fetch(tableUrl);
             const tableData = await tableResponse.json();
 
-            if (tableData.durations && tableData.durations.length > 0) {
-                // durations[0] จะเป็นอาเรย์ของเวลา/ระยะทางจากจุดเริ่มต้น (index 0) ไปยังจุดอื่นๆ (index 1, 2, 3...)
-                const distancesFromStart = tableData.durations[0]; 
+            if (tableData.distances && tableData.distances.length > 0) {
+                const distancesFromStart = tableData.distances[0]; 
                 
                 let minIndex = 1;
                 let minVal = distancesFromStart[1];
 
-                for (let i = 2; i < distancesFromStart.length; i++) {
+                // วนลูปเก็บระยะทางเข้าสู่ลูกค้าแต่ละคน และหาจุดที่ใกล้ที่สุด
+                for (let i = 1; i < pendingCustomers.length + 1; i++) {
+                    pendingCustomers[i - 1].distanceFromMe = distancesFromStart[i];
+
                     if (distancesFromStart[i] < minVal) {
                         minVal = distancesFromStart[i];
                         minIndex = i;
                     }
                 }
 
-                // จุดที่ใกล้ที่สุดคือ index ใน pendingCustomers (ต้องลบออก 1 เพราะ index 0 คือจุดเริ่มต้นของเราเอง)
                 nextTarget = pendingCustomers[minIndex - 1];
             }
         }
@@ -162,8 +163,7 @@ async function loadMyRoute() {
             }
         }
 
-        // --- จัดเรียงตาราง UI (เอาที่ส่งแล้วไว้ล่างสุด ที่เหลือเอาอันใกล้สุดขึ้นก่อน หรือแสดงตามลำดับ) ---
-        // จัดเรียงใหม่โดยเอา nextTarget ขึ้นเป็นคิวแรกสุดในตาราง (เพื่อให้สอดคล้องกับเส้นบนแผนที่)
+        // --- จัดเรียงตาราง UI ---
         let sortedRoute = [...allCustomers].sort((a, b) => {
             if (a.status === 1 && b.status !== 1) return 1;
             if (b.status === 1 && a.status !== 1) return -1;
@@ -180,9 +180,20 @@ async function loadMyRoute() {
                     <td>✅ ส่งแล้ว</td>
                 </tr>`;
             } else {
+                // แปลงระยะทางจากเมตรเป็นกิโลเมตร (ถ้ามีค่า)
+                let distText = "";
+                if (route.distanceFromMe !== null && route.distanceFromMe !== undefined) {
+                    let km = (route.distanceFromMe / 1000).toFixed(1);
+                    distText = ` <span class="text-muted" style="font-size: 0.85em;">(~${km} กม.)</span>`;
+                }
+
+                // เช็คว่าเป็นจุดถัดไปหรือไม่
+                let isNext = (nextTarget && route.id === nextTarget.id);
+                let badge = isNext ? ` <span class="badge bg-primary fw-normal ms-2">จุดถัดไป</span>` : "";
+
                 statusBarBody.innerHTML += `
                 <tr>
-                    <td>${route.customerId} - ${route.customerName}</td>
+                    <td>${route.customerId} - ${route.customerName}${distText}${badge}</td>
                     <td>
                         <a href="https://map.google.co.th/?q=${route.coords[1]},${route.coords[0]}" class="btn btn-light" target="_blank">📍 แผนที่</a>
                         <button class="btn btn-light" onclick="finishDelivery('${route.id}')">✅ ส่งแล้ว</button>
