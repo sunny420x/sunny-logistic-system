@@ -50,9 +50,8 @@ function getAllTruckLocation() {
                 ) AS rn
             FROM location_records AS lr 
             JOIN trucks AS t ON t.id = lr.truck_id 
-            JOIN transition_records AS r ON r.id = lr.route_id 
-            JOIN users AS u ON u.id = r.driver_id 
-            WHERE DATE(lr.created_at) = CURDATE()
+            JOIN users AS u ON u.id = lr.driver_id 
+            WHERE DATE(lr.created_at) = CURDATE() GROUP BY lr.truck_id 
         )
         SELECT 
             truck_id, 
@@ -70,6 +69,7 @@ function getAllTruckLocation() {
                     message: err.message
                 })
             }
+            console.log(results)
             resolve({
                 status: "success",
                 locations: results
@@ -104,5 +104,5 @@ module.exports = {
     finishDelivery,
     saveLocation,
     getAllTruckLocation,
-    getTruckLocation,
+    getTruckLocation
 }
