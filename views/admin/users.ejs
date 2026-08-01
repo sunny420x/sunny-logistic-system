@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <title>Users</title>
+  <title>ผู้ใช้งานระบบ | <%=settings.company_name%></title>
   <%-include('includes/head')%>
 </head>
 <body>
@@ -17,7 +17,7 @@
     <%-include('includes/topbar')%>
 
     <main class="container-fluid p-3 p-lg-4">
-      <h2 class="fw-bold mb-3">👨🏻‍💻 ผู้ใช้งานระบบ <button class="btn btn-outline-primary" onclick="window.location.href='/admin/users/add'">➕ เพิ่มผู้ใช้งานระบบ</button></h2>
+      <h2 class="fw-bold mb-3">👨🏻‍💻 ผู้ใช้งานระบบ <button class="btn btn-outline-primary" onclick="window.location.href='/admin/users/add'"><i class="bi bi-person-plus"></i> เพิ่มผู้ใช้งานระบบ</button></h2>
       <table class="table">
         <thead>
           <th style="width: 40px;">#</th>
@@ -36,7 +36,7 @@
             <td><div class="badge bg-primary fw-normal"><%=row.user_type%></div></td>
             <td><%=row.phone_number ?? "-"%></td>
             <td>
-              <button class="btn btn-outline-primary" onclick="window.location.href='/admin/users/edit/<%=row.id%>'">แก้ไข</button>
+              <button class="btn btn-outline-primary" onclick="window.location.href='/admin/users/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
               <button class="btn btn-outline-danger" onclick="
               Swal.fire({
                 title: 'คุณแน่ใจหรือไม่?',
@@ -52,7 +52,7 @@
                   window.location.href='/admin/users/delete/<%=row.id%>'
                 }
               })
-              ">ลบ</button>
+              "><i class="bi bi-trash3"></i> ลบ</button>
             </td>
           </tr>
           <% }) %>

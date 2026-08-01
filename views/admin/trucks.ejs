@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <title>Trucks</title>
+  <title>รถบรรทุกในระบบ | <%=settings.company_name%></title>
   <%-include('includes/head')%>
 </head>
 <body>
@@ -17,7 +17,7 @@
     <%-include('includes/topbar')%>
 
     <main class="container-fluid p-3 p-lg-4">
-      <h2 class="fw-bold mb-3">🚚 รถบรรทุกในระบบ <button class="btn btn-outline-primary" onclick="window.location.href='/admin/trucks/add'">➕ เพิ่มรถในระบบ</button></h2>
+      <h2 class="fw-bold mb-3">🚚 รถบรรทุกในระบบ <button class="btn btn-outline-primary" onclick="window.location.href='/admin/trucks/add'"><i class="bi bi-file-earmark-plus"></i> เพิ่มรถในระบบ</button></h2>
       <table class="table text-center">
         <thead>
           <th style="width: 40px;">#</th>
@@ -36,8 +36,8 @@
             <td><%=row.model ?? "-"%></td>
             <td><%=row.cost_per_km ?? 0%> บาท/กิโลเมตร</td>
             <td>
-              <button class="btn btn-outline-success" onclick="window.location.href='/admin/trucks/locations/<%=row.id%>'">ดูประวัติ</button>
-              <button class="btn btn-outline-primary" onclick="window.location.href='/admin/trucks/edit/<%=row.id%>'">แก้ไข</button>
+              <button class="btn btn-outline-success" onclick="window.location.href='/admin/trucks/locations/<%=row.id%>'"><i class="bi bi-archive"></i> ดูประวัติ</button>
+              <button class="btn btn-outline-primary" onclick="window.location.href='/admin/trucks/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
               <button class="btn btn-outline-danger" onclick="
               Swal.fire({
                 title: 'คุณแน่ใจหรือไม่?',
@@ -53,7 +53,7 @@
                   window.location.href='/admin/trucks/delete/<%=row.id%>'
                 }
               })
-              ">ลบ</button>
+              "><i class="bi bi-trash3"></i> ลบ</button>
             </td>
           </tr>
           <% }) %>

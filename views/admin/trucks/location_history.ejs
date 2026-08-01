@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <title>Location History</title>
+  <title>ประวัติพิกัดรถขนส่ง | <%=settings.company_name%></title>
   <%-include('../includes/head')%>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.10.0/ol.css">
   <style>
@@ -27,79 +27,97 @@
     <%-include('../includes/topbar')%>
 
     <main class="container-fluid p-3 p-lg-4">
-      <h2 class="fw-bold mb-3">📍 ประวัติพิกัดรถขนส่ง</h2>
-      <div id="map"></div>
-      <script src="https://cdn.jsdelivr.net/npm/ol@v10.10.0/dist/ol.js"></script>
-      <script>
-        let map = null
-        let vectorSource = null;
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div class="d-flex">
+                <h2 class="fw-bold mb-3">📍 ประวัติพิกัดรถขนส่ง</h2>
+            </div>
+            <form action="" method="get" class="d-flex gap-2">
+                <div class="d-flex gap-2">
+                    <input type="date" class="form-control" name="date" id="dateSearch" value="<% if(locals.date) {%><%=date%><%} else {%><%=moment().format('YYYY-MM-DD')%><%}%>">
+                    <button class="btn btn-outline-primary" style="width: 200px;"><i class="bi bi-filter"></i> กรองวันที่</button>
+                </div>
+            </form>
+            <script>
+                document.getElementById('dateSearch').value = getSearchQuery() ?? ''
 
-        function initializeMap() {
-            vectorSource = new ol.source.Vector();
-            const vectorLayer = new ol.layer.Vector({ source: vectorSource });
-
-            map = new ol.Map({
-                target: 'map',
-                layers: [
-                    new ol.layer.Tile({ source: new ol.source.OSM() }),
-                    vectorLayer
-                ],
-                view: new ol.View({ 
-                    center: ol.proj.fromLonLat([98.9817, 18.7883]), 
-                    zoom: 14 
-                })
-            });
-        }
-
-        async function updateTruckLocations() {
-            try {
-                const response = await fetch("/api/driver/getTruckLocation/<%=truck_id%>");
-
-                if (!response.ok) {
-                    throw new Error("ดึงข้อมูลจากหลังบ้านไม่สำเร็จ");
+                function getSearchQuery() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    return urlParams.get('date');
                 }
+            </script>
+        </div>
+        <div id="map"></div>
+        <script src="https://cdn.jsdelivr.net/npm/ol@v10.10.0/dist/ol.js"></script>
+        <script>
+            let map = null
+            let vectorSource = null;
 
-                const data = await response.json();
+            function initializeMap() {
+                vectorSource = new ol.source.Vector();
+                const vectorLayer = new ol.layer.Vector({ source: vectorSource });
 
-                // เคลียร์เฉพาะ Marker เก่าออกจาก VectorSource (ไม่กระทบตัวแผนที่)
-                vectorSource.clear();
+                map = new ol.Map({
+                    target: 'map',
+                    layers: [
+                        new ol.layer.Tile({ source: new ol.source.OSM() }),
+                        vectorLayer
+                    ],
+                    view: new ol.View({ 
+                        center: ol.proj.fromLonLat([98.9817, 18.7883]), 
+                        zoom: 14 
+                    })
+                });
+            }
 
-                // วนลูปสร้าง Marker ใหม่
-                data.locations.forEach(truck => {
-                    const marker = new ol.Feature({ 
-                        geometry: new ol.geom.Point(ol.proj.fromLonLat([
-                            parseFloat(truck.position_longitude),
-                            parseFloat(truck.position_latitude)
-                        ])) 
+            async function updateTruckLocations() {
+                try {
+                    const response = await fetch("/api/driver/getTruckLocation/<%=truck_id%>/<%=date%>");
+
+                    if (!response.ok) {
+                        throw new Error("ดึงข้อมูลจากหลังบ้านไม่สำเร็จ");
+                    }
+
+                    const data = await response.json();
+
+                    // เคลียร์เฉพาะ Marker เก่าออกจาก VectorSource (ไม่กระทบตัวแผนที่)
+                    vectorSource.clear();
+
+                    // วนลูปสร้าง Marker ใหม่
+                    data.locations.forEach(truck => {
+                        const marker = new ol.Feature({ 
+                            geometry: new ol.geom.Point(ol.proj.fromLonLat([
+                                parseFloat(truck.position_longitude),
+                                parseFloat(truck.position_latitude)
+                            ])) 
+                        });
+
+                        marker.setStyle(new ol.style.Style({
+                            image: new ol.style.Icon({ anchor: [0.5, 1], src: '/icons/marker-pending.png', scale: 0.5 }),
+                            text: new ol.style.Text({
+                                text: `${moment(truck.created_at).format('YYYY-MM-DD HH:mm:ss')} - ${truck.driver_full_name}`,
+                                font: 'bold 13px Kanit',
+                                offsetY: -35,
+                                fill: new ol.style.Fill({ color: '#000000' }),
+                                stroke: new ol.style.Stroke({ color: '#FFFFFF', width: 3 })
+                            })
+                        }));
+
+                        vectorSource.addFeature(marker);
                     });
 
-                    marker.setStyle(new ol.style.Style({
-                        image: new ol.style.Icon({ anchor: [0.5, 1], src: '/icons/marker-pending.png', scale: 0.5 }),
-                        text: new ol.style.Text({
-                            text: `${moment(truck.created_at).format('YYYY-MM-DD HH:mm:ss')} - ${truck.driver_full_name}`,
-                            font: 'bold 13px Kanit',
-                            offsetY: -35,
-                            fill: new ol.style.Fill({ color: '#000000' }),
-                            stroke: new ol.style.Stroke({ color: '#FFFFFF', width: 3 })
-                        })
-                    }));
-
-                    vectorSource.addFeature(marker);
-                });
-
-            } catch (error) {
-                console.error("เกิดข้อผิดพลาดในการอัปเดตพิกัด:", error);
+                } catch (error) {
+                    console.error("เกิดข้อผิดพลาดในการอัปเดตพิกัด:", error);
+                }
             }
-        }
 
-        initializeMap();
+            initializeMap();
 
-        updateTruckLocations();
-
-        setInterval(() => {
             updateTruckLocations();
-        }, 10000);
-      </script>
+
+            setInterval(() => {
+                updateTruckLocations();
+            }, 10000);
+        </script>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
   </div>
