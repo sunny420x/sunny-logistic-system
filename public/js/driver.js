@@ -36,8 +36,7 @@ async function loadMyRoute() {
 
         truck_id = customers[0].truck_id;
 
-        document.getElementById('license_plate').innerText = customers[0].license_plate
-        document.getElementById('weight').innerText = customers[0].weight
+        document.getElementById('license_plate').innerText = customers[0].license_plate;
         
         vectorSource.clear();
 
@@ -59,20 +58,32 @@ async function loadMyRoute() {
             })
         }));
 
-        if (customers.some(customer => customer.status == 0)) {                    
+        if (customers.some(customer => customer.status == 0)) {            
             vectorSource.addFeature(startMarker);
         }
 
-        customers.forEach(customer => {
-            const [lon, lat] = customer.location.split(',').map(Number);
+        // แปลงข้อมูลลูกค้าทั้งหมดเตรียมไว้
+        let allCustomers = customers.map(c => {
+            const [lon, lat] = c.location.split(',').map(Number);
+            return {
+                id: c.id,
+                customerId: c.customer_id,
+                customerName: c.customer_name,
+                status: c.status,
+                coords: [lon, lat]
+            };
+        });
+
+        // วาด Marker ลูกค้าทุกคนลงแผนที่ตามปกติ
+        allCustomers.forEach(customer => {
             const marker = new ol.Feature({ 
-                geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat])) 
+                geometry: new ol.geom.Point(ol.proj.fromLonLat(customer.coords)) 
             });
             let markerIcon = customer.status == 1 ? '/icons/marker-success.png' : '/icons/marker-pending.png';
             marker.setStyle(new ol.style.Style({
                 image: new ol.style.Icon({ anchor: [0.5, 1], src: markerIcon, scale: 0.5 }),
                 text: new ol.style.Text({
-                    text: `${customer.customer_id} - ${customer.customer_name}`,
+                    text: `${customer.customerId} - ${customer.customerName}`,
                     font: 'bold 13px Kanit',
                     offsetY: -35,
                     fill: new ol.style.Fill({ color: '#000000' }),
@@ -82,116 +93,108 @@ async function loadMyRoute() {
             vectorSource.addFeature(marker);
         });
 
-        if(customers.every(route => route.status == 1)) {
+        if(allCustomers.every(route => route.status == 1)) {
             statusBarBody.innerHTML += `
             <tr>
                 <td colspan="2" class="text-success text-center">🎉 ส่งงานทั้งหมดเรียบร้อยแล้ว</td>
             </tr>`;
+            return;
         }
 
-        const allCoordsStrings = [
-            `${startCoords[0]},${startCoords[1]}`,
-            ...customers.map(c => {
-                const [lon, lat] = c.location.split(',');
-                return `${lon.trim()},${lat.trim()}`;
-            })
-        ];
-        const pathCoordinates = allCoordsStrings.join(';');
+        // --- กรองเฉพาะจุดที่ยังไม่ส่ง (status != 1) มาคำนวณหาตัวที่ใกล้ที่สุด ---
+        const pendingCustomers = allCustomers.filter(c => c.status != 1);
 
-        const tripUrl = `https://router.project-osrm.org/trip/v1/driving/${pathCoordinates}?source=first&destination=any&roundtrip=false&overview=full&geometries=geojson`;
+        let nextTarget = null;
 
-        const osrmResponse = await fetch(tripUrl);
-        const data = await osrmResponse.json();
+        if (pendingCustomers.length > 0) {
+            // สร้างพิกัดสำหรับเช็คระยะทาง: [จุดปัจจุบัน, ลูกค้าคนที่ 1, ลูกค้าคนที่ 2, ...]
+            const coordsString = [
+                `${startCoords[0]},${startCoords[1]}`,
+                ...pendingCustomers.map(c => `${c.coords[0]},${c.coords[1]}`)
+            ].join(';');
 
-        if (data.trips && data.trips.length > 0) {
-            const routeCoords = data.trips[0].geometry.coordinates;
-            const transformedRouteCoords = routeCoords.map(coord => ol.proj.fromLonLat(coord));
+            // ใช้ OSRM Table API เพื่อหาระยะทางจากจุดปัจจุบันไปยังทุกจุดที่เหลือ
+            const tableUrl = `https://router.project-osrm.org/table/v1/driving/${coordsString}?sources=0`;
+            const tableResponse = await fetch(tableUrl);
+            const tableData = await tableResponse.json();
 
-            const routeFeature = new ol.Feature({
-                geometry: new ol.geom.LineString(transformedRouteCoords)
-            });
+            if (tableData.durations && tableData.durations.length > 0) {
+                // durations[0] จะเป็นอาเรย์ของเวลา/ระยะทางจากจุดเริ่มต้น (index 0) ไปยังจุดอื่นๆ (index 1, 2, 3...)
+                const distancesFromStart = tableData.durations[0]; 
+                
+                let minIndex = 1;
+                let minVal = distancesFromStart[1];
 
-            if (customers.some(customer => customer.status == 0)) {                    
-                const lineColor = "#0047AB";
+                for (let i = 2; i < distancesFromStart.length; i++) {
+                    if (distancesFromStart[i] < minVal) {
+                        minVal = distancesFromStart[i];
+                        minIndex = i;
+                    }
+                }
+
+                // จุดที่ใกล้ที่สุดคือ index ใน pendingCustomers (ต้องลบออก 1 เพราะ index 0 คือจุดเริ่มต้นของเราเอง)
+                nextTarget = pendingCustomers[minIndex - 1];
+            }
+        }
+
+        // ถ้าหาจุดถัดไปเจอ ให้ดึงเส้นทางเฉพาะจุดปัจจุบันไปหาจุดนั้นมาวาด
+        if (nextTarget) {
+            const routeUrl = `https://router.project-osrm.org/route/v1/driving/${startCoords[0]},${startCoords[1]};${nextTarget.coords[0]},${nextTarget.coords[1]}?overview=full&geometries=geojson`;
+            
+            const routeResponse = await fetch(routeUrl);
+            const routeData = await routeResponse.json();
+
+            if (routeData.routes && routeData.routes.length > 0) {
+                const singleRouteCoords = routeData.routes[0].geometry.coordinates;
+                const transformedRouteCoords = singleRouteCoords.map(coord => ol.proj.fromLonLat(coord));
+
+                const routeFeature = new ol.Feature({
+                    geometry: new ol.geom.LineString(transformedRouteCoords)
+                });
+
                 routeFeature.setStyle(new ol.style.Style({
                     stroke: new ol.style.Stroke({
-                        color: lineColor,
+                        color: "#0047AB",
                         width: 5
                     })
                 }));
                 vectorSource.addFeature(routeFeature);
             }
-
-            // --- B. จัดลำดับคิวและอัปเดตลง Table UI ---
-            const waypoints = data.waypoints;
-            const sortedRoute = waypoints
-                .map(wp => {
-                    const inputIndex = wp.waypoint_index;
-                    const queueOrder = wp.trips_index;
-
-                    let customerData = null;
-
-                    if (inputIndex === 0) {
-                        customerData = { id: 'START', name: 'World Chemical' };
-                    } else {
-                        const actualCustomer = customers[inputIndex - 1];
-                        if (actualCustomer) {
-                            customerData = {
-                                id: actualCustomer.customer_id,
-                                status: actualCustomer.status,
-                                route_id: actualCustomer.id,
-                                name: actualCustomer.customer_name
-                            };
-                        } else {
-                            customerData = { id: 'UNKNOWN', name: 'ไม่พบข้อมูลลูกค้า' };
-                        }
-                    }
-
-                    return {
-                        id: customerData.route_id,
-                        status: customerData.status,
-                        queueNumber: queueOrder,
-                        customerId: customerData.id,
-                        customerName: customerData.name,
-                        coords: wp.location,
-                        distance: wp.distance
-                    };
-                })
-                .sort((a, b) => {
-                    if (a.customerId === 'START') return -1;
-                    if (b.customerId === 'START') return 1;
-                    if (a.status === 1 && b.status !== 1) return 1;
-                    if (b.status === 1 && a.status !== 1) return -1;
-                    return a.queueNumber - b.queueNumber;
-                });
-
-            sortedRoute.forEach((route, index) => {
-                if (index === 0) return;
-
-                if (route.status == 1) {
-                    statusBarBody.innerHTML += `
-                    <tr style="opacity: 0.4;">
-                        <td>${route.customerId} - ${route.customerName}</td>
-                        <td>✅ ส่งแล้ว</td>
-                    </tr>`;
-                } else {
-                    statusBarBody.innerHTML += `
-                    <tr>
-                        <td>${route.customerId} - ${route.customerName}</td>
-                        <td>
-                            <a href="https://map.google.co.th/?q=${route.coords[1]},${route.coords[0]}" class="btn btn-light" target="_blank">📍 แผนที่</a>
-                            <button class="btn btn-light" onclick="finishDelivery('${route.id}')">✅ ส่งแล้ว</button>
-                        </td>
-                    </tr>`;
-                }
-            });
         }
+
+        // --- จัดเรียงตาราง UI (เอาที่ส่งแล้วไว้ล่างสุด ที่เหลือเอาอันใกล้สุดขึ้นก่อน หรือแสดงตามลำดับ) ---
+        // จัดเรียงใหม่โดยเอา nextTarget ขึ้นเป็นคิวแรกสุดในตาราง (เพื่อให้สอดคล้องกับเส้นบนแผนที่)
+        let sortedRoute = [...allCustomers].sort((a, b) => {
+            if (a.status === 1 && b.status !== 1) return 1;
+            if (b.status === 1 && a.status !== 1) return -1;
+            if (nextTarget && a.id === nextTarget.id) return -1;
+            if (nextTarget && b.id === nextTarget.id) return 1;
+            return 0;
+        });
+
+        sortedRoute.forEach(route => {
+            if (route.status == 1) {
+                statusBarBody.innerHTML += `
+                <tr style="opacity: 0.4;">
+                    <td>${route.customerId} - ${route.customerName}</td>
+                    <td>✅ ส่งแล้ว</td>
+                </tr>`;
+            } else {
+                statusBarBody.innerHTML += `
+                <tr>
+                    <td>${route.customerId} - ${route.customerName}</td>
+                    <td>
+                        <a href="https://map.google.co.th/?q=${route.coords[1]},${route.coords[0]}" class="btn btn-light" target="_blank">📍 แผนที่</a>
+                        <button class="btn btn-light" onclick="finishDelivery('${route.id}')">✅ ส่งแล้ว</button>
+                    </td>
+                </tr>`;
+            }
+        });
 
     } catch (error) {
         console.error("เกิดข้อผิดพลาดในการโหลดแผนที่และเส้นทาง:", error);
     }
 }
-
 initMap();
 
 function finishDelivery(route_id) {
