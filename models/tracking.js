@@ -69,7 +69,6 @@ function getAllTruckLocation() {
                     message: err.message
                 })
             }
-            console.log(results)
             resolve({
                 status: "success",
                 locations: results
