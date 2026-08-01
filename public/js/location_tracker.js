@@ -55,10 +55,12 @@ getUserLocation();
 const watchId = navigator.geolocation.watchPosition(
   (position) => {
     console.log(`Updated Lat: ${position.coords.latitude}, Lon: ${position.coords.longitude}`);
-    position_latitude = position.coords.latitude
-    position_longitude = position.coords.longitude
-    loadMyRoute()
-    sendLocationToServer(truck_id, position_latitude, position_longitude)
+    if(position.coords.latitude != position_latitude || position.coords.longitude != position_longitude) {
+      position_latitude = position.coords.latitude
+      position_longitude = position.coords.longitude
+      loadMyRoute()
+      sendLocationToServer(position_latitude, position_longitude)
+    }
   },
   (error) => console.error(error),
   { enableHighAccuracy: true }
@@ -67,18 +69,21 @@ const watchId = navigator.geolocation.watchPosition(
 // Stop
 // navigator.geolocation.clearWatch(watchId);
 
-function sendLocationToServer(truck_id = 0, position_latitude, position_longitude) {
-    fetch(`/api/saveLocation/${truck_id}/${position_latitude}/${position_longitude}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`เซิร์ฟเวอร์ตอบกลับด้วยสถานะ: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log("📥 ข้อมูลตอบกลับจากเซิร์ฟเวอร์:", data);
-        })
-        .catch(error => {
-            console.error("❌ เกิดข้อผิดพลาดในการ Fetch ข้อมูล:", error);
-        });
+function sendLocationToServer(position_latitude, position_longitude) {
+  if(truck_id == null || driver_id == null || position_latitude == null || position_longitude == null) {
+    return;
+  }
+  fetch(`/api/saveLocation/${truck_id}/${driver_id}/${position_latitude}/${position_longitude}`)
+      .then(response => {
+          if (!response.ok) {
+              throw new Error(`เซิร์ฟเวอร์ตอบกลับด้วยสถานะ: ${response.status}`);
+          }
+          return response.json();
+      })
+      .then(data => {
+          console.log("📥 ข้อมูลตอบกลับจากเซิร์ฟเวอร์:", data);
+      })
+      .catch(error => {
+          console.error("❌ เกิดข้อผิดพลาดในการ Fetch ข้อมูล:", error);
+      });
 }

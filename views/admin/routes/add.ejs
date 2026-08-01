@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <title>Customers</title>
+  <title>เพิ่มคิวส่งของ</title>
   <%-include('../includes/head')%>
 </head>
 <body>
@@ -48,6 +48,10 @@
             <div class="form-group mb-3">                
                 <label for="location">วันที่: </label>
                 <input type="date" name="date" class="form-control" required>
+            </div>
+            <div class="form-group mb-3">                
+                <label for="location">น้ำหนักบรรทุก: </label>
+                <input type="number" name="weight" class="form-control" required>
             </div>
             <input type="submit" value="เพิ่มลูกค้า" class="btn btn-primary">
           </form>

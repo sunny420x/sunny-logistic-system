@@ -18,20 +18,43 @@
 
     <main class="container-fluid p-3 p-lg-4">
       <h2 class="fw-bold mb-3">🚚 รถบรรทุกในระบบ <button class="btn btn-outline-primary" onclick="window.location.href='/admin/trucks/add'">➕ เพิ่มรถในระบบ</button></h2>
-      <table class="table">
+      <table class="table text-center">
         <thead>
-          <th>#</th>
-          <th>ทะเบียนรถ</th>
-          <th>พิกัดที่อยู่</th>
-          <th>จัดการ</th>
+          <th style="width: 40px;">#</th>
+          <th style="width: 150px;">ทะเบียนรถ</th>
+          <th style="width: 150px;">ยี่ห้อ</th>
+          <th style="width: 150px;">รุ่น</th>
+          <th style="width: 350px;">ค่าใช้จ่าย/กิโลเมตร</th>
+          <th style="width: 250px;">จัดการ</th>
         </thead>
         <tbody>
           <% trucks.forEach(row => { %>
           <tr>
             <td><%=row.id%></td>
-            <td><%=row.license_plate%></td>
-            <td><%=row.location ?? "-"%></td>
-            <td><button class="btn btn-outline-primary" onclick="window.location.href='/admin/trucks/edit/<%=row.id%>'">แก้ไข</button></td>
+            <td><span class="badge bg-secondary fs-6 fw-normal"><%=row.license_plate%></span></td>
+            <td><%=row.brand ?? "-"%></td>
+            <td><%=row.model ?? "-"%></td>
+            <td><%=row.cost_per_km ?? 0%> บาท/กิโลเมตร</td>
+            <td>
+              <button class="btn btn-outline-success" onclick="window.location.href='/admin/trucks/locations/<%=row.id%>'">ดูประวัติ</button>
+              <button class="btn btn-outline-primary" onclick="window.location.href='/admin/trucks/edit/<%=row.id%>'">แก้ไข</button>
+              <button class="btn btn-outline-danger" onclick="
+              Swal.fire({
+                title: 'คุณแน่ใจหรือไม่?',
+                text: 'คุณต้องการลบรถคันนี้ออกจากระบบ',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'ใช่, ลบเลย!',
+                cancelButtonText: 'ยกเลิก'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.href='/admin/trucks/delete/<%=row.id%>'
+                }
+              })
+              ">ลบ</button>
+            </td>
           </tr>
           <% }) %>
         </tbody>

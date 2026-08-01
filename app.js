@@ -10,7 +10,7 @@ const { getCustomers, getCustomerById, addCustomers, editCustomer } = require('.
 const { getDashboardAllPackages, getDashboardCustomers, getDashboardDelivered, getDashboardUsers } = require('./models/dashboard')
 const { getTrucks, getTruckById, addTruck, editTruck } = require('./models/trucks')
 const { getRoutes, getMyRoutes, getRouteById, addRoute, editRoute } = require('./models/routes')
-const { finishDelivery, saveLocation, getAllTruckLocation } = require('./models/tracking')
+const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation } = require('./models/tracking')
 const { getSettings, saveSettings } = require('./models/settings')
 const { loginUser, getUsers, registerUser, getUserTypes, getUserById, editUser, getDrivers, initUserToken } = require('./models/users')
 
@@ -90,9 +90,9 @@ app.get('/driver/myRoute', async(req, res) => {
     if(auth.status != 'success') res.redirect('/login')
     
     res.render('driver', {
-        truck_id: 1,
         driver_id: auth.user.id,
-        auth: auth
+        auth: auth,
+        settings: await getSettings(),
     });
 });
 
@@ -112,6 +112,12 @@ app.get('/api/driver/getMyRoute', async(req,res) => {
 
 app.get('/api/driver/getAllTruckLocation', async(req,res) => {
     const data = await getAllTruckLocation()
+    res.json(data)
+})
+
+app.get('/api/driver/getTruckLocation/:driver_id', async(req,res) => {
+    const driver_id = req.params.driver_id;
+    const data = await getTruckLocation(driver_id)
     res.json(data)
 })
 
@@ -143,13 +149,14 @@ app.get('/api/finishDelivery/:id', async (req, res) => {
     }
 });
 
-app.get('/api/saveLocation/:truck_id/:position_latitude/:position_longitude', async (req, res) => {
+app.get('/api/saveLocation/:truck_id/:driver_id/:position_latitude/:position_longitude', async (req, res) => {
     try {
         const truck_id = req.params.truck_id;
+        const driver_id = req.params.driver_id;
         const position_latitude = req.params.position_latitude;
         const position_longitude = req.params.position_longitude;
-        
-        const result = await saveLocation(truck_id, position_latitude, position_longitude);
+
+        const result = await saveLocation(truck_id, driver_id, position_latitude, position_longitude);
 
         if (result === "success" || (result && result.status === "success")) {
             return res.json({
@@ -370,8 +377,9 @@ app.post('/admin/routes/add', async(req,res) => {
     const truck_id = req.body.truck_id
     const driver_id = req.body.driver_id
     const date = req.body.date
+    const weight = req.body.weight
 
-    addRoute(customer_id, truck_id, driver_id, date).then(() => {
+    addRoute(customer_id, truck_id, driver_id, date, weight).then(() => {
         res.redirect('/admin/routes')
     })
 })
@@ -416,8 +424,9 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
     const truck_id = req.body.truck_id
     const driver_id = req.body.driver_id
     const date = req.body.date
+    const weight = req.body.weight
 
-    editRoute(id, customer_id, truck_id, driver_id, date).then(() => {
+    editRoute(id, customer_id, truck_id, driver_id, date, weight).then(() => {
         res.redirect('/admin/routes/edit/'+id)
     })
 })
@@ -472,8 +481,11 @@ app.post('/admin/trucks/add', async(req,res) => {
     if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
    
     const license_plate = req.body.license_plate
+    const brand = req.body.brand
+    const model = req.body.model
+    const cost_per_km = req.body.cost_per_km ?? 0
 
-    addTruck(license_plate).then(() => {
+    addTruck(license_plate, brand, model, cost_per_km).then(() => {
         res.redirect('/admin/trucks')
     })
 })
@@ -507,12 +519,34 @@ app.post('/admin/trucks/edit/:id', async(req,res) => {
    
     const id = req.params.id
     const license_plate = req.body.license_plate
+    const brand = req.body.brand
+    const model = req.body.model
+    const cost_per_km = req.body.cost_per_km ?? 0
 
-    editTruck(id, license_plate).then(() => {
+    editTruck(id, license_plate, brand, model, cost_per_km).then(() => {
         res.redirect('/admin/trucks/edit/'+id)
     })
 })
 
+app.get('/admin/trucks/locations/:id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
+   
+    const locations = await getTruckLocation(req.params.id)
+
+    res.render('admin/trucks/location_history', {
+        locations: locations,
+        truck_id: req.params.id,
+        auth: auth,
+        page: 'routes'
+    })
+})
 //Users
 app.get('/admin/users', async(req,res) => {
     if(!req.cookies.auth) {

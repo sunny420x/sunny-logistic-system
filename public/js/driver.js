@@ -1,5 +1,7 @@
 let map = null;
 let vectorSource = null;
+let truck_id = null;
+let driver_id = null;
 
 // 1. ฟังก์ชันสร้าง Map ครั้งแรกครั้งเดียว
 function initMap() {
@@ -32,7 +34,10 @@ async function loadMyRoute() {
 
         const customers = await response.json();
 
+        truck_id = customers[0].truck_id;
+
         document.getElementById('license_plate').innerText = customers[0].license_plate
+        document.getElementById('weight').innerText = customers[0].weight
         
         vectorSource.clear();
 
@@ -63,9 +68,9 @@ async function loadMyRoute() {
             const marker = new ol.Feature({ 
                 geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat])) 
             });
-            
+            let markerIcon = customer.status == 1 ? '/icons/marker-success.png' : '/icons/marker-pending.png';
             marker.setStyle(new ol.style.Style({
-                image: new ol.style.Icon({ anchor: [0.5, 1], src: '/icons/location-marker.png', scale: 0.5 }),
+                image: new ol.style.Icon({ anchor: [0.5, 1], src: markerIcon, scale: 0.5 }),
                 text: new ol.style.Text({
                     text: `${customer.customer_id} - ${customer.customer_name}`,
                     font: 'bold 13px Kanit',
@@ -76,6 +81,13 @@ async function loadMyRoute() {
             }));
             vectorSource.addFeature(marker);
         });
+
+        if(customers.every(route => route.status == 1)) {
+            statusBarBody.innerHTML += `
+            <tr>
+                <td colspan="2" class="text-success text-center">🎉 ส่งงานทั้งหมดเรียบร้อยแล้ว</td>
+            </tr>`;
+        }
 
         const allCoordsStrings = [
             `${startCoords[0]},${startCoords[1]}`,
@@ -112,7 +124,6 @@ async function loadMyRoute() {
 
             // --- B. จัดลำดับคิวและอัปเดตลง Table UI ---
             const waypoints = data.waypoints;
-
             const sortedRoute = waypoints
                 .map(wp => {
                     const inputIndex = wp.waypoint_index;
@@ -136,8 +147,6 @@ async function loadMyRoute() {
                         }
                     }
 
-                    console.log(wp)
-
                     return {
                         id: customerData.route_id,
                         status: customerData.status,
@@ -148,25 +157,31 @@ async function loadMyRoute() {
                         distance: wp.distance
                     };
                 })
-                .sort((a, b) => a.queueNumber - b.queueNumber);
+                .sort((a, b) => {
+                    if (a.customerId === 'START') return -1;
+                    if (b.customerId === 'START') return 1;
+                    if (a.status === 1 && b.status !== 1) return 1;
+                    if (b.status === 1 && a.status !== 1) return -1;
+                    return a.queueNumber - b.queueNumber;
+                });
 
-            // แสดงรายการลงใน Table (ข้าม Index 0 ที่เป็นจุดเริ่มต้น)
             sortedRoute.forEach((route, index) => {
                 if (index === 0) return;
 
                 if (route.status == 1) {
                     statusBarBody.innerHTML += `
                     <tr style="opacity: 0.4;">
-                        <td>✅ ${route.customerId} - ${route.customerName}</td>
-                        <td colspan="2" class="text-center"><div class="badge bg-success fs-7 fw-normal w-100">ส่งแล้ว</div></td>
+                        <td>${route.customerId} - ${route.customerName}</td>
+                        <td>✅ ส่งแล้ว</td>
                     </tr>`;
                 } else {
-                    console.log(route)
                     statusBarBody.innerHTML += `
                     <tr>
-                        <td>📍 ${route.customerId} - ${route.customerName}</td>
-                        <td><a href="https://map.google.co.th/?q=${route.coords[1]},${route.coords[0]}" class="btn btn-light" target="_blank">🧭 เปิดแผนที่</a></td>
-                        <td><button class="btn btn-light" onclick="finishDelivery('${route.id}')">✅ ส่งแล้ว</button></td>
+                        <td>${route.customerId} - ${route.customerName}</td>
+                        <td>
+                            <a href="https://map.google.co.th/?q=${route.coords[1]},${route.coords[0]}" class="btn btn-light" target="_blank">📍 แผนที่</a>
+                            <button class="btn btn-light" onclick="finishDelivery('${route.id}')">✅ ส่งแล้ว</button>
+                        </td>
                     </tr>`;
                 }
             });

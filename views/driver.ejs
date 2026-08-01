@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>OpenLayers with Express & EJS - Optimized Route</title>
+    <title>Sunny's Logistic</title>
     <%-include('includes/head')%>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.10.0/ol.css">
     <style>
@@ -34,14 +34,6 @@
                 margin: 10px;
             }
 
-            table {
-                padding: 20px;
-
-                td {
-                    padding: 10px;
-                }
-            }
-
             .statusContainer {
                 width: 100%;
                 display: block;
@@ -52,6 +44,9 @@
                     overflow: auto;
                 }
             }
+            .statusContainer .content {
+                padding: 20px;
+            }
         }
 
         @media screen and (max-width: 1200px) {
@@ -61,7 +56,7 @@
 
             #map {
                 width: 100%;
-                height: 60vh;
+                height: calc(100vh - 190px);
             }
 
             .statusBar {
@@ -69,13 +64,32 @@
                 height: 100%;
                 position: static;
                 height: max-content;
+                border-bottom: 2px solid #ccc;
             }
             
             .statusBar .statusContainer {
                 width: 100%;
             }
             .statusBar .statusContainer .content {
-                height: 20vh;
+                padding: 0px;
+                height: 130px;
+            }
+
+            #driverInfo,#pageTitle {
+                display: none;
+            }
+
+            table {
+                width: 100%;
+                font-size: 14px;
+                padding: 0;
+                margin: 0;
+
+                .btn {
+                    width: 100%;
+                    font-size: 14px;
+                    margin-bottom: 5px;
+                }
             }
         }
     </style>
@@ -85,17 +99,18 @@
         <div class="statusBar">
             <div class="statusContainer">
                 <%-include('includes/nav')%>
-                <h2 class="text-center mt-4">🚚 เส้นทางส่งสินค้า</h2>
-                <ul class="px-4 pt-2 list-group">
+                <h2 class="text-center mt-4" id="pageTitle">🚚 เส้นทางส่งสินค้า</h2>
+                <ul class="px-4 pt-2 list-group" id="driverInfo">
                     <li class="list-group-item">ชื่อ: <%=auth.user.full_name%></li>
                     <li class="list-group-item">ทะเบียนรถ: <span id="license_plate">-</span></li>
+                    <li class="list-group-item">น้ำหนักบรรทุก: <span id="weight">-</span> กิโลกรัม</li>
                 </ul>
                 <div class="content">
-                    <div class="p-4">
+                    <div class="table-responsive">
                         <table class="table">
                             <thead>
                                 <th>ชื่อลูกค้า</th>
-                                <th colspan="2" style="width: 40%;">จัดการ</th>
+                                <th style="width: 50%;">จัดการ</th>
                             </thead>
                             <tbody id="statusBarBody">
             
@@ -109,12 +124,11 @@
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/ol@v10.10.0/dist/ol.js"></script>
+    <script src="/js/driver.js"></script>
     <script>
-        let truck_id = "<%=truck_id%>"
-        let driver_id = "<%=driver_id%>"
+        driver_id = "<%=driver_id%>"
     </script>
     <script src="/js/location_tracker.js"></script>
-    <script src="/js/driver.js"></script>
     <%-include('includes/footer')%>
 </body>
 </html>

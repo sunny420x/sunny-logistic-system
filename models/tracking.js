@@ -17,10 +17,10 @@ function finishDelivery(id, finish_at) {
     })
 }
 
-function saveLocation(truck_id, position_latitude, position_longitude) {
+function saveLocation(truck_id, driver_id, position_latitude, position_longitude) {
     return new Promise(resolve => {
         const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
-        db.query("INSERT INTO location_records(truck_id, position_latitude, position_longitude, created_at) VALUES(?,?,?,?)", [truck_id, position_latitude, position_longitude,created_at], (err) => {
+        db.query("INSERT INTO location_records(truck_id, driver_id, position_latitude, position_longitude, created_at) VALUES(?,?,?,?,?)", [truck_id, driver_id, position_latitude, position_longitude,created_at], (err) => {
             if(err) {
                 resolve({
                     status: "error",
@@ -36,12 +36,56 @@ function saveLocation(truck_id, position_latitude, position_longitude) {
 
 function getAllTruckLocation() {
     return new Promise(resolve => {
-        db.query(`SELECT DISTINCT lr.truck_id, lr.position_latitude, lr.position_longitude, t.license_plate, lr.created_at, u.full_name 
-            FROM location_records as lr 
-            JOIN trucks as t ON t.id = lr.truck_id 
-            JOIN users as u ON u.id = lr.driver_id 
-            WHERE DATE(lr.created_at) = CURDATE() 
-            ORDER BY lr.id DESC`, (err, results) => {
+        db.query(`WITH LatestLocations AS (
+            SELECT 
+                lr.truck_id, 
+                lr.position_latitude, 
+                lr.position_longitude, 
+                t.license_plate, 
+                lr.created_at, 
+                u.full_name,
+                ROW_NUMBER() OVER (
+                    PARTITION BY lr.truck_id 
+                    ORDER BY lr.created_at DESC
+                ) AS rn
+            FROM location_records AS lr 
+            JOIN trucks AS t ON t.id = lr.truck_id 
+            JOIN transition_records AS r ON r.id = lr.route_id 
+            JOIN users AS u ON u.id = r.driver_id 
+            WHERE DATE(lr.created_at) = CURDATE()
+        )
+        SELECT 
+            truck_id, 
+            position_latitude, 
+            position_longitude, 
+            license_plate, 
+            created_at, 
+            full_name
+        FROM LatestLocations
+        WHERE rn = 1
+        ORDER BY created_at DESC;`, (err, results) => {
+            if(err) {
+                resolve({
+                    status: "error",
+                    message: err.message
+                })
+            }
+            resolve({
+                status: "success",
+                locations: results
+            })
+        })
+    })
+}
+
+function getTruckLocation(truck_id) {
+    return new Promise(resolve => {
+        db.query(`SELECT lr.position_latitude, lr.position_longitude, lr.created_at, u.full_name as driver_full_name, t.license_plate
+            FROM location_records as lr
+            JOIN trucks as t ON t.id = lr.truck_id
+            JOIN users as u ON u.id = lr.driver_id
+            WHERE lr.truck_id = ? 
+            ORDER BY lr.id ASC`, [truck_id], (err, results) => {
             if(err) {
                 resolve({
                     status: "error",
@@ -59,5 +103,6 @@ function getAllTruckLocation() {
 module.exports = {
     finishDelivery,
     saveLocation,
-    getAllTruckLocation
+    getAllTruckLocation,
+    getTruckLocation,
 }

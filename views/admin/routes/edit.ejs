@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <title>Customers</title>
+  <title>จัดการคิวส่งของ</title>
   <%-include('../includes/head')%>
 </head>
 <body>
@@ -48,6 +48,10 @@
             <div class="form-group mb-3">                
                 <label for="location">วันที่: </label>
                 <input type="date" name="date" class="form-control" value="<%=moment(route.date).format('YYYY-MM-DD')%>" required>
+            </div>
+            <div class="form-group mb-3">                
+                <label for="location">น้ำหนักบรรทุก: </label>
+                <input type="number" name="weight" class="form-control" value="<%=route.weight ?? 0%>" required>
             </div>
 
             <input type="submit" value="บันทึกการเปลี่ยนแปลง" class="btn btn-primary">

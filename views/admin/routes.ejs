@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <title>Customers</title>
+  <title>คิวส่งของ</title>
   <%-include('includes/head')%>
 </head>
 <body>
@@ -18,28 +18,52 @@
 
     <main class="container-fluid p-3 p-lg-4">
       <h2 class="fw-bold mb-3">📦 คิวส่งของ <button class="btn btn-outline-primary" onclick="window.location.href='/admin/routes/add'">➕ เพิ่มคิวส่งของ</button></h2>
-      <table class="table">
+      <table class="table text-center">
         <thead>
           <th>#</th>
-          <th>ชื่อลูกค้า</th>
+          <th>วันที่</th>
           <th>รหัสลูกค้า</th>
+          <th>ชื่อลูกค้า</th>
+          <th>สถานะ</th>
           <th>ทะเบียนรถ</th>
           <th>พนักงานปฏิบัติการ</th>
           <th>พิกัดที่อยู่</th>
-          <th>วันที่</th>
+          <th>น้ำหนัก</th>
+          <th>เสร็จสิ้นเมื่อเวลา</th>
           <th>จัดการ</th>
         </thead>
         <tbody>
           <% routes.forEach(row => { %>
           <tr>
             <td><%=row.id%></td>
+            <td><%=moment(row.date).format("DD/MM/YY")%></td>
             <td><%=row.customer_id%></td>
             <td><%=row.customer_name%></td>
-            <td><a href="/admin/trucks/edit/<%=row.truck_id%>" class="badge bg-secondary fw-normal" style="text-decoration: none;"><%=row.license_plate%></a></td>
-            <td><a href="/admin/users/edit/<%=row.driver_id%>" class="badge bg-secondary fw-normal" style="text-decoration: none;"><%=row.driver_full_name%></a></td>
-            <td>📍 <a href="https://map.google.co.th/?q=<%=row.location.split(',')[1] %>,<%=row.location.split(',')[0] %>" target="_blank"><%=row.location%></a></td>
-            <td><%=moment(row.date).format("DD/MM/YY")%></td>
-            <td><button class="btn btn-outline-primary" onclick="window.location.href='/admin/routes/edit/<%=row.id%>'">แก้ไข</button></td>
+            <td><%if(row.status) { %><span class="badge bg-success fw-normal">ส่งแล้ว</span><% } else { %><span class="badge bg-primary fw-normal">กำลังดำเนินการ</span><% } %></td>
+            <td><a href="/admin/trucks/edit/<%=row.truck_id%>" class="badge bg-secondary fw-normal fs-6" style="text-decoration: none;"><%=row.license_plate%></a></td>
+            <td><a href="/admin/users/edit/<%=row.driver_id%>" class="badge bg-secondary fw-normal fs-6" style="text-decoration: none;"><%=row.driver_full_name%></a></td>
+            <td>📍 <a href="https://map.google.co.th/?q=<%=row.location.split(',')[1] %>,<%=row.location.split(',')[0] %>" class="text-decoration-none" target="_blank">Google Maps</a></td>
+            <td><%=row.weight ?? 0%> กิโลกรัม</td>
+            <td><%=row.finish_at ? moment(row.finish_at).format("DD/MM/YY HH:mm") : "-" %></td>
+            <td>
+              <button class="btn btn-outline-primary" onclick="window.location.href='/admin/routes/edit/<%=row.id%>'">แก้ไข</button>
+              <button class="btn btn-outline-danger" onclick="
+              Swal.fire({
+                title: 'คุณแน่ใจหรือไม่?',
+                text: 'คุณต้องการลบคิวส่งของนี้ออกจากระบบ',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'ใช่, ลบเลย!',
+                cancelButtonText: 'ยกเลิก'
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  window.location.href='/admin/routes/delete/<%=row.id%>'
+                }
+              })
+              ">ลบ</button>
+            </td>
           </tr>
           <% }) %>
         </tbody>

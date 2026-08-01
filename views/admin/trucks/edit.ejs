@@ -25,6 +25,18 @@
                 <label for="license_plate">ทะเบียนรถ: </label>
                 <input type="text" name="license_plate" class="form-control" value="<%=truck.license_plate%>" required>
             </div>
+            <div class="form-group mb-3">                
+                <label for="brand">ยี่ห้อ: </label>
+                <input type="text" name="brand" class="form-control" value="<%=truck.brand%>" required>
+            </div>
+            <div class="form-group mb-3">                
+                <label for="model">รุ่น: </label>
+                <input type="text" name="model" class="form-control" value="<%=truck.model%>" required>
+            </div>
+            <div class="form-group mb-3">                
+                <label for="cost_per_km">ค่าใช้จ่ายต่อกิโลเมตร: </label>
+                <input type="number" name="cost_per_km" class="form-control" value="<%=truck.cost_per_km%>" required>
+            </div>
             <input type="submit" value="บันทึกการเปลี่ยนแปลง" class="btn btn-primary">
           </form>
         </div>
