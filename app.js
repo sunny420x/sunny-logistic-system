@@ -39,9 +39,8 @@ app.get('/login', async(req,res) => {
             }
         }
     } else {
-        const settings = await getSettings();
         res.render('login', {
-            settings: settings
+            settings: await getSettings(),
         })
     }
 })
@@ -115,9 +114,10 @@ app.get('/api/driver/getAllTruckLocation', async(req,res) => {
     res.json(data)
 })
 
-app.get('/api/driver/getTruckLocation/:driver_id', async(req,res) => {
+app.get('/api/driver/getTruckLocation/:driver_id/:date', async(req,res) => {
     const driver_id = req.params.driver_id;
-    const data = await getTruckLocation(driver_id)
+    const date = req.params.date ?? null
+    const data = await getTruckLocation(date, driver_id)
     res.json(data)
 })
 
@@ -201,6 +201,7 @@ app.get('/admin', async(req,res) => {
         customers: customers,
         auth: auth,
         users:users,
+        settings: await getSettings(),
     })
 })
 app.get('/admin/help', async(req,res) => {
@@ -216,7 +217,8 @@ app.get('/admin/help', async(req,res) => {
     const customers = await getCustomers() ?? [];
     res.render('admin/help', {
         auth: auth,
-        page: 'help'
+        page: 'help',
+        settings: await getSettings(),
     })
 })
 
@@ -237,7 +239,8 @@ app.get('/admin/customers', async(req,res) => {
     res.render('admin/customers', {
         customers: customers,
         auth: auth,
-        page: 'customers'
+        page: 'customers',
+        settings: await getSettings(),
     })
 })
 app.get('/admin/customers/add', async(req,res) => {
@@ -252,6 +255,7 @@ app.get('/admin/customers/add', async(req,res) => {
     
     res.render('admin/customers/add', {
         auth: auth,
+        settings: await getSettings(),
         page: 'customers'
     })
 })
@@ -292,6 +296,7 @@ app.get('/admin/customers/edit/:id', async(req,res) => {
     res.render('admin/customers/edit', {
         customer: customer[0],
         auth: auth,
+        settings: await getSettings(),
         page: 'customers'
     })
 })
@@ -338,6 +343,7 @@ app.get('/admin/routes', async(req,res) => {
         routes: routes,
         auth: auth,
         moment:moment,
+        settings: await getSettings(),
         page: 'routes'
     })
 })
@@ -360,6 +366,7 @@ app.get('/admin/routes/add', async(req,res) => {
         auth: auth,
         trucks:trucks,
         drivers:drivers,
+        settings: await getSettings(),
         page: 'routes'
     })
 })
@@ -406,6 +413,7 @@ app.get('/admin/routes/edit/:id', async(req,res) => {
         route: route[0],
         page: 'routes',
         drivers:drivers,
+        settings: await getSettings(),
         moment: moment
     })
 })
@@ -452,6 +460,7 @@ app.get('/admin/trucks', async(req,res) => {
     res.render('admin/trucks', {
         trucks: trucks,
         auth: auth,
+        settings: await getSettings(),
         page: 'trucks'
     })
 })
@@ -467,6 +476,7 @@ app.get('/admin/trucks/add', async(req,res) => {
    
     res.render('admin/trucks/add', {
         auth: auth,
+        settings: await getSettings(),
         page: 'trucks'
     })
 })
@@ -504,6 +514,7 @@ app.get('/admin/trucks/edit/:id', async(req,res) => {
     res.render('admin/trucks/edit', {
         truck: truck[0],
         auth: auth,
+        settings: await getSettings(),
         page: 'trucks'
     })
 })
@@ -538,12 +549,14 @@ app.get('/admin/trucks/locations/:id', async(req,res) => {
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
    
-    const locations = await getTruckLocation(req.params.id)
+    const date = req.query.date ?? null
 
     res.render('admin/trucks/location_history', {
-        locations: locations,
+        date: date,
         truck_id: req.params.id,
         auth: auth,
+        moment: moment,
+        settings: await getSettings(),
         page: 'routes'
     })
 })
@@ -564,6 +577,7 @@ app.get('/admin/users', async(req,res) => {
     res.render('admin/users', {
         users: users,
         auth: auth,
+        settings: await getSettings(),
         page: 'users'
     })
 })
@@ -581,6 +595,7 @@ app.get('/admin/users/add', async(req,res) => {
     res.render('admin/users/add', {
         page: 'users',
         auth: auth,
+        settings: await getSettings(),
         user_types: user_types
     })
 })
@@ -622,6 +637,7 @@ app.get('/admin/users/edit/:id', async(req,res) => {
         user: user,
         auth: auth,
         user_types: user_types,
+        settings: await getSettings(),
         page: 'users'
     })
 })
@@ -655,12 +671,10 @@ app.get('/admin/settings', async(req,res) => {
     if(auth.status != 'success') res.redirect('/login')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('settings')) res.end("Permission denial") //Check Permission
-
-    const settings = await getSettings()
    
     res.render('admin/settings', {
-        settings: settings,
         auth: auth,
+        settings: await getSettings(),
         page: 'settings'
     })
 })

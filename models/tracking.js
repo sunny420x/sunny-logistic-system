@@ -77,14 +77,24 @@ function getAllTruckLocation() {
     })
 }
 
-function getTruckLocation(truck_id) {
+function getTruckLocation(date = null, truck_id) {
     return new Promise(resolve => {
-        db.query(`SELECT lr.position_latitude, lr.position_longitude, lr.created_at, u.full_name as driver_full_name, t.license_plate
+        let query = `SELECT lr.position_latitude, lr.position_longitude, lr.created_at, u.full_name as driver_full_name, t.license_plate
             FROM location_records as lr
             JOIN trucks as t ON t.id = lr.truck_id
             JOIN users as u ON u.id = lr.driver_id
-            WHERE lr.truck_id = ? 
-            ORDER BY lr.id ASC`, [truck_id], (err, results) => {
+            WHERE lr.truck_id = ?`
+
+        const params = [truck_id]
+
+        if (date) {
+            query += ` AND DATE(lr.created_at) = ?`
+            params.push(date);
+        }
+
+        query += ` ORDER BY lr.id ASC`
+
+        db.query(query, params, (err, results) => {
             if(err) {
                 resolve({
                     status: "error",
