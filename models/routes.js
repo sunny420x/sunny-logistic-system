@@ -28,7 +28,7 @@ function getMyRoutes(driver_id) {
         FROM transition_records as r 
         JOIN customers as c ON c.id = r.customer_id 
         LEFT JOIN trucks as t ON t.id = r.truck_id
-        JOIN users as u ON u.id = r.driver_id WHERE r.driver_id = ?`, [driver_id], (err, results) => {
+        JOIN users as u ON u.id = r.driver_id WHERE r.driver_id = ? AND r.date = CURDATE()`, [driver_id], (err, results) => {
             if(err) console.error(err);
             resolve(results)
         })

@@ -40,6 +40,7 @@ function getAllTruckLocation() {
             FROM location_records as lr 
             JOIN trucks as t ON t.id = lr.truck_id 
             JOIN users as u ON u.id = lr.driver_id 
+            WHERE DATE(lr.created_at) = CURDATE() 
             ORDER BY lr.id DESC`, (err, results) => {
             if(err) {
                 resolve({

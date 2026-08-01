@@ -2,7 +2,7 @@ const db = require('../database');
 
 function getTrucks() {
     return new Promise(resolve => {
-        db.query("SELECT * FROM trucks ORDER BY id DESC", (err, results) => {
+        db.query("SELECT t.id, t.license_plate FROM trucks as t ORDER BY id DESC", (err, results) => {
             if(err) console.error(err);
             resolve(results)
         })

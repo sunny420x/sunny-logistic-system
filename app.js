@@ -174,6 +174,8 @@ app.get('/admin', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('dashboard')) res.end("Permission denial") //Check Permission
 
     const delivered = await getDashboardDelivered(moment().format("YYYY-MM-DD"))
     const all_package = await getDashboardAllPackages(moment().format("YYYY-MM-DD"))
@@ -200,6 +202,7 @@ app.get('/admin/customers', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
 
     const customers = await getCustomers() ?? [];
@@ -216,6 +219,7 @@ app.get('/admin/customers/add', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
     
     res.render('admin/customers/add', {
@@ -230,6 +234,7 @@ app.post('/admin/customers/add', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
     
     const customer_name = req.body.customer_name
@@ -251,6 +256,7 @@ app.get('/admin/customers/edit/:id', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
    
     const id = req.params.id;
@@ -268,6 +274,7 @@ app.post('/admin/customers/edit/:id', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
    
     const id = req.params.id
@@ -292,6 +299,7 @@ app.get('/admin/routes', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
 
     const date = req.query.date ?? moment().format("YYYY-MM-DD")
@@ -311,6 +319,7 @@ app.get('/admin/routes/add', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
    
     const customers = await getCustomers()
@@ -332,6 +341,7 @@ app.post('/admin/routes/add', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
    
     const customer_id = req.body.customer_id
@@ -350,6 +360,7 @@ app.get('/admin/routes/edit/:id', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
    
     const id = req.params.id;
@@ -375,6 +386,7 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
    
     const id = req.params.id
@@ -400,6 +412,7 @@ app.get('/admin/trucks', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
    
     const trucks = await getTrucks() ?? [];
@@ -416,6 +429,7 @@ app.get('/admin/trucks/add', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
    
     res.render('admin/trucks/add', {
@@ -430,6 +444,7 @@ app.post('/admin/trucks/add', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
    
     const license_plate = req.body.license_plate
@@ -445,6 +460,7 @@ app.get('/admin/trucks/edit/:id', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
    
     const id = req.params.id;
@@ -462,6 +478,7 @@ app.post('/admin/trucks/edit/:id', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
    
     const id = req.params.id
@@ -480,6 +497,7 @@ app.get('/admin/users', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
    
     const users = await getUsers() ?? [];
@@ -496,6 +514,7 @@ app.get('/admin/users/add', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
    
     const user_types = await getUserTypes() ?? []
@@ -512,6 +531,7 @@ app.post('/admin/users/add', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
    
     const username = req.body.username
@@ -532,6 +552,7 @@ app.get('/admin/users/edit/:id', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
    
     const id = req.params.id;
@@ -551,6 +572,7 @@ app.post('/admin/users/edit/:id', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
    
     const id = req.params.id
@@ -571,6 +593,7 @@ app.get('/admin/settings', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('settings')) res.end("Permission denial") //Check Permission
 
     const settings = await getSettings()
@@ -589,6 +612,7 @@ app.post('/admin/settings', async(req,res) => {
     }
     const auth = await initUserToken(req.cookies.auth)
     if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('settings')) res.end("Permission denial") //Check Permission
 
     const company_name = req.body.company_name
