@@ -109,26 +109,32 @@
                 ],
                 view: new ol.View({ 
                     center: ol.proj.fromLonLat([98.9817, 18.7883]), 
-                    zoom: 14 
+                    zoom: 15 
                 })
             });
         }
 
         async function updateTruckLocations() {
             try {
-                const response = await fetch("/api/driver/getAllTruckLocation");
+                const drivers = await fetch("/api/driver/getAllTruckLocation");
+                const customers = await fetch("/api/admin/getAllCustomersLocation");
 
-                if (!response.ok) {
-                    throw new Error("ดึงข้อมูลจากหลังบ้านไม่สำเร็จ");
+                if (!drivers.ok) {
+                    throw new Error("ดึงข้อมูล คนขับ จากหลังบ้านไม่สำเร็จ");
                 }
 
-                const data = await response.json();
+                if (!customers.ok) {
+                    throw new Error("ดึงข้อมูล ลูกค้าจากหลังบ้านไม่สำเร็จ");
+                }
+
+                const drivers_data = await drivers.json();
+                const customers_data = await customers.json();
 
                 // เคลียร์เฉพาะ Marker เก่าออกจาก VectorSource (ไม่กระทบตัวแผนที่)
                 vectorSource.clear();
 
                 // วนลูปสร้าง Marker ใหม่
-                data.locations.forEach(truck => {
+                drivers_data.locations.forEach(truck => {
                     const marker = new ol.Feature({ 
                         geometry: new ol.geom.Point(ol.proj.fromLonLat([
                             parseFloat(truck.position_longitude),
@@ -146,6 +152,25 @@
                             text: `${truck.license_plate} - คนขับ ${truck.full_name}`,
                             font: 'bold 13px Kanit',
                             offsetY: -15,
+                            fill: new ol.style.Fill({ color: '#000000' }),
+                            stroke: new ol.style.Stroke({ color: '#FFFFFF', width: 3 })
+                        })
+                    }));
+
+                    vectorSource.addFeature(marker);
+                });
+
+                customers_data.locations.forEach(customer => {
+                    const marker = new ol.Feature({ 
+                        geometry: new ol.geom.Point(ol.proj.fromLonLat(customer.location.split(','))) 
+                    });
+
+                    marker.setStyle(new ol.style.Style({
+                        image: new ol.style.Icon({ anchor: [0.5, 1], src: '/icons/marker-pending.png', scale: 0.4 }),
+                        text: new ol.style.Text({
+                            text: `${customer.customer_name}`,
+                            font: 'bold 12px Kanit',
+                            offsetY: -35,
                             fill: new ol.style.Fill({ color: '#000000' }),
                             stroke: new ol.style.Stroke({ color: '#FFFFFF', width: 3 })
                         })

@@ -10,9 +10,9 @@ const { getCustomers, getCustomerById, addCustomers, editCustomer } = require('.
 const { getDashboardAllPackages, getDashboardCustomers, getDashboardDelivered, getDashboardUsers } = require('./models/dashboard')
 const { getTrucks, getTruckById, addTruck, editTruck } = require('./models/trucks')
 const { getRoutes, getMyRoutes, getRouteById, addRoute, editRoute } = require('./models/routes')
-const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation } = require('./models/tracking')
+const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation } = require('./models/tracking')
 const { getSettings, saveSettings } = require('./models/settings')
-const { loginUser, getUsers, registerUser, getUserTypes, getUserById, editUser, getDrivers, initUserToken } = require('./models/users')
+const { loginUser, getUsers, registerUser, getUserTypes, getUserById, editUser, getDrivers, initUserToken, getUserTypeById, editUserType, addUserType } = require('./models/users')
 
 require('dotenv').config();
 
@@ -122,6 +122,11 @@ app.get('/api/driver/getMyRoute', async(req,res) => {
 
 app.get('/api/driver/getAllTruckLocation', async(req,res) => {
     const data = await getAllTruckLocation()
+    res.json(data)
+})
+
+app.get('/api/admin/getAllCustomersLocation', async(req,res) => {
+    const data = await getAllCustomersLocation()
     res.json(data)
 })
 
@@ -670,6 +675,100 @@ app.post('/admin/users/edit/:id', async(req,res) => {
 
     editUser(id, username, full_name, type_id, phone_number).then(() => {
         res.redirect('/admin/users/edit/'+id)
+    })
+})
+// User Types
+app.get('/admin/user_types', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
+   
+    const user_types = await getUserTypes() ?? [];
+
+    res.render('admin/user_types', {
+        user_types: user_types,
+        auth: auth,
+        settings: await getSettings(),
+        page: 'user_types'
+    })
+})
+app.get('/admin/user_types/add', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
+   
+    res.render('admin/user_types/add', {
+        page: 'user_types',
+        auth: auth,
+        settings: await getSettings(),
+    })
+})
+app.post('/admin/user_types/add', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
+   
+    const user_type = req.body.user_type
+    const permission = req.body.permission
+    const color = req.body.color
+
+    addUserType(user_type, permission, color).then(() => {
+        res.redirect('/admin/user_types')
+    })
+})
+app.get('/admin/user_types/edit/:id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
+   
+    const id = req.params.id;
+    const user_type = await getUserTypeById(id)
+    const user_types = await getUserTypes() ?? []
+    res.render('admin/user_types/edit', {
+        user_type: user_type,
+        auth: auth,
+        user_types: user_types,
+        settings: await getSettings(),
+        page: 'user_types'
+    })
+})
+app.post('/admin/user_types/edit/:id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
+   
+    const id = req.params.id
+    const user_type = req.body.user_type
+    const permission = req.body.permission
+    const color = req.body.color
+
+    editUserType(id, user_type, permission, color).then(() => {
+        res.redirect('/admin/user_types/edit/'+id)
     })
 })
 

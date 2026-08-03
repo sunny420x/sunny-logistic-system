@@ -77,6 +77,23 @@ function getAllTruckLocation() {
     })
 }
 
+function getAllCustomersLocation() {
+    return new Promise(resolve => {
+        db.query(`SELECT c.id, c.customer_name, c.location FROM customers as c ORDER BY c.id DESC`, (err, results) => {
+            if(err) {
+                resolve({
+                    status: "error",
+                    message: err.message
+                })
+            }
+            resolve({
+                status: "success",
+                locations: results
+            })
+        })
+    })
+}
+
 function getTruckLocation(date = null, truck_id) {
     return new Promise(resolve => {
         let query = `SELECT lr.position_latitude, lr.position_longitude, lr.created_at, u.full_name as driver_full_name, t.license_plate
@@ -113,5 +130,6 @@ module.exports = {
     finishDelivery,
     saveLocation,
     getAllTruckLocation,
-    getTruckLocation
+    getTruckLocation,
+    getAllCustomersLocation,
 }
