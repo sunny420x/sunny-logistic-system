@@ -17,29 +17,26 @@
     <%-include('includes/topbar')%>
 
     <main class="container-fluid p-3 p-lg-4">
-      <h2 class="fw-bold mb-3">👨🏻‍💻 ผู้ใช้งานระบบ 
-        <button class="btn btn-outline-primary" onclick="window.location.href='/admin/users/add'"><i class="bi bi-person-plus"></i> เพิ่มผู้ใช้งานระบบ</button>
-        <button class="btn btn-outline-secondary" onclick="window.location.href='/admin/user_types'"><i class="bi bi-person"></i> จัดการประเภทผู้ใช้งาน</button>
+      <h2 class="fw-bold mb-3">👨🏻‍💻 ประเภทผู้ใช้งานระบบ 
+        <button class="btn btn-outline-secondary" onclick="window.location.href='/admin/user_types/add'"><i class="bi bi-person"></i> เพิ่มประเภทผู้ใช้งาน</button>
       </h2>
       <table class="table">
         <thead>
           <th style="width: 40px;">#</th>
-          <th style="width: 100px;">ชื่อผู้ใช้</th>
-          <th style="width: 250px;">ชื่อเต็ม</th>
-          <th style="width: 80px;">ประเภท</th>
-          <th>โทรศัพท์</th>
-          <th style="width: 200px;">จัดการ</th>
+          <th style="width: 100px;">ชื่อประเภท</th>
+          <th style="width: 250px;">สี</th>
+          <th style="width: 80px;">สิทธิ์</th>
+          <th>จัดการ</th>
         </thead>
         <tbody>
-          <% users.forEach(row => { %>
+          <% user_types.forEach(row => { %>
           <tr>
             <td><%=row.id%></td>
-            <td><%=row.username%></td>
-            <td><%=row.full_name ?? "-"%></td>
-            <td><div class="badge bg-<%=row.user_type_color%> fw-normal"><%=row.user_type%></div></td>
-            <td><%=row.phone_number ?? "-"%></td>
+            <td><%=row.name%></td>
+            <td><span class="badge bg-<%=row.color%> fw-normal"><%=row.color%></span></td>
+            <td><%=row.permission%></td>
             <td>
-              <button class="btn btn-outline-primary" onclick="window.location.href='/admin/users/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
+              <button class="btn btn-outline-primary" onclick="window.location.href='/admin/user_types/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
               <button class="btn btn-outline-danger" onclick="
               Swal.fire({
                 title: 'คุณแน่ใจหรือไม่?',
@@ -52,7 +49,7 @@
                 cancelButtonText: 'ยกเลิก'
               }).then((result) => {
                 if (result.isConfirmed) {
-                  window.location.href='/admin/users/delete/<%=row.id%>'
+                  window.location.href='/admin/user_types/delete/<%=row.id%>'
                 }
               })
               "><i class="bi bi-trash3"></i> ลบ</button>

@@ -9,13 +9,22 @@ function getUserTypes() {
     })
 }
 
+function getUserTypeById(id) {
+    return new Promise(resolve => {
+        db.query("SELECT * FROM user_types WHERE id = ?", [id], (err, results) => {
+            if(err) console.error(err);
+            resolve(results[0])
+        })
+    })
+}
+
 function getUsers(search = null) {
     return new Promise(resolve => {
-        let query = "SELECT u.id, u.username, u.full_name, ut.name as user_type, u.phone_number, u.type_id FROM users as u JOIN user_types as ut ON ut.id = u.type_id ";
+        let query = "SELECT u.id, u.username, u.full_name, ut.name as user_type, u.phone_number, u.type_id, ut.color as user_type_color FROM users as u JOIN user_types as ut ON ut.id = u.type_id ";
         if(search != null) {
             query += "WHERE u.username LIKE ? OR u.full_name LIKE ? OR u.phone_number LIKE ? ";
         }
-        query += "ORDER BY u.id DESC";
+        query += "ORDER BY u.type_id ASC";
         db.query(query, [ `%${search}%`, `%${search}%`, `%${search}%` ], (err, users) => {
             if(err) console.error(err);
             resolve(users)
@@ -53,6 +62,24 @@ function registerUser(username, password, full_name, type_id, phone_number) {
 function editUser(username, full_name, type_id, phone_number) {
     return new Promise(resolve => {
         db.query("UPDATE users SET username = ?, full_name = ?, type_id = ?, phone_number = ?", [username, full_name, type_id, phone_number], (err) => {
+            if(err) console.error(err);
+            resolve()
+        })
+    })
+}
+
+function addUserType(user_type, permission, color) {
+    return new Promise(resolve => {
+        db.query("INSERT INTO user_types(name, permission, color) VALUES(?,?,?)", [user_type, permission, color], (err) => {
+            if(err) console.error(err);
+            resolve()
+        })
+    })
+}
+
+function editUserType(id, user_type, permission, color) {
+    return new Promise(resolve => {
+        db.query("UPDATE user_types SET name = ?, permission = ?, color = ? WHERE id = ?", [user_type, permission, color, id], (err) => {
             if(err) console.error(err);
             resolve()
         })
@@ -113,5 +140,8 @@ module.exports = {
     deleteUser,
     loginUser,
     getDrivers,
-    initUserToken
+    initUserToken,
+    getUserTypeById,
+    editUserType,
+    addUserType,
 }

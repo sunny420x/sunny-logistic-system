@@ -31,11 +31,11 @@
             </div>
             <div class="form-group mb-3">
                 <label for="customer_id">รหัสลูกค้าที่แสดงในระบบ: </label>
-                <input type="text" name="customer_id" class="form-control" required>
+                <input type="text" name="customer_id" class="form-control" value="-" required>
             </div>
             <div class="form-group mb-3">                
                 <label for="location">พิกัดที่อยู่: </label>
-                <input type="text" name="location" class="form-control" required>
+                <input type="text" name="location" class="form-control" oninput="validateLocation()" required>
             </div>
 
             <input type="submit" value="เพิ่มลูกค้า" class="btn btn-primary">
@@ -53,6 +53,14 @@
             document.querySelector('input[name="location"]').value = `${longitude},${latitude}`
           } else {
             document.querySelector('input[name="location"]').value = ''
+          }
+        }
+
+        function validateLocation() {
+          const locationInput = document.querySelector('input[name="location"]')
+          const locationValue = locationInput.value.trim()
+          if (locationValue.split(',')[0] < 90) {
+            locationInput.value = `${locationValue.split(',')[1]},${locationValue.split(',')[0]}`
           }
         }
       </script>
