@@ -24,8 +24,19 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(cookieParser());
 
-app.get('/', (req, res) => {
-    res.redirect('/login');
+app.get('/', async(req, res) => {
+    if(req.cookies.auth) {
+        const auth = await initUserToken(req.cookies.auth)
+        if(auth.status == "success") {
+            if(auth.user.type_id == "2") {
+                res.redirect('/driver/myRoute')
+            } else {
+                res.redirect('/admin')
+            }
+        }
+    } else {
+        res.redirect('/login');
+    }
 });
 
 app.get('/login', async(req,res) => {
