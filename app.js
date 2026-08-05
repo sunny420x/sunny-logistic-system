@@ -85,7 +85,6 @@ app.get('/driver/myRoute', async(req, res) => {
     if(auth.status != 'success') res.redirect('/login')
     
     res.render('driver', {
-        driver_id: auth.user.id,
         auth: auth,
         settings: await getSettings(),
     });
