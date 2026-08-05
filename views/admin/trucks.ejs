@@ -13,11 +13,28 @@
   <%-include('includes/mobile-sidebar')%>
 
   <div class="main-wrapper">
-    <!-- Topbar -->
-    <%-include('includes/topbar')%>
 
     <main class="container-fluid p-3 p-lg-4">
-      <h2 class="fw-bold mb-3">🚚 รถบรรทุกในระบบ <button class="btn btn-outline-primary" onclick="window.location.href='/admin/trucks/add'"><i class="bi bi-file-earmark-plus"></i> เพิ่มรถในระบบ</button></h2>
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <h2 class="fw-bold mb-3">🚚 รถบรรทุกในระบบ</h2>
+        <div class="d-lg-flex gap-2">
+          <button class="btn btn-outline-primary" onclick="window.location.href='/admin/trucks/add'"><i class="bi bi-file-earmark-plus"></i> เพิ่มรถในระบบ</button>
+          <form>
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                <input class="form-control bg-light" name="q" id="topbarSearch" type="search" placeholder="ค้นหา...">
+            </div>
+          </form>
+        </div>
+      </div>
+      <script>
+          document.getElementById('topbarSearch').value = getSearchQuery() ?? ''
+
+          function getSearchQuery() {
+              const urlParams = new URLSearchParams(window.location.search);
+              return urlParams.get('q');
+          }
+      </script>
       <table class="table text-center">
         <thead>
           <th style="width: 40px;">#</th>

@@ -69,6 +69,7 @@ async function loadMyRoute() {
                 id: c.id,
                 customerId: c.customer_id,
                 customerName: c.customer_name,
+                time: c.time,
                 status: c.status,
                 coords: [lon, lat],
                 distanceFromMe: null // เพิ่มตัวแปรเก็บระยะทาง
@@ -84,7 +85,7 @@ async function loadMyRoute() {
             marker.setStyle(new ol.style.Style({
                 image: new ol.style.Icon({ anchor: [0.5, 1], src: markerIcon, scale: 0.5 }),
                 text: new ol.style.Text({
-                    text: `${customer.customerId} - ${customer.customerName}`,
+                    text: `${customer.customerId} ${customer.customerName}`,
                     font: 'bold 13px Kanit',
                     offsetY: -35,
                     fill: new ol.style.Fill({ color: '#000000' }),
@@ -172,16 +173,18 @@ async function loadMyRoute() {
             return 0;
         });
 
+        
         sortedRoute.forEach(route => {
             if (route.status == 1) {
                 statusBarBody.innerHTML += `
                 <tr style="opacity: 0.4;">
-                    <td>${route.customerId} - ${route.customerName}</td>
+                    <td>${route.customerId} ${route.customerName}</td>
                     <td>✅ ส่งแล้ว</td>
                 </tr>`;
             } else {
                 // แปลงระยะทางจากเมตรเป็นกิโลเมตร (ถ้ามีค่า)
                 let distText = "";
+                let time = `<span class="badge bg-secendary">${route.time}</span>`
                 if (route.distanceFromMe !== null && route.distanceFromMe !== undefined) {
                     let km = (route.distanceFromMe / 1000).toFixed(1);
                     distText = ` <span class="text-muted" style="font-size: 0.85em;">(~${km} กม.)</span>`;
@@ -193,7 +196,7 @@ async function loadMyRoute() {
 
                 statusBarBody.innerHTML += `
                 <tr>
-                    <td>${route.customerId} - ${route.customerName}${distText}${badge}</td>
+                    <td>${route.customerId} ${route.customerName}${distText}${badge} <span class="badge bg-secondary fw-normal">${route.time}</span></td>
                     <td>
                         <a href="https://map.google.co.th/?q=${route.coords[1]},${route.coords[0]}" class="btn btn-light" target="_blank">📍 แผนที่</a>
                         <button class="btn btn-light" onclick="finishDelivery('${route.id}')">✅ ส่งแล้ว</button>

@@ -3,6 +3,20 @@
 <head>
   <title>ลูกค้าในระบบ | <%=settings.company_name%></title>
   <%-include('includes/head')%>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.10.0/ol.css">
+  <style>
+    #map {
+      width: 80%;
+      height: 60vh;
+      z-index: 1;
+      overflow: hidden;
+    }
+    #customer_groups {
+      width: 20%;
+      max-height: 60vh;
+      overflow: auto;
+    }
+  </style>
 </head>
 <body>
 
@@ -13,18 +27,53 @@
   <%-include('includes/mobile-sidebar')%>
 
   <div class="main-wrapper">
-    <!-- Topbar -->
-    <%-include('includes/topbar')%>
 
     <main class="container-fluid p-3 p-lg-4">
-      <h2 class="fw-bold mb-3">👨🏻‍💼 ลูกค้าในระบบ <button class="btn btn-outline-primary" onclick="window.location.href='/admin/customers/add'"><i class="bi bi-person-plus"></i> เพิ่มลูกค้า</button></h2>
+      <h2 class="fw-bold mb-3">👨🏻‍💼 ลูกค้าในระบบ 
+        <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/customers/add'"><i class="bi bi-person-plus"></i> เพิ่มลูกค้า</button>
+      </h2>
+      <div class="d-flex">
+        <div id="map"></div>
+        <div id="customer_groups">
+          <ul class="list-group rounded-0" id="customerGroupList">
+            <% customer_groups.forEach(group => { %>
+              <li class="list-group-item d-flex align-items-center gap-2" data-group-id="<%= group.id || group._id %>">
+                <span class="group-badge" style="color: #fff; font-size: 18px;"><span style="font-size: 30px;">■</span> <%= group.name %></span> 
+              </li>
+            <% }) %>
+          </ul>
+        </div>
+      </div>
+      <div class="d-flex my-3 gap-2">
+        <form style="width: 60%;">
+          <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+              <input class="form-control bg-light" name="q" id="topbarSearch" type="search" placeholder="ค้นหา...">
+          </div>
+        </form>
+        <select style="width: 40%;" class="form-select d-inline-block" onchange="window.location.href='/admin/customers?group_id=' + this.value">
+          <option value="">ทั้งหมด</option>
+          <% customer_groups.forEach(row => { %>
+            <option value="<%=row.id%>" <%if(row.id == group_id) {%>selected<%}%>><%=row.name%></option>
+          <% }) %>
+        </select>
+      </div>
+      <script>
+          document.getElementById('topbarSearch').value = getSearchQuery() ?? ''
+
+          function getSearchQuery() {
+              const urlParams = new URLSearchParams(window.location.search);
+              return urlParams.get('q');
+          }
+      </script>
       <table class="table">
         <thead>
           <th style="width: 40px;" class="text-center">#</th>
-          <th style="width: 80px;" class="text-center">รหัสลูกค้า</th>
-          <th>ชื่อลูกค้า</th>
-          <th style="width: 150px;" class="text-center">พิกัดที่อยู่</th>
-          <th style="width: 200px;" class="text-center">จัดการ</th>
+          <th style="width: 150px;" class="text-center">รหัสลูกค้า</th>
+          <th style="width: 250px;">ชื่อลูกค้า</th>
+          <th style="width: 150px;">กลุ่มลูกค้า</th>
+          <th class="text-center">พิกัดที่อยู่</th>
+          <th style="width: 300px;" class="text-center">จัดการ</th>
         </thead>
         <tbody>
           <% customers.forEach(row => { %>
@@ -32,8 +81,10 @@
             <td class="text-center"><%=row.id%></td>
             <td class="text-center"><span class="badge bg-secondary fs-6 fw-normal"><%=row.customer_id%></span></td>
             <td><%=row.customer_name%></td>
+            <td><a href="/admin/customers?group_id=<%=row.group_id%>"><%=row.customer_group%></a></td>
             <td class="text-center">📍 <a href="https://map.google.co.th/?q=<%=row.location.split(',')[1] %>,<%=row.location.split(',')[0] %>" target="_blank" class="text-decoration-none">Google Maps</a></td>
             <td class="text-center">
+              <button class="btn btn-outline-success" onclick="selectMark('<%=row.id%>')"><i class="bi bi-pencil-square"></i> ดูตำแหน่ง</button>
               <button class="btn btn-outline-primary" onclick="window.location.href='/admin/customers/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
               <button class="btn btn-outline-danger" onclick="
               Swal.fire({
@@ -60,5 +111,21 @@
   </div>
 
   <%-include('includes/footer')%>
+  <script src="https://cdn.jsdelivr.net/npm/ol@v10.10.0/dist/ol.js"></script>
+  <script src="/js/admin/map.js"></script>
+  <script>
+    updateMap('customers');
+
+    setInterval(() => {
+        updateMap('customers');
+    }, 10000);
+  </script>
+  <% if(customers.length == 1) { %>
+    <script>
+    setTimeout(() => {
+      selectMark('<%=customers[0].id%>')
+    }, 1000)
+    </script>
+  <% } %>
 </body>
 </html>

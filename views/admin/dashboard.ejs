@@ -6,11 +6,16 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.10.0/ol.css">
   <style>
     #map {
-      width: 100%;
+      width: 80%;
       height: 60vh;
       z-index: 1;
-      border-radius: 20px;
       overflow: hidden;
+    }
+    #ongoingDrivers {
+      width: 20%;
+      height: 60vh;
+      overflow: auto;
+      background: #fff;
     }
   </style>
 </head>
@@ -23,8 +28,6 @@
   <%-include('includes/mobile-sidebar')%>
 
   <div class="main-wrapper">
-    <!-- Topbar -->
-    <%-include('includes/topbar')%>
 
     <main class="container-fluid p-3 p-lg-4">
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
@@ -91,105 +94,35 @@
           </div>
         </div>
       </section>
-      <div id="map"></div>
+      <div class="d-flex">
+        <div id="map"></div>
+        <div id="ongoingDrivers">
+          <a href="/admin/routes?date=<%=moment().format('YYYY-MM-DD')%>" class="btn btn-primary w-100 rounded-0">คิวส่งของทั้งหมดของวันนี้</a>
+          <table class="table text-center">
+            <thead>
+              <th>พนักงานขับรถ</th>
+              <th>ทะเบียนรถ</th>
+            </thead>
+            <tbody>
+              <% if(ongoing_drivers.data.length > 0) { %>
+              <% ongoing_drivers.data.forEach(driver => { %>
+                <tr>
+                  <td><%= driver.full_name %></td>
+                  <td><%= driver.license_plate %></td>
+                </tr>
+              <% }) %>
+              <% } %>
+            </tbody>
+          </table>
+        </div>
+      </div>
       <script src="https://cdn.jsdelivr.net/npm/ol@v10.10.0/dist/ol.js"></script>
+      <script src="/js/admin/map.js"></script>
       <script>
-        let map = null
-        let vectorSource = null;
-
-        function initializeMap() {
-            vectorSource = new ol.source.Vector();
-            const vectorLayer = new ol.layer.Vector({ source: vectorSource });
-
-            map = new ol.Map({
-                target: 'map',
-                layers: [
-                    new ol.layer.Tile({ source: new ol.source.OSM() }),
-                    vectorLayer
-                ],
-                view: new ol.View({ 
-                    center: ol.proj.fromLonLat([98.9817, 18.7883]), 
-                    zoom: 15 
-                })
-            });
-        }
-
-        async function updateTruckLocations() {
-            try {
-                const drivers = await fetch("/api/driver/getAllTruckLocation");
-                const customers = await fetch("/api/admin/getAllCustomersLocation");
-
-                if (!drivers.ok) {
-                    throw new Error("ดึงข้อมูล คนขับ จากหลังบ้านไม่สำเร็จ");
-                }
-
-                if (!customers.ok) {
-                    throw new Error("ดึงข้อมูล ลูกค้าจากหลังบ้านไม่สำเร็จ");
-                }
-
-                const drivers_data = await drivers.json();
-                const customers_data = await customers.json();
-
-                // เคลียร์เฉพาะ Marker เก่าออกจาก VectorSource (ไม่กระทบตัวแผนที่)
-                vectorSource.clear();
-
-                // วนลูปสร้าง Marker ใหม่
-                drivers_data.locations.forEach(truck => {
-                    const marker = new ol.Feature({ 
-                        geometry: new ol.geom.Point(ol.proj.fromLonLat([
-                            parseFloat(truck.position_longitude),
-                            parseFloat(truck.position_latitude)
-                        ])) 
-                    });
-
-                    marker.setStyle(new ol.style.Style({
-                        image: new ol.style.Circle({ 
-                            radius: 8, 
-                            fill: new ol.style.Fill({ color: '#0000FF' }), 
-                            stroke: new ol.style.Stroke({ color: '#FFFFFF', width: 2 }) 
-                        }),
-                        text: new ol.style.Text({
-                            text: `${truck.license_plate} - คนขับ ${truck.full_name}`,
-                            font: 'bold 13px Kanit',
-                            offsetY: -15,
-                            fill: new ol.style.Fill({ color: '#000000' }),
-                            stroke: new ol.style.Stroke({ color: '#FFFFFF', width: 3 })
-                        })
-                    }));
-
-                    vectorSource.addFeature(marker);
-                });
-
-                customers_data.locations.forEach(customer => {
-                    const marker = new ol.Feature({ 
-                        geometry: new ol.geom.Point(ol.proj.fromLonLat(customer.location.split(','))) 
-                    });
-
-                    marker.setStyle(new ol.style.Style({
-                        image: new ol.style.Icon({ anchor: [0.5, 1], src: '/icons/marker-pending.png', scale: 0.4 }),
-                        text: new ol.style.Text({
-                            text: `${customer.customer_name}`,
-                            font: 'bold 12px Kanit',
-                            offsetY: -35,
-                            fill: new ol.style.Fill({ color: '#000000' }),
-                            stroke: new ol.style.Stroke({ color: '#FFFFFF', width: 3 })
-                        })
-                    }));
-
-                    vectorSource.addFeature(marker);
-                });
-
-            } catch (error) {
-                console.error("เกิดข้อผิดพลาดในการอัปเดตพิกัด:", error);
-            }
-        }
-
-        initializeMap();
-
-        updateTruckLocations();
+        updateMap('drivers');
 
         setInterval(() => {
-            updateTruckLocations();
+            updateMap('drivers');
         }, 10000);
       </script>
     </main>

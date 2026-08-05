@@ -13,27 +13,39 @@
   <%-include('includes/mobile-sidebar')%>
 
   <div class="main-wrapper">
-    <!-- Topbar -->
-    <%-include('includes/topbar')%>
 
     <main class="container-fluid p-3 p-lg-4">
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-        <div class="d-flex">
-          <h2 class="fw-bold mb-3">📦 คิวส่งของ <button class="btn btn-outline-primary" onclick="window.location.href='/admin/routes/add'"><i class="bi bi-calendar-plus"></i> เพิ่มคิวส่งของ</button></h2>
-        </div>
-        <form action="" method="get" class="d-flex gap-2">
+        <h2 class="fw-bold mb-3">📦 คิวส่งของ</h2>
+        <div class="d-lg-flex gap-2">
+          <button class="btn btn-outline-primary" onclick="window.location.href='/admin/routes/add'"><i class="bi bi-calendar-plus"></i> เพิ่มคิวส่งของ</button>
+          <form>
+            <div class="input-group">
+                <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                <input class="form-control bg-light" name="q" id="topbarSearch" type="search" placeholder="ค้นหา...">
+            </div>
+          </form>
+          <form action="" method="get" class="d-flex gap-2">
             <div class="d-flex gap-2">
               <input type="date" class="form-control" name="date" id="dateSearch" value="<% if(locals.date) {%><%=date%><%} else {%><%=moment().format('YYYY-MM-DD')%><%}%>">
               <button class="btn btn-outline-primary" style="width: 200px;"><i class="bi bi-filter"></i> กรองวันที่</button>
             </div>
-        </form>
+          </form>
+        </div>
         <script>
-            document.getElementById('dateSearch').value = getSearchQuery() ?? ''
+          document.getElementById('topbarSearch').value = getSearchQuery() ?? ''
 
-            function getSearchQuery() {
-                const urlParams = new URLSearchParams(window.location.search);
-                return urlParams.get('date');
-            }
+          function getSearchQuery() {
+              const urlParams = new URLSearchParams(window.location.search);
+              return urlParams.get('q');
+          }
+
+          document.getElementById('dateSearch').value = getSearchQuery() ?? ''
+
+          function getSearchQuery() {
+              const urlParams = new URLSearchParams(window.location.search);
+              return urlParams.get('date');
+          }
         </script>
       </div>
       <div class="table-responsive">

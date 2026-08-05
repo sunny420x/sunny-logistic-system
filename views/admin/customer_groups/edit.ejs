@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>แก้ไขข้อมูลกลุ่มลูกค้า | <%=settings.company_name%></title>
+  <%-include('../includes/head')%>
+</head>
+<body>
+
+  <!-- Desktop Sidebar -->
+  <%-include('../includes/desktop-sidebar')%>
+
+  <!-- Mobile Sidebar -->
+  <%-include('../includes/mobile-sidebar')%>
+
+  <div class="main-wrapper">
+
+
+    <main class="container-fluid p-3 p-lg-4">
+      <div class="mb-4">
+        <div>
+          <h2 class="fw-bold mb-3">เพิ่มลูกค้าในระบบ</h2>
+          <form action="" method="post" style="width: 800px;">
+            <div class="form-group mb-3">
+                <label for="customer_name">ชื่อกลุ่ม: </label>
+                <input type="text" name="customer_group_name" class="form-control" value="<%=group.name%>" required>
+            </div>
+            <div class="form-group mb-3">
+                <label for="color" class="form-label">สีที่ใช้แสดงผล</label>
+                <input type="color" class="form-control form-control-color" id="color" name="customer_group_color" value="<%=group.color%>" title="เลือกสี">
+            </div>
+            <input type="submit" value="บันทึกการเปลี่ยนแปลง" class="btn btn-primary w-100">
+          </form>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <%-include('../includes/footer')%>
+</body>
+</html>

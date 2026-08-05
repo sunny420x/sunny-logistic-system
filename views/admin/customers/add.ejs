@@ -13,18 +13,13 @@
   <%-include('../includes/mobile-sidebar')%>
 
   <div class="main-wrapper">
-    <!-- Topbar -->
-    <%-include('../includes/topbar')%>
+
 
     <main class="container-fluid p-3 p-lg-4">
       <div class="mb-4">
         <div>
           <h2 class="fw-bold mb-3">เพิ่มลูกค้าในระบบ</h2>
-          <div class="form-group mb-3">
-            พิกัดที่อยู่จาก Google Map: <input class="form-control" type="text" id="googleMapUrl" onkeyup="googleMapExtract()" style="width: 800px;" placeholder="https://www.google.com/maps/place/...">
-          </div>
-          <hr>
-          <form action="" method="post" style="width: 500px;">
+          <form action="" method="post" style="width: 800px;">
             <div class="form-group mb-3">
                 <label for="customer_name">ชื่อลูกค้าที่แสดงในระบบ: </label>
                 <input type="text" name="customer_name" class="form-control" required>
@@ -33,12 +28,27 @@
                 <label for="customer_id">รหัสลูกค้าที่แสดงในระบบ: </label>
                 <input type="text" name="customer_id" class="form-control" value="-" required>
             </div>
-            <div class="form-group mb-3">                
-                <label for="location">พิกัดที่อยู่: </label>
-                <input type="text" name="location" class="form-control" oninput="validateLocation()" required>
+
+            <div class="form-group mb-3">
+              <label for="group_id">กลุ่มลูกค้า:</label>
+              <select name="group_id" class="form-select" required>
+                  <% customer_groups.forEach(group => { %>
+                    <option value="<%=group.id%>"><%=group.name%></option>
+                  <% }) %>
+              </select>
             </div>
 
-            <input type="submit" value="เพิ่มลูกค้า" class="btn btn-primary">
+            <div class="form-group mb-3">
+              พิกัดที่อยู่จาก Google Map: <input class="form-control" type="text" id="googleMapUrl" onkeyup="googleMapExtract()" placeholder="https://www.google.com/maps/place/...">
+            </div>
+
+            <div class="form-group mb-3">                
+                <label for="location">พิกัดที่อยู่:</label>
+                <input type="text" name="location" class="form-control" oninput="validateLocation()" required>
+                <small>รูปแบบ: Longtitude,Latitude</small>
+            </div>
+
+            <input type="submit" value="เพิ่มลูกค้า" class="btn btn-primary w-100">
           </form>
         </div>
       </div>

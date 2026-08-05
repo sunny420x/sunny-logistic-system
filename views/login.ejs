@@ -148,10 +148,6 @@
             .then(data => {
                 if (data.status == 'success') {
                     setCookie('auth', data.token);
-                    Swal.fire({
-                        icon: 'success',
-                        title: "เข้าสู่ระบบสมบูรณ์"
-                    })
                     window.location.reload()
                 } else {
                     Swal.fire({
