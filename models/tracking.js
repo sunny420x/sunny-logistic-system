@@ -143,6 +143,22 @@ function ongoingDrivers() {
     })
 }
 
+function saveArrivalImageFile(route_id, file_name) {
+    return new Promise(resolve => {
+        db.query("UPDATE transition_records SET arrivalImage = ? WHERE id = ?", [file_name, route_id], (err) => {
+            if(err) {
+                resolve({
+                    status: "error",
+                    message: err.message
+                })
+            }
+            resolve({
+                status: "success",
+            })
+        })
+    })
+}
+
 module.exports = {
     finishDelivery,
     saveLocation,
@@ -150,4 +166,5 @@ module.exports = {
     getTruckLocation,
     getAllCustomersLocation,
     ongoingDrivers,
+    saveArrivalImageFile,
 }

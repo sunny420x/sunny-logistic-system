@@ -33,49 +33,89 @@
     <main class="container-fluid p-3 p-lg-4">
       <div class="mb-4">
         <div>
-          <h2 class="fw-bold mb-3">แก้ไขข้อมูลลูกค้าในระบบ</h2>
+          <h2 class="fw-bold mb-3">ข้อมูลคิวส่งของ #<%=route.id%></h2>
           <div class="d-lg-flex d-block">
             <div id="map"></div>
             <div class="p-4 py-lg-0">
+              <%if(route.status) { %>
+                สถานะ: <span class="badge bg-success fw-normal mb-3">ส่งแล้ว</span>
+              <% } else { %>
+                สถานะ: <span class="badge bg-primary fw-normal mb-3">มอบหมายแล้ว</span>
+              <% } %>
+              <% if(route.arrivalImage) { %>
+                <img src="/uploads/<%=route.arrivalImage%>" alt="Arrival Image" width="300" class="mb-3">
+              <% } %>
               <form action="" method="post">
                 <div class="form-group mb-3">
                     <label for="customer_id">ลูกค้า: </label>
+                     <% if(route.status == 0) { %>
                     <select name="customer_id" class="form-select" onchange="selectMark(this.value)" required>
                       <% customers.forEach(customer => { %>
                         <option value="<%=customer.id%>" <% if(route.customer_row_id == customer.id) {%>selected<%}%> ><%=customer.customer_name%></option>
                       <% }) %>
                     </select>
+                    <% } else { %>
+                      <br><strong><%=route.customer_name%></strong>
+                    <% } %>
                 </div>
                 <div class="form-group mb-3">
                     <label for="customer_id">รถที่ใช้ส่งสินค้า: </label>
+                     <% if(route.status == 0) { %>
                     <select name="truck_id" class="form-select" required>
                       <% trucks.forEach(truck => { %>
                         <option value="<%=truck.id%>" <% if(route.truck_id == truck.id) {%>selected<%}%>><%=truck.license_plate%></option>
                       <% }) %>
                     </select>
+                    <% } else {%>
+                      <br><strong><%=route.license_plate%></strong>
+                    <%}%>
                 </div>
                 <div class="form-group mb-3">
                     <label for="driver_id">พนักงานปฏิบัติการ (คนขับรถ): </label>
+                     <% if(route.status == 0) { %>
                     <select name="driver_id" class="form-select" required>
                       <% drivers.forEach(driver => { %>
                         <option value="<%=driver.id%>" <% if(route.driver_id == driver.id) {%>selected<%}%>><%=driver.full_name%></option>
                       <% }) %>
                     </select>
+                    <% } else {%>
+                      <br><strong><%=route.driver_full_name%></strong>
+                    <%}%>
                 </div>
                 <div class="form-group mb-3">                
                     <label for="location">วันที่: </label>
+                     <% if(route.status == 0) { %>
                     <input type="date" name="date" class="form-control" value="<%=moment(route.date).format('YYYY-MM-DD')%>" required>
+                    <% } else {%>
+                      <br><strong><%=moment(route.date).format('DD/MM/YYYY')%></strong>
+                    <%}%>
                 </div>
                 <div class="form-group mb-3">                
                     <label for="time">เวลา:</label>
-                    <input type="time" name="time_start" class="form-control"  value="<%=route.time%>" required>
+                     <% if(route.status == 0) { %>
+                    <input type="time" name="time_start" class="form-control"  value="<%=route.time%>" <% if(route.status == 1) { %>readonly<%}%> required>
+                    <% } else {%>
+                      <br><strong><%=route.time%></strong>
+                    <%}%>
                 </div>
+                <% if(route.status != 0) {%>
+                <div class="form-group mb-3">                
+                  <label for="finish_at">ส่งสินค้าเสร็จเมื่อ: </label>
+                  <br><strong id="finish_at"><%=moment(route.finish_at).format('DD/MM/YYYY HH:mm:ss')%></strong>
+                </div>
+                <%}%>
                 <div class="form-group mb-3">                
                     <label for="location">น้ำหนักบรรทุก: </label>
-                    <input type="number" name="weight" class="form-control" value="<%=route.weight ?? 0%>" required>
+                     <% if(route.status == 0) { %>
+                    <input type="number" name="weight" class="form-control" value="<%=route.weight ?? 0%>" <% if(route.status == 1) { %>readonly<%}%> required>
+                    <% } else {%>
+                      <br><strong><%=route.weight%> กิโลกรัม</strong>
+                    <%}%>
                 </div>
-    
+  
+                <% if(route.status == 0) { %>
                 <input type="submit" value="บันทึกการเปลี่ยนแปลง" class="btn btn-primary w-100">
+                <% } %>
               </form>
             </div>
           </div>
@@ -89,5 +129,15 @@
   <%-include('../includes/footer')%>
   <script src="https://cdn.jsdelivr.net/npm/ol@v10.10.0/dist/ol.js"></script>
   <script src="/js/admin/map.js"></script>
+  <script>
+    updateMap('customers');
+  </script>
+  <% if(route.customer_row_id) { %>
+  <script>
+    setTimeout(() => {
+      selectMark('<%=route.customer_row_id%>')
+    }, 1000)
+  </script>
+  <%}%>
 </body>
 </html>

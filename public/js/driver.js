@@ -199,7 +199,7 @@ async function loadMyRoute() {
                     <td>${route.customerId} ${route.customerName}${distText}${badge} <span class="badge bg-secondary fw-normal">${route.time}</span></td>
                     <td>
                         <a href="https://map.google.co.th/?q=${route.coords[1]},${route.coords[0]}" class="btn btn-light" target="_blank">📍 แผนที่</a>
-                        <button class="btn btn-light" onclick="finishDelivery('${route.id}')">✅ ส่งแล้ว</button>
+                        <button class="btn btn-light" onclick="uploadArrivalImage('${route.id}')">✅ ส่งแล้ว</button>
                     </td>
                 </tr>`;
             }

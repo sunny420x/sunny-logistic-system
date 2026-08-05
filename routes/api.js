@@ -1,14 +1,28 @@
-const express = require('express');
-const app = express.Router();
-const moment = require('moment');
-const crypto = require('crypto');
-const cookieParser = require('cookie-parser');
+const express = require('express')
+const app = express.Router()
+const moment = require('moment')
+const crypto = require('crypto')
+const cookieParser = require('cookie-parser')
+const multer  = require('multer')
+const path  = require('path')
 
 const { getCustomers, getCustomerById, addCustomers, editCustomer, getCustomerGroups } = require('../models/customers')
 const { getMyRoutes } = require('../models/routes')
-const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation } = require('../models/tracking')
+const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation, saveArrivalImageFile } = require('../models/tracking')
 const { getSettings } = require('../models/settings')
 const { loginUser, initUserToken } = require('../models/users')
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, 'public/uploads/');
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        const newFileName = `arrival-${Date.now()}${ext}`;
+        cb(null, newFileName);
+    }
+});
+const upload = multer({ storage: storage });
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
@@ -59,16 +73,37 @@ app.get('/api/driver/getMyRoute', async(req,res) => {
 })
 
 app.get('/api/driver/getAllTruckLocation', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+
     const data = await getAllTruckLocation()
     res.json(data)
 })
 
 app.get('/api/admin/getAllCustomersLocation', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+
     const data = await getAllCustomersLocation()
     res.json(data)
 })
 
 app.get('/api/driver/getTruckLocation/:driver_id/:date', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+
     const driver_id = req.params.driver_id;
     const date = req.params.date ?? null
     const data = await getTruckLocation(date, driver_id)
@@ -76,6 +111,13 @@ app.get('/api/driver/getTruckLocation/:driver_id/:date', async(req,res) => {
 })
 
 app.get('/api/finishDelivery/:id', async (req, res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+
     try {
         const finish_at = moment().format("YYYY-MM-DD HH:mm:ss");
         const id = req.params.id;
@@ -104,6 +146,13 @@ app.get('/api/finishDelivery/:id', async (req, res) => {
 });
 
 app.get('/api/saveLocation/:truck_id/:driver_id/:position_latitude/:position_longitude', async (req, res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+
     try {
         const truck_id = req.params.truck_id;
         const driver_id = req.params.driver_id;
@@ -132,5 +181,35 @@ app.get('/api/saveLocation/:truck_id/:driver_id/:position_latitude/:position_lon
     }
 });
 
+app.post('/api/driver/uploadArrivalImage', upload.single('file'), async (req, res) => {
+    if (!req.cookies.auth) {
+        return res.redirect('/login');
+    }
+    
+    const auth = await initUserToken(req.cookies.auth);
+    if (auth.status !== 'success') {
+        return res.redirect('/login');
+    }
+
+    const route_id = req.body.route_id
+
+    if (!req.file) {
+        return res.status(400).send('No file uploaded.');
+    }
+
+    const saveDataStatus = await saveArrivalImageFile(route_id, req.file.filename)
+
+    if(saveDataStatus.status == "success") {
+        return res.json({
+            status: "success",
+            filename: req.file.filename
+        });
+    } else {
+        return res.status(500).json({
+            status: "error",
+            message: saveDataStatus.message
+        });
+    }
+});
 
 module.exports = app;

@@ -178,7 +178,7 @@ function selectMark(customerId) {
             duration: 1000      // ความเร็ว animation (1000ms = 1 วินาที)
         });
 
-        // (Optional) เปิด Overlay หรือ Popup ข้อมูลลูกค้าต่อตรงนี้ได้
+       window.location.href="#map"
     } else {
         console.warn(`ไม่พบหมุดสำหรับ Customer ID: ${customerId}`);
     }

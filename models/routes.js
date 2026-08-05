@@ -1,7 +1,7 @@
 const db = require('../database');
 
 function getRoutes(date = null, search = null) {
-    let query = `SELECT r.id, r.date, r.time, c.customer_name, c.customer_id, c.location, r.status, t.license_plate, u.full_name as driver_full_name, r.driver_id, t.id as truck_id, r.weight, r.finish_at  
+    let query = `SELECT r.id, r.date, r.time, c.customer_name, c.customer_id, c.location, r.status, t.license_plate, u.full_name as driver_full_name, r.driver_id, t.id as truck_id, r.weight, r.finish_at, r.arrivalImage 
     FROM transition_records as r 
     JOIN customers as c ON c.id = r.customer_id 
     LEFT JOIN trucks as t ON t.id = r.truck_id
@@ -29,7 +29,7 @@ function getRoutes(date = null, search = null) {
 
 function getMyRoutes(driver_id) {
     return new Promise(resolve => {
-        db.query(`SELECT r.id, r.date, r.time, c.customer_name, c.customer_id, c.id as customer_row_id, c.location, r.status, t.license_plate, u.full_name as driver_full_name, r.driver_id, t.id as truck_id, r.weight  
+        db.query(`SELECT r.id, r.date, r.time, c.customer_name, c.customer_id, c.id as customer_row_id, c.location, r.status, t.license_plate, u.full_name as driver_full_name, r.driver_id, t.id as truck_id, r.weight, r.finish_at, r.arrivalImage 
         FROM transition_records as r 
         JOIN customers as c ON c.id = r.customer_id 
         LEFT JOIN trucks as t ON t.id = r.truck_id
@@ -43,7 +43,7 @@ function getMyRoutes(driver_id) {
 
 function getRouteById(id) {
     return new Promise(resolve => {
-        db.query(`SELECT r.id, r.date, r.time, c.customer_name, c.customer_id, c.id as customer_row_id, c.location, t.license_plate, r.driver_id, u.full_name as driver_full_name, r.weight, r.finish_at 
+        db.query(`SELECT r.id, r.date, r.time, c.customer_name, c.customer_id, c.id as customer_row_id, c.location, t.license_plate, r.driver_id, u.full_name as driver_full_name, r.weight, r.finish_at, r.arrivalImage, r.status 
             FROM transition_records as r JOIN customers as c ON c.id = r.customer_id 
             LEFT JOIN trucks as t ON t.id = r.truck_id 
             JOIN users as u ON u.id = r.driver_id WHERE r.id = ?`, [id], (err, result) => {
