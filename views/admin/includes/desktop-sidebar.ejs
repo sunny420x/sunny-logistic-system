@@ -9,7 +9,9 @@
 
         <div class="small text-uppercase text-secondary px-3 mt-4 mb-2">ระบบ</div>
         <nav class="nav flex-column">
+            <% if(auth.user.permission.split(',').includes('settings')) { %>
             <a class="nav-link <% if(locals.page == 'settings') { %>active<%}%>" href="/admin/settings"><i class="bi bi-gear"></i> ตั้งค่า</a>
+            <% } %>
             <a class="nav-link <% if(locals.page == 'help') { %>active<%}%>" href="/admin/help"><i class="bi bi-question-circle"></i> ช่วยเหลือ</a>
         </nav>
     </div>

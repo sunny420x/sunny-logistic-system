@@ -19,25 +19,28 @@
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
           <h2 class="fw-bold mb-3">แก้ไขข้อมูลประเภทผู้ใช้งาน</h2>
-          <form action="" method="post" style="width: 500px;">
-
-            <div class="form-group mb-3">
-                <label for="user_type">ชื่อประเภท: </label>
-                <input type="text" name="user_type" class="form-control" value="<%=user_type.name%>" required>
-            </div>
-
-            <div class="form-group mb-3">
-                <label for="permission">Permission: </label>
-                <input type="text" name="permission" class="form-control" value="<%=user_type.permission%>" required>
-            </div>
-
-            <div class="form-group mb-3">
-                <label for="color">สี: </label>
-                <input type="text" name="color" class="form-control" value="<%=user_type.color%>" required>
-            </div>
-
-            <input type="submit" value="บันทึกการเปลี่ยนแปลง" class="btn btn-primary">
-          </form>
+          <div class="d-flex">
+            <%-include('../includes/permission_table')%>
+            <form action="" method="post" style="width: 500px;" class="px-4">
+  
+              <div class="form-group mb-3">
+                  <label for="user_type">ชื่อประเภท: </label>
+                  <input type="text" name="user_type" class="form-control" value="<%=user_type.name%>" required>
+              </div>
+  
+              <div class="form-group mb-3">
+                  <label for="permission">Permission: </label>
+                  <input type="text" name="permission" class="form-control" value="<%=user_type.permission%>" required>
+              </div>
+  
+              <div class="form-group mb-3">
+                  <label for="color">สี: </label>
+                  <input type="text" name="color" class="form-control" value="<%=user_type.color%>" required>
+              </div>
+  
+              <input type="submit" value="บันทึกการเปลี่ยนแปลง" class="btn btn-primary">
+            </form>
+          </div>
         </div>
       </div>
 
