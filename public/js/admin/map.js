@@ -151,7 +151,6 @@ async function updateMap(options) {
             const groupColor = getGroupColor(groupId);
             const badge = item.querySelector('.group-badge');
             if (badge) {
-                // เปลี่ยนสีพื้นหลัง Badge เป็นสีประจำกลุ่ม
                 badge.style.color = groupColor.stroke;
             }
         }
