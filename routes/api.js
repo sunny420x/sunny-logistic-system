@@ -1,0 +1,136 @@
+const express = require('express');
+const app = express.Router();
+const moment = require('moment');
+const crypto = require('crypto');
+const cookieParser = require('cookie-parser');
+
+const { getCustomers, getCustomerById, addCustomers, editCustomer, getCustomerGroups } = require('../models/customers')
+const { getMyRoutes } = require('../models/routes')
+const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation } = require('../models/tracking')
+const { getSettings } = require('../models/settings')
+const { loginUser, initUserToken } = require('../models/users')
+
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser())
+
+app.post('/api/login', async(req,res) => {
+    const username = req.body.username ?? null
+    const password = req.body.password ?? null
+
+    if(!username || !password) {
+        res.json({
+            status: 'error',
+            message: "โปรดกรอกชื่อผู้ใช้และรหัสผ่าน"
+        })
+        res.end()
+    }
+
+    const password_hash = crypto.createHash('sha256').update(password).digest('hex');
+    const auth = await loginUser(username, password_hash)
+
+    if(auth.length == 1) {
+        res.json({
+            status: 'success',
+            token: btoa(auth[0].username + ":" + password_hash)
+        })
+        res.end()
+    } else {
+        res.json({
+            status: 'error',
+            message: "ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง"
+        })
+        res.end()
+    }
+})
+
+app.get('/api/driver/getMyRoute', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+
+    const driver_id = auth.user.id
+    const date = moment().format("YYYY-MM-DD")
+    const routes = await getMyRoutes(driver_id)
+    res.json(routes)
+})
+
+app.get('/api/driver/getAllTruckLocation', async(req,res) => {
+    const data = await getAllTruckLocation()
+    res.json(data)
+})
+
+app.get('/api/admin/getAllCustomersLocation', async(req,res) => {
+    const data = await getAllCustomersLocation()
+    res.json(data)
+})
+
+app.get('/api/driver/getTruckLocation/:driver_id/:date', async(req,res) => {
+    const driver_id = req.params.driver_id;
+    const date = req.params.date ?? null
+    const data = await getTruckLocation(date, driver_id)
+    res.json(data)
+})
+
+app.get('/api/finishDelivery/:id', async (req, res) => {
+    try {
+        const finish_at = moment().format("YYYY-MM-DD HH:mm:ss");
+        const id = req.params.id;
+        
+        const result = await finishDelivery(id, finish_at);
+
+        if (result === "success" || (result && result.status === "success")) {
+            return res.json({
+                status: "success",
+                message: "อัปเดตสถานะการส่งสินค้าเสร็จสิ้น"
+            });
+        } else {
+            return res.status(400).json({
+                status: "failed",
+                message: "ไม่สามารถเปลี่ยนสถานะในระบบได้"
+            });
+        }
+
+    } catch (error) {
+        console.error("เกิดข้อผิดพลาดขณะอัปเดตงาน:", error);
+        return res.status(500).json({
+            status: "error",
+            message: error.message
+        });
+    }
+});
+
+app.get('/api/saveLocation/:truck_id/:driver_id/:position_latitude/:position_longitude', async (req, res) => {
+    try {
+        const truck_id = req.params.truck_id;
+        const driver_id = req.params.driver_id;
+        const position_latitude = req.params.position_latitude;
+        const position_longitude = req.params.position_longitude;
+
+        const result = await saveLocation(truck_id, driver_id, position_latitude, position_longitude);
+
+        if (result === "success" || (result && result.status === "success")) {
+            return res.json({
+                status: "success",
+            });
+        } else {
+            return res.status(400).json({
+                status: "failed",
+                message: "ไม่สามารถเพิ่มข้อมูลลงในระบบได้"
+            });
+        }
+
+    } catch (error) {
+        console.error("เกิดข้อผิดพลาดขณะบันทึกตำแหน่ง:", error);
+        return res.status(500).json({
+            status: "error",
+            message: error.message
+        });
+    }
+});
+
+
+module.exports = app;

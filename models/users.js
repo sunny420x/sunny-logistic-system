@@ -59,7 +59,7 @@ function registerUser(username, password, full_name, type_id, phone_number) {
     })
 }
 
-function editUser(username, full_name, type_id, phone_number) {
+function editUser(id, username, full_name, type_id, phone_number) {
     return new Promise(resolve => {
         db.query("UPDATE users SET username = ?, full_name = ?, type_id = ?, phone_number = ?", [username, full_name, type_id, phone_number], (err) => {
             if(err) console.error(err);

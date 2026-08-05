@@ -79,7 +79,7 @@ function getAllTruckLocation() {
 
 function getAllCustomersLocation() {
     return new Promise(resolve => {
-        db.query(`SELECT c.id, c.customer_name, c.location FROM customers as c ORDER BY c.id DESC`, (err, results) => {
+        db.query(`SELECT c.id, c.customer_name, c.location, c.group_id, cg.name as group_name FROM customers as c JOIN customer_groups as cg ON cg.id = c.group_id ORDER BY c.id DESC`, (err, results) => {
             if(err) {
                 resolve({
                     status: "error",
@@ -126,10 +126,28 @@ function getTruckLocation(date = null, truck_id) {
     })
 }
 
+function ongoingDrivers() {
+    return new Promise(resolve => {
+        db.query("SELECT DISTINCT u.full_name, t.license_plate FROM transition_records as r JOIN users as u ON r.driver_id = u.id JOIN trucks as t ON t.id = r.truck_id WHERE r.date = CURDATE()", (err, drivers) => {
+            if(err) {
+                resolve({
+                    status: "error",
+                    message: err.message
+                })
+            }
+            resolve({
+                status: "success",
+                data: drivers
+            })
+        })
+    })
+}
+
 module.exports = {
     finishDelivery,
     saveLocation,
     getAllTruckLocation,
     getTruckLocation,
     getAllCustomersLocation,
+    ongoingDrivers,
 }
