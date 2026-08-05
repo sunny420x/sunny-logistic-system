@@ -70,13 +70,14 @@ app.post('/admin/customers/add', async(req,res) => {
     const customer_name = req.body.customer_name
     const customer_id = req.body.customer_id
     const location = req.body.location
+    const address = req.body.address
     const group_id = req.body.group_id
 
     if(location.split(",").length != 2) {
         res.end("พิกัดที่อยู่ลูกค้าไม่ถูกต้อง")
     }
 
-    addCustomers(customer_name, customer_id, location, group_id).then(() => {
+    addCustomers(customer_name, customer_id, address, location, group_id).then(() => {
         res.redirect('/admin/customers')
     })
 })
@@ -116,13 +117,14 @@ app.post('/admin/customers/edit/:id', async(req,res) => {
     const customer_name = req.body.customer_name
     const customer_id = req.body.customer_id
     const location = req.body.location
+    const address = req.body.address
     const group_id = req.body.group_id
 
     if(location.split(",").length != 2) {
         res.end("พิกัดที่อยู่ลูกค้าไม่ถูกต้อง")
     }
 
-    editCustomer(id, customer_name, customer_id, location, group_id).then(() => {
+    editCustomer(id, customer_name, customer_id, address, location, group_id).then(() => {
         res.redirect('/admin/customers/edit/'+id)
     })
 })

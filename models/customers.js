@@ -2,7 +2,7 @@ const db = require('../database');
 
 function getCustomers(search = null, group_id = null) {
     return new Promise(resolve => {
-        let query = "SELECT c.*, cg.name as customer_group, c.group_id FROM customers as c JOIN customer_groups as cg ON cg.id = c.group_id ";
+        let query = "SELECT c.*, cg.name as customer_group, c.group_id, c.address FROM customers as c JOIN customer_groups as cg ON cg.id = c.group_id "
         if(search != null && group_id == null) {
             query += "WHERE c.customer_name LIKE ? OR c.customer_id LIKE ? OR c.location LIKE ? ORDER BY c.id DESC";
             db.query(query, [ `%${search}%`, `%${search}%`, `%${search}%` ], (err, results) => {
@@ -55,12 +55,13 @@ function getCustomerById(id) {
 function addCustomers(
     customer_name,
     customer_id,
+    address,
     location,
     group_id
 ) {
     return new Promise(resolve => {
-        db.query("INSERT INTO customers(customer_name, customer_id, location, group_id) VALUES(?,?,?,?)", 
-            [customer_name, customer_id, location, group_id], (err) => {
+        db.query("INSERT INTO customers(customer_name, customer_id, location, address, group_id) VALUES(?,?,?,?,?)", 
+            [customer_name, customer_id, location, address, group_id], (err) => {
             if(err) console.error(err);
             resolve()
         })
@@ -71,12 +72,13 @@ function editCustomer(
     id,
     customer_name,
     customer_id,
+    address,
     location,
     group_id
 ) {
     return new Promise(resolve => {
-        db.query("UPDATE customers SET customer_name = ?, customer_id = ?, location = ?, group_id = ? WHERE id = ?", 
-            [customer_name, customer_id, location, group_id, id], (err) => {
+        db.query("UPDATE customers SET customer_name = ?, customer_id = ?, location = ?, address = ?, group_id = ? WHERE id = ?", 
+            [customer_name, customer_id, location, address, group_id, id], (err) => {
             if(err) console.error(err);
             resolve()
         })
