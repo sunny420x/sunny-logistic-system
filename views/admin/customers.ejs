@@ -86,9 +86,9 @@
             <td class="text-center"><%=row.address%></td>
             <td class="text-center">📍 <a href="https://map.google.co.th/?q=<%=row.location.split(',')[1] %>,<%=row.location.split(',')[0] %>" target="_blank" class="text-decoration-none">Google Maps</a></td>
             <td class="text-center">
-              <button class="btn btn-outline-success" onclick="selectMark('<%=row.id%>')"><i class="bi bi-pencil-square"></i> ดูตำแหน่ง</button>
-              <button class="btn btn-outline-primary" onclick="window.location.href='/admin/customers/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
-              <button class="btn btn-outline-danger" onclick="
+              <button class="btn btn-outline-success btn-sm" onclick="selectMark('<%=row.id%>')"><i class="bi bi-pencil-square"></i> ดูตำแหน่ง</button>
+              <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/customers/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
+              <button class="btn btn-outline-danger btn-sm" onclick="
               Swal.fire({
                 title: 'คุณแน่ใจหรือไม่?',
                 text: 'คุณต้องการลบลูกค้ารายนี้ออกจากระบบ',

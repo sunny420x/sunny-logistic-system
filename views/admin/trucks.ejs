@@ -48,14 +48,14 @@
           <% trucks.forEach(row => { %>
           <tr>
             <td><%=row.id%></td>
-            <td><span class="badge bg-secondary fs-6 fw-normal"><%=row.license_plate%></span></td>
+            <td><%=row.license_plate%></td>
             <td><%=row.brand ?? "-"%></td>
             <td><%=row.model ?? "-"%></td>
             <td><%=row.cost_per_km ?? 0%> บาท/กิโลเมตร</td>
             <td>
-              <button class="btn btn-outline-success" onclick="window.location.href='/admin/trucks/locations/<%=row.id%>'"><i class="bi bi-archive"></i> ดูประวัติ</button>
-              <button class="btn btn-outline-primary" onclick="window.location.href='/admin/trucks/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
-              <button class="btn btn-outline-danger" onclick="
+              <button class="btn btn-outline-success btn-sm" onclick="window.location.href='/admin/trucks/locations/<%=row.id%>'"><i class="bi bi-archive"></i> ดูประวัติ</button>
+              <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/trucks/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
+              <button class="btn btn-outline-danger btn-sm" onclick="
               Swal.fire({
                 title: 'คุณแน่ใจหรือไม่?',
                 text: 'คุณต้องการลบรถคันนี้ออกจากระบบ',

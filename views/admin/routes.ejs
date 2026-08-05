@@ -71,14 +71,14 @@
               <td><%=row.customer_id%></td>
               <td><%=row.customer_name%></td>
               <td><%if(row.status) { %><span class="badge bg-success fw-normal">ส่งแล้ว</span><% } else { %><span class="badge bg-primary fw-normal">มอบหมายแล้ว</span><% } %></td>
-              <td><a href="/admin/trucks/edit/<%=row.truck_id%>" class="badge bg-secondary fw-normal fs-6" style="text-decoration: none;"><%=row.license_plate%></a></td>
-              <td><a href="/admin/users/edit/<%=row.driver_id%>" class="badge bg-secondary fw-normal fs-6" style="text-decoration: none;"><%=row.driver_full_name%></a></td>
+              <td><a href="/admin/trucks/edit/<%=row.truck_id%>" class="badge bg-secondary fw-normal" style="text-decoration: none;"><%=row.license_plate%></a></td>
+              <td><a href="/admin/users/edit/<%=row.driver_id%>" class="badge bg-secondary fw-normal" style="text-decoration: none;"><%=row.driver_full_name%></a></td>
               <td>📍 <a href="https://map.google.co.th/?q=<%=row.location.split(',')[1] %>,<%=row.location.split(',')[0] %>" class="text-decoration-none" target="_blank">Google Maps</a></td>
               <td><%=row.weight ?? 0%> กิโลกรัม</td>
               <td><%=row.finish_at ? moment(row.finish_at).format("DD/MM/YY HH:mm") : "-" %></td>
               <td>
-                <button class="btn btn-outline-primary" onclick="window.location.href='/admin/routes/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
-                <button class="btn btn-outline-danger" onclick="
+                <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/routes/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
+                <button class="btn btn-outline-danger btn-sm" onclick="
                 Swal.fire({
                   title: 'คุณแน่ใจหรือไม่?',
                   text: 'คุณต้องการลบคิวส่งของนี้ออกจากระบบ',

@@ -37,8 +37,8 @@
             <td><div class="badge bg-<%=row.user_type_color%> fw-normal"><%=row.user_type%></div></td>
             <td><%=row.phone_number ?? "-"%></td>
             <td>
-              <button class="btn btn-outline-primary" onclick="window.location.href='/admin/users/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
-              <button class="btn btn-outline-danger" onclick="
+              <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/users/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
+              <button class="btn btn-outline-danger btn-sm" onclick="
               Swal.fire({
                 title: 'คุณแน่ใจหรือไม่?',
                 text: 'คุณต้องการลบผู้ใช้งานรายนี้ออกจากระบบ',

@@ -34,11 +34,11 @@
             <td><span class="badge bg-<%=row.color%> fw-normal"><%=row.color%></span></td>
             <td><%=row.permission%></td>
             <td>
-              <button class="btn btn-outline-primary" onclick="window.location.href='/admin/user_types/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
-              <button class="btn btn-outline-danger" onclick="
+              <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/user_types/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
+              <button class="btn btn-outline-danger btn-sm" onclick="
               Swal.fire({
                 title: 'คุณแน่ใจหรือไม่?',
-                text: 'คุณต้องการลบผู้ใช้งานรายนี้ออกจากระบบ',
+                text: 'คุณต้องการลบประเภทผู้ใช้งานนี้ออกจากระบบ',
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonColor: '#3085d6',
