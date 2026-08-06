@@ -35,6 +35,7 @@ async function updateMap(options) {
                     customerData: customer,
                 });
                 marker.setId(customer.id || customer._id);
+
                 function createGeoAltSvg(fillColor) {
                     const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="${fillColor}" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
                         <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
@@ -43,7 +44,7 @@ async function updateMap(options) {
                 }
 
                 // 2. นำไปใช้ใน Marker
-                const groupColor = getGroupColor(customer.group_id || 'default');
+                const groupColor = customer.color
 
                 marker.setStyle(function(feature, resolution) {
                     // resolution ยิ่งน้อย = ยิ่งซูมเข้าใกล้
@@ -90,7 +91,7 @@ async function updateMap(options) {
                     return new ol.style.Style({
                         image: new ol.style.Icon({
                             anchor: [0.5, 1],
-                            src: createGeoAltSvg(groupColor.stroke),
+                            src: createGeoAltSvg(groupColor),
                             scale: 0.8
                         }),
                         text: currentText
@@ -144,17 +145,6 @@ async function updateMap(options) {
     } catch (error) {
         console.error("เกิดข้อผิดพลาดในการอัปเดตพิกัด:", error);
     }
-    // วนลูปหาลิสต์ทุกตัวแล้วเปลี่ยนสีตาม group_id
-    document.querySelectorAll('#customerGroupList .list-group-item').forEach(item => {
-        const groupId = item.getAttribute('data-group-id');
-        if (groupId) {
-            const groupColor = getGroupColor(groupId);
-            const badge = item.querySelector('.group-badge');
-            if (badge) {
-                badge.style.color = groupColor.stroke;
-            }
-        }
-    });
 }
 
 initializeMap();
@@ -181,50 +171,4 @@ function selectMark(customerId) {
     } else {
         console.warn(`ไม่พบหมุดสำหรับ Customer ID: ${customerId}`);
     }
-}
-
-function getGroupColor(groupId) {
-    const colorPalette = [
-        { h: 0,   s: 90, l: 32 }, // 1. แดงเลือดหมู (Crimson)
-        { h: 215, s: 90, l: 32 }, // 2. น้ำเงินกรมท่า (Navy Blue)
-        { h: 130, s: 85, l: 22 }, // 3. เขียวป่าเข้ม (Forest Green)
-        { h: 25,  s: 95, l: 32 }, // 4. ส้มอิฐ/ไหม้ (Burnt Brick)
-        { h: 280, s: 85, l: 30 }, // 5. ม่วงเข้ม (Deep Violet)
-        { h: 330, s: 85, l: 32 }, // 6. ชมพูสตรอว์เบอร์รีเข้ม (Dark Berry)
-        { h: 185, s: 95, l: 22 }, // 7. เขียวน้ำทะเลมืด (Dark Teal)
-        { h: 40,  s: 100,l: 25 }, // 8. น้ำตาลทองเข้ม (Dark Ochre)
-        { h: 12,  s: 90, l: 32 }, // 9. ส้มดินเผา (Terracotta)
-        { h: 250, s: 75, l: 32 }, // 10. ม่วงอินดิโก้ (Indigo)
-        { h: 150, s: 100,l: 20 }, // 11. เขียวไพน์เข้ม (Deep Pine)
-        { h: 225, s: 85, l: 22 }, // 12. กรมท่ามืด (Midnight Navy)
-        { h: 345, s: 90, l: 28 }, // 13. แดงไวน์/มารูน (Maroon/Wine)
-        { h: 195, s: 100,l: 22 }, // 14. น้ำเงินเป็ดเข้ม (Dark Deep Blue)
-        { h: 165, s: 90, l: 20 }, // 15. เขียวหยกมืด (Dark Jade)
-        { h: 265, s: 80, l: 26 }, // 16. ม่วงเปลือกมังคุด (Plum/Eggplant)
-        { h: 315, s: 80, l: 30 }, // 17. บานเย็นเข้มมืด (Dark Magenta)
-        { h: 35,  s: 90, l: 28 }, // 18. น้ำตาลช็อกโกแลต (Chocolate Brown)
-        { h: 175, s: 85, l: 20 }, // 19. ฟ้าเขียวมืด (Dark Cyan/Petroleum)
-        { h: 205, s: 90, l: 28 }, // 20. น้ำเงินโคบอลต์เข้ม (Dark Cobalt)
-        { h: 295, s: 85, l: 26 }, // 21. ม่วงกล้วยไม้เข้ม (Dark Orchid)
-        { h: 5,   s: 85, l: 25 }, // 22. แดงชาดมืด (Dark Vermilion)
-        { h: 140, s: 80, l: 18 }, // 23. เขียวเข้มทึบ (Ultra Dark Green)
-        { h: 220, s: 60, l: 20 }  // 24. เทาอมน้ำเงินมืด (Dark Slate Blue)
-    ];
-
-    let hash = 0;
-    const str = String(groupId);
-    for (let i = 0; i < str.length; i++) {
-        hash = Math.imul(31, hash) + str.charCodeAt(i) | 0;
-    }
-
-    // ดึง Index จากชุดสี Palette
-    const colorIndex = Math.abs(hash) % colorPalette.length;
-    const color = colorPalette[colorIndex];
-
-    return {
-        // สีพื้นหลังวงกลม
-        fill: `hsla(${color.h}, ${color.s}%, ${color.l}%, 0.12)`, 
-        // สีหมุด/ขอบ/ฟอนต์ (สีทึบ 100%)
-        stroke: `hsla(${color.h}, ${color.s}%, ${color.l}%, 1)` 
-    };
 }

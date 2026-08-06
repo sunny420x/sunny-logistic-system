@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 
-const { getCustomers, getCustomerById, addCustomers, editCustomer, getCustomerGroups } = require('../models/customers')
+const { getCustomers, getCustomerById, addCustomers, editCustomer, getCustomerGroups, addCustomerGroup, editCustomerGroup, getCustomerGroupById } = require('../models/customers')
 const { initUserToken} = require('../models/users')
 const { getSettings } = require('../models/settings')
 
@@ -126,6 +126,103 @@ app.post('/admin/customers/edit/:id', async(req,res) => {
 
     editCustomer(id, customer_name, customer_id, address, location, group_id).then(() => {
         res.redirect('/admin/customers/edit/'+id)
+    })
+})
+app.get('/admin/customer_groups', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
+
+    const search = req.query.q || null
+    const customer_groups = await getCustomerGroups() ?? [];
+
+    res.render('admin/customer_groups', {
+        customer_groups: customer_groups,
+        auth: auth,
+        page: 'customer_groups',
+        settings: await getSettings(),
+    })
+})
+app.get('/admin/customer_groups/add', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
+
+    const customer_groups = await getCustomerGroups() ?? [];
+    
+    res.render('admin/customer_groups/add', {
+        auth: auth,
+        settings: await getSettings(),
+        page: 'customecustomer_groupsrs'
+    })
+})
+app.post('/admin/customer_groups/add', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
+    
+    const name = req.body.name
+    const color = req.body.color
+
+    if(location.split(",").length != 2) {
+        res.end("พิกัดที่อยู่ลูกค้าไม่ถูกต้อง")
+    }
+
+    addCustomerGroup(name, color).then(() => {
+        res.redirect('/admin/customer_groups')
+    })
+})
+app.get('/admin/customer_groups/edit/:id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
+   
+    const id = req.params.id;
+    const customer_group = await getCustomerGroupById(id) ?? [];
+
+    res.render('admin/customer_groups/edit', {
+        customer_group: customer_group,
+        auth: auth,
+        settings: await getSettings(),
+        page: 'customer_groups'
+    })
+})
+app.post('/admin/customer_groups/edit/:id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(auth.status != 'success') res.redirect('/login')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
+   
+    const id = req.params.id
+    const name = req.body.name
+    const color = req.body.color
+
+    editCustomerGroup(id, name, color).then(() => {
+        res.redirect('/admin/customer_groups/edit/'+id)
     })
 })
 

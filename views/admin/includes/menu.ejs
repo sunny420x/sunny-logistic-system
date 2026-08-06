@@ -7,6 +7,7 @@
     <% } %>
     <% if(auth.user.permission.split(',').includes('customers')) { %>
     <a class="nav-link <% if(locals.page == 'customers') { %>active<%}%>" href="/admin/customers"><i class="bi bi-people"></i> ลูกค้า</a>
+    <a class="nav-link <% if(locals.page == 'customer_groups') { %>active<%}%>" href="/admin/customer_groups"><i class="bi bi-people"></i> กลุ่มลูกค้า</a>
     <% } %>
     <% if(auth.user.permission.split(',').includes('routes')) { %>
     <a class="nav-link <% if(locals.page == 'routes') { %>active<%}%>" href="/admin/routes"><i class="bi bi-map"></i> คิวส่งของ</a>

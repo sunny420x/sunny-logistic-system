@@ -38,11 +38,21 @@
         <div id="customer_groups">
           <ul class="list-group rounded-0" id="customerGroupList">
             <% customer_groups.forEach(group => { %>
-              <li class="list-group-item d-flex align-items-center gap-2" data-group-id="<%= group.id || group._id %>">
-                <span class="group-badge" style="color: #fff; font-size: 18px;"><span style="font-size: 30px;">■</span> <%= group.name %></span> 
+              <li class="list-group-item d-flex align-items-center gap-2" data-group-id="<%= group.id || group._id %>" data-color="<%= group.color %>">
+                <span class="group-badge" style=" font-size: 18px;"><span style="font-size: 30px;">■</span> <%= group.name %></span> 
               </li>
             <% }) %>
           </ul>
+          <script>
+            document.querySelectorAll('.list-group-item').forEach(li => {
+              const color = li.dataset.color;
+              const badge = li.querySelector('.group-badge');
+              
+              if (badge && color) {
+                badge.style.color = color;
+              }
+            });
+          </script>
         </div>
       </div>
       <div class="d-flex my-3 gap-2">

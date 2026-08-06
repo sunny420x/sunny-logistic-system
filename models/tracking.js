@@ -79,7 +79,7 @@ function getAllTruckLocation() {
 
 function getAllCustomersLocation() {
     return new Promise(resolve => {
-        db.query(`SELECT c.id, c.customer_name, c.location, c.group_id, cg.name as group_name FROM customers as c JOIN customer_groups as cg ON cg.id = c.group_id ORDER BY c.id DESC`, (err, results) => {
+        db.query(`SELECT c.id, c.customer_name, c.location, c.group_id, cg.name as group_name, cg.color FROM customers as c JOIN customer_groups as cg ON cg.id = c.group_id ORDER BY c.id DESC`, (err, results) => {
             if(err) {
                 resolve({
                     status: "error",
