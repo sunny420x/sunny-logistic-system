@@ -45,9 +45,6 @@ app.post('/api/login', async(req,res) => {
 
     if(auth.length == 1) {
         res.cookie('auth', btoa(auth[0].username + ":" + password_hash), {
-            httpOnly: false, // บังคับให้เป็น false เพื่อให้สคริปต์หน้าบ้านในแอปพลิเคชันยังอ่านค่าได้อยู่
-            secure: false,   // ⚠️ จำเป็นมาก: ต้องตั้งเป็น false เพราะเราทดสอบผ่าน http://
-            sameSite: 'lax', // ยอมรับการทำงานข้ามไอพีเครื่อง
             path: '/'
         });
 
