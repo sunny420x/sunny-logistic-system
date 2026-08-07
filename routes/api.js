@@ -31,6 +31,7 @@ app.use(cookieParser())
 app.post('/api/login', async(req,res) => {
     const username = req.body.username ?? null
     const password = req.body.password ?? null
+    const remember = req.body.remember ?? false
 
     if(!username || !password) {
         res.json({
@@ -44,11 +45,16 @@ app.post('/api/login', async(req,res) => {
     const auth = await loginUser(username, password_hash)
 
     if(auth.length == 1) {
+        let maxAge = 24 * 60 * 60 * 1000
+        if(remember) {
+            maxAge =  10 * 365 * 24 * 60 * 60 * 1000
+        }
         res.cookie('auth', btoa(auth[0].username + ":" + password_hash), {
             path: '/',
             httpOnly: true,
             secure: true,
-            sameSite: 'lax'
+            sameSite: 'lax',
+            maxAge: maxAge
         });
         res.json({
             status: 'success',

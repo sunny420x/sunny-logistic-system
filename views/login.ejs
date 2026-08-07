@@ -129,6 +129,8 @@
             }
             const username = document.getElementById('username').value
             const password = document.getElementById('password').value
+            const remember = document.getElementById('remember').checked || false
+
             fetch(`/api/login`, {
                 method: "POST",
                 headers: {
@@ -136,7 +138,8 @@
                 },
                 body: JSON.stringify({
                     username: username,
-                    password: password
+                    password: password,
+                    remember: remember
                 }),
             })
             .then(res => {
