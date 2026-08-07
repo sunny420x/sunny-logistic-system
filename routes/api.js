@@ -45,9 +45,11 @@ app.post('/api/login', async(req,res) => {
 
     if(auth.length == 1) {
         res.cookie('auth', btoa(auth[0].username + ":" + password_hash), {
-            path: '/'
+            path: '/',
+            httpOnly: true,
+            secure: true,
+            sameSite: 'lax'
         });
-
         res.json({
             status: 'success',
             token: btoa(auth[0].username + ":" + password_hash)
