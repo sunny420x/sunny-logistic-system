@@ -27,6 +27,7 @@ const upload = multer({ storage: storage });
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
+app.set('trust proxy', 1);
 
 app.post('/api/login', async(req,res) => {
     const username = req.body.username ?? null
