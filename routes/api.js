@@ -187,7 +187,18 @@ app.get('/api/saveLocation/:truck_id/:driver_id/:position_latitude/:position_lon
     }
 });
 
-app.post('/api/driver/uploadArrivalImage', upload.array('files', 10), async (req, res) => {
+app.post('/api/driver/uploadArrivalImage', (req, res, next) => {
+    upload.any()(req, res, (err) => {
+        if (err) {
+            console.error('Multer upload error:', err);
+            return res.status(400).json({
+                status: 'error',
+                message: err.message
+            });
+        }
+        next();
+    });
+}, async (req, res) => {
     if (!req.cookies.auth) {
         return res.redirect('/login');
     }
