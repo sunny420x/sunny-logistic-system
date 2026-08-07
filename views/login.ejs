@@ -147,7 +147,6 @@
             })
             .then(data => {
                 if (data.status == 'success') {
-                    setCookie('auth', data.token);
                     window.location.reload()
                 } else {
                     Swal.fire({
