@@ -44,7 +44,10 @@
                 สถานะ: <span class="badge bg-primary fw-normal mb-3">มอบหมายแล้ว</span>
               <% } %>
               <% if(route.arrivalImage) { %>
-                <img src="/uploads/<%=route.arrivalImage%>" alt="Arrival Image" width="300" class="mb-3">
+                <% const arrivalImages = String(route.arrivalImage).split(',').filter(Boolean); %>
+                <% arrivalImages.forEach((imageName) => { %>
+                  <img src="/uploads/<%=imageName%>" alt="Arrival Image" width="300" class="mb-3">
+                <% }) %>
               <% } %>
               <form action="" method="post">
                 <div class="form-group mb-3">

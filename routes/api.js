@@ -187,7 +187,7 @@ app.get('/api/saveLocation/:truck_id/:driver_id/:position_latitude/:position_lon
     }
 });
 
-app.post('/api/driver/uploadArrivalImage', upload.single('file'), async (req, res) => {
+app.post('/api/driver/uploadArrivalImage', upload.array('files', 10), async (req, res) => {
     if (!req.cookies.auth) {
         return res.redirect('/login');
     }
@@ -199,16 +199,17 @@ app.post('/api/driver/uploadArrivalImage', upload.single('file'), async (req, re
 
     const route_id = req.body.route_id
 
-    if (!req.file) {
-        return res.status(400).send('No file uploaded.');
+    if (!req.files || req.files.length === 0) {
+        return res.status(400).send('No files uploaded.');
     }
 
-    const saveDataStatus = await saveArrivalImageFile(route_id, req.file.filename)
+    const filenames = req.files.map(file => file.filename);
+    const saveDataStatus = await saveArrivalImageFile(route_id, filenames)
 
     if(saveDataStatus.status == "success") {
         return res.json({
             status: "success",
-            filename: req.file.filename
+            filenames: filenames
         });
     } else {
         return res.status(500).json({

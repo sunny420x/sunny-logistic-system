@@ -111,33 +111,34 @@
 
                 <script>
                 async function uploadArrivalImage(route_id) {
-                    const { value: file } = await Swal.fire({
+                    const { value: files } = await Swal.fire({
                         title: 'อัพโหลดรูปหลักฐานการส่งของ',
                         input: 'file',
                         inputAttributes: {
                             'accept': 'image/*',
-                            'aria-label': 'Upload arrival image'
+                            'multiple': 'multiple',
+                            'aria-label': 'Upload arrival images'
                         },
                         showCancelButton: true,
                         confirmButtonText: 'อัพโหลดเลย!',
                         cancelButtonText: 'อาจจะยังน้า...'
                     });
 
-                    // 2. Process file if selected
-                    if (file) {
-                        // Prepare file payload 
+                    const selectedFiles = Array.from(files || []);
+
+                    if (selectedFiles.length > 0) {
                         const formData = new FormData();
-                        formData.append('file', file);
+                        selectedFiles.forEach((file) => {
+                            formData.append('files', file);
+                        });
                         formData.append('route_id', route_id)
 
-                        // Optional: Show loading state during backend processing
                         Swal.fire({
                             title: 'Uploading...',
                             didOpen: () => { Swal.showLoading(); }
                         });
 
                         try {
-                            // 3. Send file using fetch API
                             const response = await fetch(`/api/driver/uploadArrivalImage/`, {
                                 method: 'POST',
                                 body: formData

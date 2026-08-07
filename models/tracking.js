@@ -143,9 +143,10 @@ function ongoingDrivers() {
     })
 }
 
-function saveArrivalImageFile(route_id, file_name) {
+function saveArrivalImageFile(route_id, file_names) {
     return new Promise(resolve => {
-        db.query("UPDATE transition_records SET arrivalImage = ? WHERE id = ?", [file_name, route_id], (err) => {
+        const imageList = Array.isArray(file_names) ? file_names.join(',') : (file_names || '');
+        db.query("UPDATE transition_records SET arrivalImage = ? WHERE id = ?", [imageList, route_id], (err) => {
             if(err) {
                 resolve({
                     status: "error",
