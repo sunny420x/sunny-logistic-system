@@ -15,6 +15,8 @@ const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, get
 const { getSettings, saveSettings } = require('./models/settings')
 const { loginUser, getUsers, registerUser, getUserTypes, getUserById, editUser, getDrivers, initUserToken, getUserTypeById, editUserType, addUserType } = require('./models/users')
 
+app.set('trust proxy', 1)
+
 //Routes
 const usersRoute = require('./routes/users')
 const apiRoute = require('./routes/api')
