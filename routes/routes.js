@@ -20,7 +20,7 @@ app.get('/admin/routes', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
     
@@ -43,7 +43,7 @@ app.get('/admin/routes/add', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
    
@@ -67,7 +67,7 @@ app.post('/admin/routes/add', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
    
@@ -88,7 +88,7 @@ app.get('/admin/routes/edit/:id', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
    
@@ -115,7 +115,7 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
    

@@ -19,7 +19,7 @@ app.get('/admin/customers', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
 
@@ -44,7 +44,7 @@ app.get('/admin/customers/add', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
 
@@ -63,7 +63,7 @@ app.post('/admin/customers/add', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
     
@@ -87,7 +87,7 @@ app.get('/admin/customers/edit/:id', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
    
@@ -109,7 +109,7 @@ app.post('/admin/customers/edit/:id', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
    
@@ -134,7 +134,7 @@ app.get('/admin/customer_groups', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
 
@@ -154,7 +154,7 @@ app.get('/admin/customer_groups/add', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
 
@@ -172,7 +172,7 @@ app.post('/admin/customer_groups/add', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
     
@@ -193,7 +193,7 @@ app.get('/admin/customer_groups/edit/:id', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
    
@@ -213,7 +213,7 @@ app.post('/admin/customer_groups/edit/:id', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
    

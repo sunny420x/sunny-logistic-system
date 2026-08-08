@@ -17,7 +17,7 @@ app.get('/admin/users', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
    
@@ -37,7 +37,7 @@ app.get('/admin/users/add', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
    
@@ -55,7 +55,7 @@ app.post('/admin/users/add', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
    
@@ -76,7 +76,7 @@ app.get('/admin/users/edit/:id', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
    
@@ -97,7 +97,7 @@ app.post('/admin/users/edit/:id', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
    
@@ -126,7 +126,7 @@ app.get('/admin/user_types', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
    
@@ -145,7 +145,7 @@ app.get('/admin/user_types/add', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
    
@@ -161,7 +161,7 @@ app.post('/admin/user_types/add', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
    
@@ -179,7 +179,7 @@ app.get('/admin/user_types/edit/:id', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
    
@@ -200,7 +200,7 @@ app.post('/admin/user_types/edit/:id', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
    

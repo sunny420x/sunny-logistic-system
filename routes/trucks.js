@@ -18,7 +18,7 @@ app.get('/admin/trucks', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
 
@@ -38,7 +38,7 @@ app.get('/admin/trucks/add', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
    
@@ -54,7 +54,7 @@ app.post('/admin/trucks/add', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
    
@@ -73,7 +73,7 @@ app.get('/admin/trucks/edit/:id', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
    
@@ -92,7 +92,7 @@ app.post('/admin/trucks/edit/:id', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
    
@@ -113,7 +113,7 @@ app.get('/admin/trucks/locations/:id', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
    

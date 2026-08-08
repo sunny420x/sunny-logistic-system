@@ -85,7 +85,7 @@ app.get('/driver/myRoute', async(req, res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     
     res.render('driver', {
         auth: auth,
@@ -99,7 +99,7 @@ app.get('/admin', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('dashboard')) res.end("Permission denial") //Check Permission
 
@@ -129,7 +129,7 @@ app.get('/admin/help', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('dashboard')) res.end("Permission denial") //Check Permission
 
@@ -147,7 +147,7 @@ app.get('/admin/settings', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('settings')) res.end("Permission denial") //Check Permission
    
@@ -164,7 +164,7 @@ app.post('/admin/settings', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('settings')) res.end("Permission denial") //Check Permission
 

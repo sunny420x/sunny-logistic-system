@@ -76,7 +76,7 @@ app.get('/api/driver/getMyRoute', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
 
     const driver_id = auth.user.id
     const date = moment().format("YYYY-MM-DD")
@@ -90,7 +90,7 @@ app.get('/api/driver/getAllTruckLocation', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
 
     const data = await getAllTruckLocation()
     res.json(data)
@@ -102,7 +102,7 @@ app.get('/api/admin/getAllCustomersLocation', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
 
     const data = await getAllCustomersLocation()
     res.json(data)
@@ -114,7 +114,7 @@ app.get('/api/driver/getTruckLocation/:driver_id/:date', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
 
     const driver_id = req.params.driver_id;
     const date = req.params.date ?? null
@@ -128,7 +128,7 @@ app.get('/api/finishDelivery/:id', async (req, res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
 
     try {
         const finish_at = moment().format("YYYY-MM-DD HH:mm:ss");
@@ -163,7 +163,7 @@ app.get('/api/saveLocation/:truck_id/:driver_id/:position_latitude/:position_lon
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(auth.status != 'success') res.redirect('/login')
+    if(!auth.user) res.redirect('/logout')
 
     try {
         const truck_id = req.params.truck_id;
