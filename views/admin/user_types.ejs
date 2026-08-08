@@ -16,47 +16,49 @@
   <div class="main-wrapper">
 
     <main class="container-fluid p-3 p-lg-4">
-      <h2 class="fw-bold mb-3">👨🏻‍💻 ประเภทผู้ใช้งานระบบ 
-        <button class="btn btn-outline-secondary" onclick="window.location.href='/admin/user_types/add'"><i class="bi bi-person"></i> เพิ่มประเภทผู้ใช้งาน</button>
+      <h2 class="fw-bold mb-3">👨🏻‍💻 ประเภทผู้ใช้
+        <button class="btn btn-outline-secondary btn-sm ms-2" onclick="window.location.href='/admin/user_types/add'"><i class="bi bi-person"></i> เพิ่มประเภทผู้ใช้งาน</button>
       </h2>
-      <table class="table">
-        <thead>
-          <th style="width: 40px;">#</th>
-          <th style="width: 100px;">ชื่อประเภท</th>
-          <th style="width: 250px;">สี</th>
-          <th style="width: 80px;">สิทธิ์</th>
-          <th>จัดการ</th>
-        </thead>
-        <tbody>
-          <% user_types.forEach(row => { %>
-          <tr>
-            <td><%=row.id%></td>
-            <td><%=row.name%></td>
-            <td><span class="badge bg-<%=row.color%> fw-normal"><%=row.color%></span></td>
-            <td><%=row.permission%></td>
-            <td>
-              <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/user_types/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
-              <button class="btn btn-outline-danger btn-sm" onclick="
-              Swal.fire({
-                title: 'คุณแน่ใจหรือไม่?',
-                text: 'คุณต้องการลบประเภทผู้ใช้งานนี้ออกจากระบบ',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'ใช่, ลบเลย!',
-                cancelButtonText: 'ยกเลิก'
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  window.location.href='/admin/user_types/delete/<%=row.id%>'
-                }
-              })
-              "><i class="bi bi-trash3"></i> ลบ</button>
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <th style="width: 40px;">#</th>
+            <th style="width: 100px;">ชื่อประเภท</th>
+            <th style="width: 250px;">สี</th>
+            <th style="width: 80px;">สิทธิ์</th>
+            <th>จัดการ</th>
+          </thead>
+          <tbody>
+            <% user_types.forEach(row => { %>
+            <tr>
+              <td><%=row.id%></td>
+              <td><%=row.name%></td>
+              <td><span class="badge bg-<%=row.color%> fw-normal"><%=row.color%></span></td>
+              <td><%=row.permission%></td>
+              <td>
+                <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/user_types/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
+                <button class="btn btn-outline-danger btn-sm" onclick="
+                Swal.fire({
+                  title: 'คุณแน่ใจหรือไม่?',
+                  text: 'คุณต้องการลบประเภทผู้ใช้งานนี้ออกจากระบบ',
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: 'ใช่, ลบเลย!',
+                  cancelButtonText: 'ยกเลิก'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    window.location.href='/admin/user_types/delete/<%=row.id%>'
+                  }
+                })
+                "><i class="bi bi-trash3"></i> ลบ</button>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
     </main>
   </div>
 

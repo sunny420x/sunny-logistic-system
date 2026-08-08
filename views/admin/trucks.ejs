@@ -16,17 +16,16 @@
   <div class="main-wrapper">
 
     <main class="container-fluid p-3 p-lg-4">
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-        <h2 class="fw-bold mb-3">🚚 รถบรรทุกในระบบ</h2>
-        <div class="d-lg-flex gap-2">
-          <button class="btn btn-outline-primary" onclick="window.location.href='/admin/trucks/add'"><i class="bi bi-file-earmark-plus"></i> เพิ่มรถในระบบ</button>
-          <form>
-            <div class="input-group">
-                <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
-                <input class="form-control bg-light" name="q" id="topbarSearch" type="search" placeholder="ค้นหา...">
-            </div>
-          </form>
-        </div>
+      <h2 class="fw-bold mb-3">🚚 รถในระบบ
+        <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/trucks/add'"><i class="bi bi-file-earmark-plus"></i> เพิ่มรถในระบบ</button>
+      </h2>
+      <div class="mb-4">
+        <form>
+          <div class="input-group">
+              <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+              <input class="form-control bg-light" name="q" id="topbarSearch" type="search" placeholder="ค้นหา...">
+          </div>
+        </form>
       </div>
       <script>
           document.getElementById('topbarSearch').value = getSearchQuery() ?? ''
@@ -36,47 +35,49 @@
               return urlParams.get('q');
           }
       </script>
-      <table class="table text-center">
-        <thead>
-          <th style="width: 40px;">#</th>
-          <th style="width: 150px;">ทะเบียนรถ</th>
-          <th style="width: 150px;">ยี่ห้อ</th>
-          <th style="width: 150px;">รุ่น</th>
-          <th style="width: 350px;">ค่าใช้จ่าย/กิโลเมตร</th>
-          <th style="width: 250px;">จัดการ</th>
-        </thead>
-        <tbody>
-          <% trucks.forEach(row => { %>
-          <tr>
-            <td><%=row.id%></td>
-            <td><%=row.license_plate%></td>
-            <td><%=row.brand ?? "-"%></td>
-            <td><%=row.model ?? "-"%></td>
-            <td><%=row.cost_per_km ?? 0%> บาท/กิโลเมตร</td>
-            <td>
-              <button class="btn btn-outline-success btn-sm" onclick="window.location.href='/admin/trucks/locations/<%=row.id%>'"><i class="bi bi-archive"></i> ดูประวัติ</button>
-              <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/trucks/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
-              <button class="btn btn-outline-danger btn-sm" onclick="
-              Swal.fire({
-                title: 'คุณแน่ใจหรือไม่?',
-                text: 'คุณต้องการลบรถคันนี้ออกจากระบบ',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'ใช่, ลบเลย!',
-                cancelButtonText: 'ยกเลิก'
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  window.location.href='/admin/trucks/delete/<%=row.id%>'
-                }
-              })
-              "><i class="bi bi-trash3"></i> ลบ</button>
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
+      <div class="table-responsive">        
+        <table class="table text-center">
+          <thead>
+            <th style="width: 40px;">#</th>
+            <th style="width: 150px;">ทะเบียนรถ</th>
+            <th style="width: 150px;">ยี่ห้อ</th>
+            <th style="width: 150px;">รุ่น</th>
+            <th style="width: 350px;">ค่าใช้จ่าย/กิโลเมตร</th>
+            <th style="width: 250px;">จัดการ</th>
+          </thead>
+          <tbody>
+            <% trucks.forEach(row => { %>
+            <tr>
+              <td><%=row.id%></td>
+              <td><%=row.license_plate%></td>
+              <td><%=row.brand ?? "-"%></td>
+              <td><%=row.model ?? "-"%></td>
+              <td><%=row.cost_per_km ?? 0%> บาท/กิโลเมตร</td>
+              <td>
+                <button class="btn btn-outline-success btn-sm" onclick="window.location.href='/admin/trucks/locations/<%=row.id%>'"><i class="bi bi-archive"></i> ดูประวัติ</button>
+                <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/trucks/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
+                <button class="btn btn-outline-danger btn-sm" onclick="
+                Swal.fire({
+                  title: 'คุณแน่ใจหรือไม่?',
+                  text: 'คุณต้องการลบรถคันนี้ออกจากระบบ',
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: 'ใช่, ลบเลย!',
+                  cancelButtonText: 'ยกเลิก'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    window.location.href='/admin/trucks/delete/<%=row.id%>'
+                  }
+                })
+                "><i class="bi bi-trash3"></i> ลบ</button>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
     </main>
   </div>
 

@@ -16,50 +16,54 @@
   <div class="main-wrapper">
 
     <main class="container-fluid p-3 p-lg-4">
-      <h2 class="fw-bold mb-3">👨🏻‍💻 ผู้ใช้งานระบบ 
-        <button class="btn btn-outline-primary" onclick="window.location.href='/admin/users/add'"><i class="bi bi-person-plus"></i> เพิ่มผู้ใช้งานระบบ</button>
-        <button class="btn btn-outline-secondary" onclick="window.location.href='/admin/user_types'"><i class="bi bi-person"></i> จัดการประเภทผู้ใช้งาน</button>
+      <div class="d-lg-flex gap-2">
+      <h2 class="fw-bold mb-3">👨🏻‍💻 ผู้ใช้งานระบบ
       </h2>
-      <table class="table">
-        <thead>
-          <th style="width: 40px;">#</th>
-          <th style="width: 100px;">ชื่อผู้ใช้</th>
-          <th style="width: 250px;">ชื่อเต็ม</th>
-          <th style="width: 80px;">ประเภท</th>
-          <th>โทรศัพท์</th>
-          <th style="width: 200px;">จัดการ</th>
-        </thead>
-        <tbody>
-          <% users.forEach(row => { %>
-          <tr>
-            <td><%=row.id%></td>
-            <td><%=row.username%></td>
-            <td><%=row.full_name ?? "-"%></td>
-            <td><div class="badge bg-<%=row.user_type_color%> fw-normal"><%=row.user_type%></div></td>
-            <td><%=row.phone_number ?? "-"%></td>
-            <td>
-              <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/users/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
-              <button class="btn btn-outline-danger btn-sm" onclick="
-              Swal.fire({
-                title: 'คุณแน่ใจหรือไม่?',
-                text: 'คุณต้องการลบผู้ใช้งานรายนี้ออกจากระบบ',
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#3085d6',
-                cancelButtonColor: '#d33',
-                confirmButtonText: 'ใช่, ลบเลย!',
-                cancelButtonText: 'ยกเลิก'
-              }).then((result) => {
-                if (result.isConfirmed) {
-                  window.location.href='/admin/users/delete/<%=row.id%>'
-                }
-              })
-              "><i class="bi bi-trash3"></i> ลบ</button>
-            </td>
-          </tr>
-          <% }) %>
-        </tbody>
-      </table>
+      <button class="btn btn-outline-primary btn-sm mb-2" onclick="window.location.href='/admin/users/add'"><i class="bi bi-person-plus"></i> เพิ่มผู้ใช้งานระบบ</button>
+      <button class="btn btn-outline-secondary btn-sm mb-2" onclick="window.location.href='/admin/user_types'"><i class="bi bi-person"></i> จัดการประเภทผู้ใช้งาน</button>
+      </div>
+      <div class="table-responsive">
+        <table class="table">
+          <thead>
+            <th style="width: 40px;">#</th>
+            <th style="width: 100px;">ชื่อผู้ใช้</th>
+            <th style="width: 250px;">ชื่อเต็ม</th>
+            <th style="width: 80px;">ประเภท</th>
+            <th>โทรศัพท์</th>
+            <th style="width: 200px;">จัดการ</th>
+          </thead>
+          <tbody>
+            <% users.forEach(row => { %>
+            <tr>
+              <td><%=row.id%></td>
+              <td><%=row.username%></td>
+              <td><%=row.full_name ?? "-"%></td>
+              <td><div class="badge bg-<%=row.user_type_color%> fw-normal"><%=row.user_type%></div></td>
+              <td><%=row.phone_number ?? "-"%></td>
+              <td>
+                <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/users/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
+                <button class="btn btn-outline-danger btn-sm" onclick="
+                Swal.fire({
+                  title: 'คุณแน่ใจหรือไม่?',
+                  text: 'คุณต้องการลบผู้ใช้งานรายนี้ออกจากระบบ',
+                  icon: 'warning',
+                  showCancelButton: true,
+                  confirmButtonColor: '#3085d6',
+                  cancelButtonColor: '#d33',
+                  confirmButtonText: 'ใช่, ลบเลย!',
+                  cancelButtonText: 'ยกเลิก'
+                }).then((result) => {
+                  if (result.isConfirmed) {
+                    window.location.href='/admin/users/delete/<%=row.id%>'
+                  }
+                })
+                "><i class="bi bi-trash3"></i> ลบ</button>
+              </td>
+            </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
     </main>
   </div>
 

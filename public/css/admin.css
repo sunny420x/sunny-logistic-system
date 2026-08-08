@@ -115,4 +115,8 @@ body {
     .main-wrapper {
     margin-left: 0;
     }
+
+    .table {
+        width: max-content;
+    }
 }

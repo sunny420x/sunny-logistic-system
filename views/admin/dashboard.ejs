@@ -17,6 +17,19 @@
       overflow: auto;
       background: #fff;
     }
+
+    @media screen and (max-width: 1024px) {
+      #map {
+        width: 100%;
+      }
+      #ongoingDrivers {
+        width: 100%;
+
+        table {
+          width: 100%;
+        }
+      }
+    }
   </style>
 </head>
 <body>
@@ -95,7 +108,7 @@
           </div>
         </div>
       </section>
-      <div class="d-flex">
+      <div class="d-lg-flex">
         <div id="map"></div>
         <div id="ongoingDrivers">
           <a href="/admin/routes?date=<%=moment().format('YYYY-MM-DD')%>" class="btn btn-primary w-100 rounded-0">คิวส่งของทั้งหมดของวันนี้</a>
