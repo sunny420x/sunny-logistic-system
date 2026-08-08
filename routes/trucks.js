@@ -126,7 +126,6 @@ app.get('/admin/trucks/locations/:id', async(req,res) => {
         truck_id: req.params.id,
         auth: auth,
         moment: moment,
-        timezone: process.env.TIMEZONE,
         settings: await getSettings(),
         page: 'trucks'
     })
