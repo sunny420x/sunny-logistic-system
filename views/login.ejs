@@ -6,7 +6,7 @@
     <title>เข้าสู่ระบบ | <%=settings.company_name%></title>
     <script src="/js/helper.js"></script>
     <link rel="stylesheet" href="/css/login.css">
-
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/7.3.0/css/all.min.css" integrity="sha512-ApSLB1Pd3/bZN8fWB/RG9YhN/7bd9Hkf3AGaE2mPfebjrxagjuBtx2GcgdqIlJkUzwylBo61r9Xa9NmgBI0swA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         .login-banner {
             position: relative;
@@ -33,7 +33,7 @@
                 <div class="logo"><img src="<%=settings.company_logo%>" alt="" width="50"></div>
                 <h1>ยินดีต้อนรับ</h1>
                 <p>
-                    เข้าสู่ระบบผู้ดูแลระบบและพนักงานปฏิบัติการ ระบบจัดการการขนส่งสินค้า <%=settings.company_name%>
+                    เข้าสู่ระบบผู้ดูแลระบบและพนักงานปฏิบัติการ <br>ระบบจัดการการขนส่งสินค้า <%=settings.company_name%>
                 </p>
             </div>
         </section>
@@ -44,12 +44,12 @@
                 <div class="form-group">
                     <label for="email">ชื่อผู้ใช้งาน</label>
                     <div class="input-wrapper">
-                        <span class="input-icon">👤</span>
+                        <span class="input-icon"><i class="fa-solid fa-user"></i></span>
                         <input
                             type="text"
                             id="username"
                             name="username"
-                            placeholder="example"
+                            placeholder="WCF00XX"
                             autocomplete="username"
                             required
                         >
@@ -58,7 +58,7 @@
                 <div class="form-group">
                     <label for="password">รหัสผ่าน</label>
                     <div class="input-wrapper">
-                        <span class="input-icon">🔒</span>
+                        <span class="input-icon"><i class="fa-solid fa-lock"></i></span>
                         <input
                             class="password-input"
                             type="password"
@@ -73,7 +73,7 @@
                             type="button"
                             id="togglePassword"
                             aria-label="แสดงหรือซ่อนรหัสผ่าน"
-                        >👁</button>
+                        ><i class="fa-solid fa-eye"></i></button>
                     </div>
                 </div>
                 <div class="form-options">
@@ -108,7 +108,7 @@
             const isPassword = passwordInput.type === "password";
 
             passwordInput.type = isPassword ? "text" : "password";
-            togglePassword.textContent = isPassword ? "🙈" : "👁";
+            togglePassword.innerHTML = isPassword ? "<i class='fa-solid fa-eye-slash'></i>" : "<i class='fa-solid fa-eye'></i>";
         });
 
         passwordInput.addEventListener('keydown', function(event) {
