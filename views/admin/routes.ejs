@@ -15,37 +15,45 @@
   <div class="main-wrapper">
 
     <main class="container-fluid p-3 p-lg-4">
-      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
-        <h2 class="fw-bold mb-3">📦 คิวส่งของ</h2>
-        <div class="d-lg-flex gap-2">
-          <button class="btn btn-outline-primary" onclick="window.location.href='/admin/routes/add'"><i class="bi bi-calendar-plus"></i> เพิ่มคิวส่งของ</button>
-          <form>
-            <div class="input-group">
-                <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
-                <input class="form-control bg-light" name="q" id="topbarSearch" type="search" placeholder="ค้นหา...">
-            </div>
-          </form>
+      <h2 class="fw-bold mb-3">📦 คิวส่งของ <button class="btn btn-outline-primary" onclick="window.location.href='/admin/routes/add'"><i class="bi bi-calendar-plus"></i> เพิ่มคิวส่งของ</button></h2>
+      <div>
+        <div class="d-lg-flex flex-md-row gap-2 mb-4">
           <form action="" method="get" class="d-flex gap-2">
-            <div class="d-flex gap-2">
-              <input type="date" class="form-control" name="date" id="dateSearch" value="<% if(locals.date) {%><%=date%><%} else {%><%=moment().format('YYYY-MM-DD')%><%}%>">
-              <button class="btn btn-outline-primary" style="width: 200px;"><i class="bi bi-filter"></i> กรองวันที่</button>
+            <div class="d-lg-flex w-100 gap-2">
+              <div class="input-group" style="min-width: 300px;">
+                  <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                  <input class="form-control bg-light" name="q" id="topbarSearch" type="search" placeholder="ค้นหา...">
+              </div>
+              <input type="date" class="form-control w-100" name="date" id="dateSearch" value="<% if(locals.date) {%><%=date%><%} else {%><%=moment().format('YYYY-MM-DD')%><%}%>" style="min-width: 200px;">
+              <select name="status" id="statusSearch" class="form-select w-100" style="min-width: 200px;">
+                <option value="">เลือกสถานะ</option>
+                <option value="0">มอบหมายแล้ว</option>
+                <option value="1">ส่งแล้ว</option>
+              </select>
+              <button class="btn btn-primary w-100"><i class="bi bi-filter"></i> กรองวันที่</button>
             </div>
           </form>
         </div>
         <script>
+          
+          function getSearchQuery() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('q');
+          }
+          
+          function getStatusQuery() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('status');
+          }
+          
+          function getDateQuery() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('date');
+          }
+          
           document.getElementById('topbarSearch').value = getSearchQuery() ?? ''
-
-          function getSearchQuery() {
-              const urlParams = new URLSearchParams(window.location.search);
-              return urlParams.get('q');
-          }
-
-          document.getElementById('dateSearch').value = getSearchQuery() ?? ''
-
-          function getSearchQuery() {
-              const urlParams = new URLSearchParams(window.location.search);
-              return urlParams.get('date');
-          }
+          document.getElementById('dateSearch').value = getDateQuery() ?? ''
+          document.getElementById('statusSearch').value = getStatusQuery() ?? ''
         </script>
       </div>
       <div class="table-responsive">

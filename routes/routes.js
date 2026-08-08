@@ -23,11 +23,12 @@ app.get('/admin/routes', async(req,res) => {
     if(auth.status != 'success') res.redirect('/login')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
-
-    const date = req.query.date ?? null
+    
     const search = req.query.q ?? null
+    const date = req.query.date ?? null
+    const status = req.query.status ?? null
    
-    const routes = await getRoutes(date, search)
+    const routes = await getRoutes(date, search, status)
     res.render('admin/routes', {
         routes: routes,
         auth: auth,

@@ -1,30 +1,47 @@
 const db = require('../database');
 
-function getRoutes(date = null, search = null) {
-    let query = `SELECT r.id, r.date, r.time, c.customer_name, c.customer_id, c.location, r.status, t.license_plate, u.full_name as driver_full_name, r.driver_id, t.id as truck_id, r.weight, r.finish_at, r.arrivalImage 
-    FROM transition_records as r 
-    JOIN customers as c ON c.id = r.customer_id 
-    LEFT JOIN trucks as t ON t.id = r.truck_id
-    JOIN users as u ON u.id = r.driver_id `
-    return new Promise(resolve => {
-        if(date != null || search != null) {
-            if(date != null) {
-                query += "WHERE r.date = ? "
-            }
-            if(search != null) {
-                query += (date != null ? "AND" : "WHERE") + " (c.customer_name LIKE ? OR c.customer_id LIKE ?) "
-            }
-            db.query(query+"ORDER BY r.date DESC", [date, `%${search}%`, `%${search}%`], (err, results) => {
-                if(err) console.error(err);
-                resolve(results)
-            })
-        } else {
-            db.query(query+"ORDER BY r.date DESC", (err, results) => {
-                if(err) console.error(err);
-                resolve(results)
-            })
+function getRoutes(date = null, search = null, status = null) {
+    return new Promise((resolve, reject) => {
+        let query = `SELECT r.id, r.date, r.time, c.customer_name, c.customer_id, c.location, r.status, 
+            t.license_plate, u.full_name as driver_full_name, r.driver_id, 
+            t.id as truck_id, r.weight, r.finish_at, r.arrivalImage 
+        FROM transition_records as r 
+        JOIN customers as c ON c.id = r.customer_id 
+        LEFT JOIN trucks as t ON t.id = r.truck_id
+        JOIN users as u ON u.id = r.driver_id`;
+
+        let conditions = [];
+        let params = [];
+
+        if (date) {
+            conditions.push("r.date = ?");
+            params.push(date);
         }
-    })    
+
+        if (search) {
+            conditions.push("(c.customer_name LIKE ? OR c.customer_id LIKE ?)");
+            params.push(`%${search}%`, `%${search}%`); // ใส่ 2 ค่าสำหรับ 2 เครื่องหมาย ?
+        }
+
+        if (status) {
+            conditions.push("r.status = ?");
+            params.push(status);
+        }
+
+        if (conditions.length > 0) {
+            query += " WHERE " + conditions.join(" AND ");
+        }
+
+        query += " ORDER BY r.date DESC";
+
+        db.query(query, params, (err, results) => {
+            if (err) {
+                console.error("Database Query Error:", err);
+                return reject(err);
+            }
+            resolve(results);
+        });
+    });
 }
 
 function getMyRoutes(driver_id) {
