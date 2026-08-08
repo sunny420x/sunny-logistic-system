@@ -103,13 +103,21 @@ app.post('/admin/users/edit/:id', async(req,res) => {
    
     const id = req.params.id
     const username = req.body.username
+    const password = req.body.password || null
     const type_id = req.body.type_id
     const phone_number = req.body.phone_number
     const full_name = req.body.full_name
 
-    editUser(id, username, full_name, type_id, phone_number).then(() => {
-        res.redirect('/admin/users/edit/'+id)
-    })
+    if(password) {
+        const password_hash = crypto.createHash('sha256').update(password).digest('hex');
+        editUser(id, username, full_name, type_id, phone_number, password_hash).then(() => {
+            res.redirect('/admin/users/edit/'+id)
+        })
+    } else {
+        editUser(id, username, full_name, type_id, phone_number).then(() => {
+            res.redirect('/admin/users/edit/'+id)
+        })
+    }
 })
 // User Types
 app.get('/admin/user_types', async(req,res) => {

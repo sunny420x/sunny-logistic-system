@@ -59,12 +59,20 @@ function registerUser(username, password, full_name, type_id, phone_number) {
     })
 }
 
-function editUser(id, username, full_name, type_id, phone_number) {
+function editUser(id, username, full_name, type_id, phone_number, password = null) {
     return new Promise(resolve => {
-        db.query("UPDATE users SET username = ?, full_name = ?, type_id = ?, phone_number = ? WHERE id = ?", [username, full_name, type_id, phone_number, id], (err) => {
-            if(err) console.error(err);
-            resolve()
-        })
+        if(password != null) {
+            db.query("UPDATE users SET username = ?, full_name = ?, type_id = ?, phone_number = ?, password = ? WHERE id = ?", [username, full_name, type_id, phone_number, password, id], (err) => {
+                if(err) console.error(err);
+                resolve()
+            })
+            return
+        } else {
+            db.query("UPDATE users SET username = ?, full_name = ?, type_id = ?, phone_number = ? WHERE id = ?", [username, full_name, type_id, phone_number, id], (err) => {
+                if(err) console.error(err);
+                resolve()
+            })
+        }
     })
 }
 

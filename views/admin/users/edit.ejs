@@ -28,13 +28,18 @@
             </div>
 
             <div class="form-group mb-3">
+                <label for="password">ตั้งรหัสผ่านใหม่ (ไม่บังคับ): </label>
+                <input type="password" name="password" class="form-control">
+            </div>
+
+            <div class="form-group mb-3">
                 <label for="full_name">ชื่อนามสกุล: </label>
-                <input type="text" name="full_name" class="form-control" value="<%=user.full_name%>">
+                <input type="text" name="full_name" class="form-control" value="<%=user.full_name%>" required>
             </div>
 
             <div class="form-group mb-3">
                 <label for="phone_number">โทรศัพท์: </label>
-                <input type="text" name="phone_number" class="form-control" value="<%=user.phone_number%>">
+                <input type="text" name="phone_number" class="form-control" value="<%=user.phone_number%>" required>
             </div>
 
             <div class="form-group mb-3">
