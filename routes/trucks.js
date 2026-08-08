@@ -125,7 +125,7 @@ app.get('/admin/trucks/locations/:id', async(req,res) => {
         auth: auth,
         moment: moment,
         settings: await getSettings(),
-        page: 'routes'
+        page: 'trucks'
     })
 })
 
