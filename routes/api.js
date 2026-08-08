@@ -108,6 +108,19 @@ app.get('/api/admin/getAllCustomersLocation', async(req,res) => {
     res.json(data)
 })
 
+app.get('/api/driver/getTruckLocation/:truck_id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+
+    const truck_id = req.params.truck_id;
+    const data = await getTruckLocation(null, truck_id)
+    res.json(data)
+})
+
 app.get('/api/driver/getTruckLocation/:truck_id/:date', async(req,res) => {
     if(!req.cookies.auth) {
         res.redirect('/login')
