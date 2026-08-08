@@ -43,6 +43,7 @@
               <% } else { %>
                 สถานะ: <span class="badge bg-primary fw-normal mb-3">มอบหมายแล้ว</span>
               <% } %>
+              <br>
               <% if(route.arrivalImage) { %>
                 <% const arrivalImages = String(route.arrivalImage).split(',').filter(Boolean); %>
                 <% arrivalImages.forEach((imageName) => { %>
