@@ -94,7 +94,7 @@
                         marker.setStyle(new ol.style.Style({
                             image: new ol.style.Icon({ anchor: [0.5, 1], src: '/icons/marker-pending.png', scale: 0.5 }),
                             text: new ol.style.Text({
-                                text: `${moment(truck.created_at).tz("<%=timezone%>").format('YYYY-MM-DD HH:mm:ss')} - ${truck.driver_full_name}`,
+                                text: `${moment(truck.created_at).tz("<%=timezone%>")} - ${truck.driver_full_name}`,
                                 font: 'bold 13px Kanit',
                                 offsetY: -35,
                                 fill: new ol.style.Fill({ color: '#000000' }),
