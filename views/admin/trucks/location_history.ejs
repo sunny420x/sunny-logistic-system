@@ -94,7 +94,7 @@
                         marker.setStyle(new ol.style.Style({
                             image: new ol.style.Icon({ anchor: [0.5, 1], src: '/icons/marker-pending.png', scale: 0.5 }),
                             text: new ol.style.Text({
-                                text: `${moment(truck.created_at).format('YYYY-MM-DD HH:mm:ss')} - ${truck.driver_full_name}`,
+                                text: `${moment(truck.created_at).tz("<%=timezone%>").format('YYYY-MM-DD HH:mm:ss')} - ${truck.driver_full_name}`,
                                 font: 'bold 13px Kanit',
                                 offsetY: -35,
                                 fill: new ol.style.Fill({ color: '#000000' }),
@@ -119,7 +119,7 @@
             }, 10000);
         </script>
     </main>
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.6.2/moment-timezone.min.js" integrity="sha512-tSKmn/O3c9qMrcRo74gTSKa8V2q3NzA/7pQbCImjIBbdL0LjrbYQMHyIATN43NGkIVjYi3G85QRCXUq0BjzTag==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   </div>
   <%-include('../includes/footer')%>
 </body>

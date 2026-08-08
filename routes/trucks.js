@@ -6,11 +6,13 @@ const cookieParser = require('cookie-parser');
 
 const { getTrucks, getTruckById, addTruck, editTruck } = require('../models/trucks')
 const { initUserToken } = require('../models/users')
-const { getSettings } = require('../models/settings')
+const { getSettings } = require('../models/settings');
+const { time } = require('console');
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
+require('dotenv').config();
 
 app.get('/admin/trucks', async(req,res) => {
     if(!req.cookies.auth) {
@@ -124,6 +126,7 @@ app.get('/admin/trucks/locations/:id', async(req,res) => {
         truck_id: req.params.id,
         auth: auth,
         moment: moment,
+        timezone: process.env.TIMEZONE,
         settings: await getSettings(),
         page: 'trucks'
     })
