@@ -4,7 +4,7 @@ const moment = require('moment');
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 
-const { getRoutes, getRouteById, addRoute, editRoute } = require('../models/routes')
+const { getRoutes, getRouteById, addRoute, editRoute, deleteRouteById } = require('../models/routes')
 const { getCustomers, getCustomerById, getCustomerGroups } = require('../models/customers')
 const { getTrucks, getTruckById } = require('../models/trucks')
 const { getDrivers, initUserToken } = require('../models/users')
@@ -129,6 +129,22 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
 
     editRoute(id, customer_id, truck_id, driver_id, date, time_start, weight).then(() => {
         res.redirect('/admin/routes/edit/'+id)
+    })
+})
+app.get('/admin/routes/delete/:id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
+   
+    const id = req.params.id;
+
+    deleteRouteById(id).then(() => {
+        res.redirect('/admin/routes')
     })
 })
 

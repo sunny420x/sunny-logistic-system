@@ -105,10 +105,20 @@ function editRoute(
     })    
 }
 
+function deleteRouteById(id) {
+    return new Promise(resolve => {
+        db.query(`DELETE FROM transition_records WHERE id = ?`, [id], (err) => {
+            if(err) console.error(err);
+            resolve()
+        })
+    })
+}
+
 module.exports = {
     getRoutes,
     getMyRoutes,
     getRouteById,
     addRoute,
     editRoute,
+    deleteRouteById,
 }
