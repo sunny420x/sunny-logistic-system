@@ -55,9 +55,19 @@ function editTruck(
     })    
 }
 
+function deleteTruckById(id) {
+    return new Promise(resolve => {
+        db.query(`DELETE FROM trucks WHERE id = ?`, [id], (err) => {
+            if(err) console.error(err);
+            resolve()
+        })
+    })
+}
+
 module.exports = {
     getTrucks,
     getTruckById,
     addTruck,
     editTruck,
+    deleteTruckById,
 }

@@ -4,7 +4,7 @@ const moment = require('moment');
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 
-const { getTrucks, getTruckById, addTruck, editTruck } = require('../models/trucks')
+const { getTrucks, getTruckById, addTruck, editTruck, deleteTruckById } = require('../models/trucks')
 const { initUserToken } = require('../models/users')
 const { getSettings } = require('../models/settings');
 const { time } = require('console');
@@ -128,6 +128,23 @@ app.get('/admin/trucks/locations/:id', async(req,res) => {
         moment: moment,
         settings: await getSettings(),
         page: 'trucks'
+    })
+})
+
+app.get('/admin/trucks/delete/:id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
+   
+    const id = req.params.id;
+
+    deleteTruckById(id).then(() => {
+        res.redirect('/admin/trucks')
     })
 })
 
