@@ -78,9 +78,15 @@ function getAllTruckLocation() {
     })
 }
 
-function getAllCustomersLocation() {
+function getAllCustomersLocation(group_id = null) {
     return new Promise(resolve => {
-        db.query(`SELECT c.id, c.customer_name, c.location, c.group_id, cg.name as group_name, cg.color FROM customers as c JOIN customer_groups as cg ON cg.id = c.group_id ORDER BY c.id DESC`, (err, results) => {
+        let query = `SELECT c.id, c.customer_name, c.location, c.group_id, cg.name as group_name, cg.color FROM customers as c JOIN customer_groups as cg ON cg.id = c.group_id `
+        let params = []
+        if(group_id != null) {
+            query += `WHERE c.group_id = ?`
+            params.push(group_id)
+        }
+        db.query(query+` ORDER BY c.id DESC`, params, (err, results) => {
             if(err) {
                 resolve({
                     status: "error",
@@ -129,7 +135,7 @@ function getTruckLocation(date = null, truck_id) {
 
 function ongoingDrivers() {
     return new Promise(resolve => {
-        db.query(`SELECT r.id, u.full_name, u.id as driver_id, t.license_plate, t.id as truck_id, r.time, c.location, c.customer_name, c.customer_id, cg.color 
+        db.query(`SELECT r.id, u.full_name, u.id as driver_id, t.license_plate, t.id as truck_id, r.time, c.location, c.customer_name, c.customer_id, cg.color, cg.id as group_id  
             FROM transition_records as r 
             JOIN users as u ON r.driver_id = u.id 
             JOIN trucks as t ON t.id = r.truck_id 

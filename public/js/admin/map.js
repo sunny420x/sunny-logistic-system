@@ -19,6 +19,28 @@ function initializeMap(zoom = 15) {
     });
 }
 
+function metersBetween(coordA, coordB) {
+    const toRad = degrees => degrees * Math.PI / 180;
+    const [lon1, lat1] = coordA;
+    const [lon2, lat2] = coordB;
+    const R = 6371000;
+    const dLat = toRad(lat2 - lat1);
+    const dLon = toRad(lon2 - lon1);
+    const a = Math.sin(dLat/2) * Math.sin(dLat/2) + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon/2) * Math.sin(dLon/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    return R * c;
+}
+
+function isPointNearStops(point, stops, maxDistanceMeters = 500) {
+    return stops.some(stop => {
+        if (!stop.location) return false;
+        const [stopLon, stopLat] = stop.location.split(',').map(Number);
+        if (Number.isNaN(stopLon) || Number.isNaN(stopLat)) return false;
+        const distance = metersBetween(point, [stopLon, stopLat]);
+        return distance <= maxDistanceMeters;
+    });
+}
+
 async function updateMap(options) {
     try {        
         vectorSource.clear();
@@ -221,14 +243,16 @@ async function updateMap(options) {
                 }
                 orderedStops.forEach(assigned => {
                     const [destLon, destLat] = assigned.location.split(',').map(Number);
+                    const assignedColor = assigned.color || assigned.customer_group_color || '#2E8B57';
                     const destFeature = new ol.Feature({
                         geometry: new ol.geom.Point(ol.proj.fromLonLat([destLon, destLat])),
                         name: assigned.customer_name
                     });
                     destFeature.setStyle(new ol.style.Style({
+                        zIndex: 2,
                         image: new ol.style.Icon({
                             anchor: [0.5, 1],
-                            src: createGeoAltSvg(assigned.color),
+                            src: createGeoAltSvg(assignedColor),
                             scale: 0.8
                         }),
                         text: new ol.style.Text({
@@ -241,6 +265,77 @@ async function updateMap(options) {
                     }));
                     vectorSource.addFeature(destFeature);
                 });
+
+                const poiGroupIds = [...new Set(orderedStops.map(s => s.group_id).filter(Boolean))];
+                if (poiGroupIds.length === 0) {
+                    console.warn('ไม่พบ group_id สำหรับ POI ใน assignedStops', assignedStops);
+                }
+                await Promise.all(poiGroupIds.map(async groupId => {
+                    try {
+                        const pointOfInterestRes = await fetch(`/api/getPointOfInterest/${groupId}`);
+                        if (!pointOfInterestRes.ok) {
+                            console.warn('ไม่สามารถดึง POI ได้', pointOfInterestRes.status, 'groupId=', groupId);
+                            return;
+                        }
+
+                        const pointOfInterest = await pointOfInterestRes.json();
+                        const poiLocations = pointOfInterest.locations || [];
+                        if (poiLocations.length === 0) {
+                            console.warn('POI ไม่มี location สำหรับ group_id', groupId, pointOfInterest);
+                        }
+
+                        poiLocations.forEach(data => {
+                            if (!data.location) {
+                                console.warn('POI location ว่างสำหรับ data', data);
+                                return;
+                            }
+                            const [destLon, destLat] = data.location.split(',').map(Number);
+                            if (Number.isNaN(destLon) || Number.isNaN(destLat)) {
+                                console.warn('POI location ไม่ถูกต้อง', data.location, data);
+                                return;
+                            }
+
+                            const poiPoint = [destLon, destLat];
+                            const isSamePoint = orderedStops.some(stop => {
+                                if (!stop.location) return false;
+                                const [stopLon, stopLat] = stop.location.split(',').map(Number);
+                                if (Number.isNaN(stopLon) || Number.isNaN(stopLat)) return false;
+                                return metersBetween(poiPoint, [stopLon, stopLat]) <= 1;
+                            });
+                            if (isSamePoint) {
+                                return;
+                            }
+
+                            const nearStops = isPointNearStops(poiPoint, orderedStops, 800);
+                            if (!nearStops) {
+                                return;
+                            }
+
+                            const destFeature = new ol.Feature({
+                                geometry: new ol.geom.Point(ol.proj.fromLonLat(poiPoint)),
+                                name: data.customer_name
+                            });
+                            destFeature.setStyle(new ol.style.Style({
+                                zIndex: 1,
+                                image: new ol.style.Icon({
+                                    anchor: [0.5, 1],
+                                    src: createGeoAltSvg('#8B639B'),
+                                    scale: 0.7
+                                }),
+                                text: new ol.style.Text({
+                                    text: `${data.customer_name}`,
+                                    font: 'bold 12px Kanit',
+                                    offsetY: -28,
+                                    fill: new ol.style.Fill({ color: '#222' }),
+                                    stroke: new ol.style.Stroke({ color: '#FFFFFF', width: 3 })
+                                })
+                            }));
+                            vectorSource.addFeature(destFeature);
+                        });
+                    } catch (e) {
+                        console.warn('เกิดข้อผิดพลาดในการดึง POI', e, 'groupId=', groupId);
+                    }
+                }));
             }));
         }
     } catch (error) {

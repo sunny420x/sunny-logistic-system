@@ -120,6 +120,18 @@ app.get('/api/admin/getAllCustomersLocation', async(req,res) => {
     res.json(data)
 })
 
+app.get('/api/getPointOfInterest/:group_id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+
+    const data = await getAllCustomersLocation(req.params.group_id)
+    res.json(data)
+})
+
 app.get('/api/driver/getTruckLocation/:truck_id', async(req,res) => {
     if(!req.cookies.auth) {
         res.redirect('/login')
