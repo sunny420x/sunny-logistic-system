@@ -121,6 +121,25 @@ function editCustomerGroup(
     })    
 }
 
+
+function deleteCustomerById(id) {
+    return new Promise(resolve => {
+        db.query(`DELETE FROM customers WHERE id = ?`, [id], (err) => {
+            if(err) console.error(err);
+            resolve()
+        })
+    })
+}
+
+function deleteCustomerGroupById(id) {
+    return new Promise(resolve => {
+        db.query(`DELETE FROM customer_groups WHERE id = ?`, [id], (err) => {
+            if(err) console.error(err);
+            resolve()
+        })
+    })
+}
+
 module.exports = {
     getCustomers,
     getCustomerById,
@@ -130,4 +149,6 @@ module.exports = {
     addCustomerGroup,
     editCustomerGroup,
     getCustomerGroupById,
+    deleteCustomerById,
+    deleteCustomerGroupById,
 }

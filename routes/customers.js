@@ -5,7 +5,7 @@ const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const path = require('path');
 
-const { getCustomers, getCustomerById, addCustomers, editCustomer, getCustomerGroups, addCustomerGroup, editCustomerGroup, getCustomerGroupById } = require('../models/customers')
+const { getCustomers, getCustomerById, addCustomers, editCustomer, getCustomerGroups, addCustomerGroup, editCustomerGroup, getCustomerGroupById, deleteCustomerById, deleteCustomerGroupById } = require('../models/customers')
 const { initUserToken} = require('../models/users')
 const { getSettings } = require('../models/settings')
 
@@ -225,5 +225,41 @@ app.post('/admin/customer_groups/edit/:id', async(req,res) => {
         res.redirect('/admin/customer_groups/edit/'+id)
     })
 })
+
+app.get('/admin/customers/delete/:id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
+   
+    const id = req.params.id;
+
+    deleteCustomerById(id).then(() => {
+        res.redirect('/admin/customers')
+    })
+})
+
+app.get('/admin/customer_groups/delete/:id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
+   
+    const id = req.params.id;
+
+    deleteCustomerGroupById(id).then(() => {
+        res.redirect('/admin/customer_groups')
+    })
+})
+
+
 
 module.exports = app;
