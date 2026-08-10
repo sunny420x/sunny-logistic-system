@@ -129,7 +129,14 @@ function getTruckLocation(date = null, truck_id) {
 
 function ongoingDrivers() {
     return new Promise(resolve => {
-        db.query("SELECT DISTINCT u.full_name, t.license_plate FROM transition_records as r JOIN users as u ON r.driver_id = u.id JOIN trucks as t ON t.id = r.truck_id WHERE r.date = CURDATE()", (err, drivers) => {
+        db.query(`SELECT r.id, u.full_name, u.id as driver_id, t.license_plate, t.id as truck_id, r.time, c.location, c.customer_name, c.customer_id, cg.color 
+            FROM transition_records as r 
+            JOIN users as u ON r.driver_id = u.id 
+            JOIN trucks as t ON t.id = r.truck_id 
+            JOIN customers AS c ON c.id = r.customer_id 
+            JOIN customer_groups as cg ON c.group_id = cg.id 
+            WHERE r.date = CURDATE()
+            ORDER BY t.id, r.time ASC, r.id ASC`, (err, drivers) => {
             if(err) {
                 resolve({
                     status: "error",

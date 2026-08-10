@@ -8,7 +8,7 @@ const path  = require('path')
 
 const { getCustomers, getCustomerById, addCustomers, editCustomer, getCustomerGroups } = require('../models/customers')
 const { getMyRoutes } = require('../models/routes')
-const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation, saveArrivalImageFile } = require('../models/tracking')
+const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation, saveArrivalImageFile, ongoingDrivers } = require('../models/tracking')
 const { getSettings } = require('../models/settings')
 const { loginUser, initUserToken } = require('../models/users')
 
@@ -93,6 +93,18 @@ app.get('/api/driver/getAllTruckLocation', async(req,res) => {
     if(!auth.user) res.redirect('/logout')
 
     const data = await getAllTruckLocation()
+    res.json(data)
+})
+
+app.get('/api/driver/ongoingDrivers', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+
+    const data = await ongoingDrivers()
     res.json(data)
 })
 

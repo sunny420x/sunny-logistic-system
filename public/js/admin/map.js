@@ -1,7 +1,8 @@
 let map = null
 let vectorSource = null;
+let isFit = false
 
-function initializeMap() {
+function initializeMap(zoom = 15) {
     vectorSource = new ol.source.Vector();
     const vectorLayer = new ol.layer.Vector({ source: vectorSource });
 
@@ -13,7 +14,7 @@ function initializeMap() {
         ],
         view: new ol.View({ 
             center: ol.proj.fromLonLat([98.9817, 18.7883]), 
-            zoom: 15 
+            zoom: zoom 
         })
     });
 }
@@ -21,6 +22,11 @@ function initializeMap() {
 async function updateMap(options) {
     try {        
         vectorSource.clear();
+
+        function createGeoAltSvg(fillColor) {
+            const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="${fillColor}" class="bi bi-geo-alt-fill" viewBox="0 0 16 16"><path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/></svg>`;
+            return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+        }
 
         if(options == "customers") {
             const customers = await fetch("/api/admin/getAllCustomersLocation");
@@ -36,12 +42,7 @@ async function updateMap(options) {
                 });
                 marker.setId(customer.id || customer._id);
 
-                function createGeoAltSvg(fillColor) {
-                    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" fill="${fillColor}" class="bi bi-geo-alt-fill" viewBox="0 0 16 16">
-                        <path d="M8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10m0-7a3 3 0 1 1 0-6 3 3 0 0 1 0 6"/>
-                    </svg>`;
-                    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
-                }
+                // createGeoAltSvg is defined above
 
                 // 2. นำไปใช้ใน Marker
                 const groupColor = customer.color
@@ -116,12 +117,29 @@ async function updateMap(options) {
                 throw new Error("ดึงข้อมูล คนขับ จากหลังบ้านไม่สำเร็จ");
             }
             const drivers_data = await drivers.json();
-            drivers_data.locations.forEach(truck => {
+            // fetch ongoing/assigned destinations for drivers
+            let ongoing_data = { status: 'error', data: [] };
+            try {
+                const ongoingRes = await fetch('/api/driver/ongoingDrivers');
+                if (ongoingRes.ok) {
+                    ongoing_data = await ongoingRes.json();
+                }
+            } catch (e) {
+                console.warn('ไม่สามารถดึงข้อมูลปลายทางคนขับได้', e);
+            }
+
+            const assignedByTruck = (ongoing_data.data || []).reduce((acc, item) => {
+                const key = item.truck_id || item.license_plate;
+                if (!acc[key]) acc[key] = [];
+                acc[key].push(item);
+                return acc;
+            }, {});
+
+            await Promise.all(drivers_data.locations.map(async truck => {
+                const truckLon = parseFloat(truck.position_longitude);
+                const truckLat = parseFloat(truck.position_latitude);
                 const marker = new ol.Feature({ 
-                    geometry: new ol.geom.Point(ol.proj.fromLonLat([
-                        parseFloat(truck.position_longitude),
-                        parseFloat(truck.position_latitude)
-                    ])) 
+                    geometry: new ol.geom.Point(ol.proj.fromLonLat([truckLon, truckLat])) 
                 });
 
                 marker.setStyle(new ol.style.Style({
@@ -140,14 +158,95 @@ async function updateMap(options) {
                 }));
 
                 vectorSource.addFeature(marker);
-            });
+
+                const assignedStops = assignedByTruck[truck.truck_id] || assignedByTruck[truck.license_plate] || [];
+                if (assignedStops.length === 0) {
+                    return;
+                }
+
+                const orderedStops = assignedStops.sort((a, b) => {
+                    if (a.time === b.time) return a.customer_name.localeCompare(b.customer_name);
+                    return a.time.localeCompare(b.time);
+                });
+
+                const routeCoords = [
+                    `${truckLon},${truckLat}`,
+                    ...orderedStops.map(stop => stop.location.trim())
+                ].join(';');
+
+                
+                try {
+                    const routeUrl = `https://router.project-osrm.org/route/v1/driving/${routeCoords}?overview=full&geometries=geojson`;
+                    const routeResponse = await fetch(routeUrl);
+                    const routeData = await routeResponse.json();
+
+                    if (routeData.routes && routeData.routes.length > 0) {
+                        const routeCoordinates = routeData.routes[0].geometry.coordinates;
+                        const transformedRouteCoords = routeCoordinates.map(coord => ol.proj.fromLonLat(coord));
+                        const routeLine = new ol.Feature({
+                            geometry: new ol.geom.LineString(transformedRouteCoords)
+                        });
+                        routeLine.setStyle(new ol.style.Style({
+                            stroke: new ol.style.Stroke({ color: assignedStops[0].color, width: 4 })
+                        }));
+                        vectorSource.addFeature(routeLine);
+                        try {
+                            const extent = ol.extent.boundingExtent(transformedRouteCoords);
+                            if(!isFit) {
+                                map.getView().fit(extent, { padding: [40,40,40,40], maxZoom: 15, duration: 800 });
+                                isFit = true
+                            }
+                        } catch (e) {
+                            console.warn('ไม่สามารถย่อ/ขยายมุมมองเส้นทางได้', e);
+                        }
+                    }
+                } catch (e) {
+                    console.warn('ไม่สามารถดึงเส้นทาง OSRM ได้สำหรับ', truck.license_plate, e);
+                }
+                // Fallback: if OSRM didn't return a route, fit view to truck + stops
+                try {
+                    const points = [ol.proj.fromLonLat([truckLon, truckLat])].concat(orderedStops.map(s => {
+                        const [lon, lat] = s.location.split(',').map(Number);
+                        return ol.proj.fromLonLat([lon, lat]);
+                    }));
+                    if (points.length > 0) {
+                        const extent = ol.extent.boundingExtent(points);
+                        if(!isFit) {
+                            map.getView().fit(extent, { padding: [40,40,40,40], maxZoom: 15, duration: 800 });
+                            isFit = true
+                        }
+                    }
+                } catch (e) {
+                    // ignore
+                }
+                orderedStops.forEach(assigned => {
+                    const [destLon, destLat] = assigned.location.split(',').map(Number);
+                    const destFeature = new ol.Feature({
+                        geometry: new ol.geom.Point(ol.proj.fromLonLat([destLon, destLat])),
+                        name: assigned.customer_name
+                    });
+                    destFeature.setStyle(new ol.style.Style({
+                        image: new ol.style.Icon({
+                            anchor: [0.5, 1],
+                            src: createGeoAltSvg(assigned.color),
+                            scale: 0.8
+                        }),
+                        text: new ol.style.Text({
+                            text: `${assigned.customer_name}`,
+                            font: 'bold 12px Kanit',
+                            offsetY: -28,
+                            fill: new ol.style.Fill({ color: '#222' }),
+                            stroke: new ol.style.Stroke({ color: '#FFFFFF', width: 3 })
+                        })
+                    }));
+                    vectorSource.addFeature(destFeature);
+                });
+            }));
         }
     } catch (error) {
         console.error("เกิดข้อผิดพลาดในการอัปเดตพิกัด:", error);
     }
 }
-
-initializeMap();
 
 function selectMark(customerId) {
     if (!customerId) return;
