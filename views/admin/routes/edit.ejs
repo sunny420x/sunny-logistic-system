@@ -60,6 +60,7 @@
                       <% }) %>
                     </select>
                     <% } else { %>
+                      <input type="hidden" name="customer_id" class="form-control" value="<%=route.customer_row_id%>" required>
                       <br><strong><%=route.customer_name%></strong>
                     <% } %>
                 </div>
@@ -72,6 +73,7 @@
                       <% }) %>
                     </select>
                     <% } else {%>
+                      <input type="hidden" name="truck_id" class="form-control" value="<%=route.truck_id%>" required>
                       <br><strong><%=route.license_plate%></strong>
                     <%}%>
                 </div>
@@ -84,6 +86,7 @@
                       <% }) %>
                     </select>
                     <% } else {%>
+                      <input type="hidden" name="driver_id" class="form-control"  value="<%=route.driver_id%>" required>
                       <br><strong><%=route.driver_full_name%></strong>
                     <%}%>
                 </div>
@@ -92,6 +95,7 @@
                      <% if(route.status == 0) { %>
                     <input type="date" name="date" class="form-control" value="<%=moment(route.date).format('YYYY-MM-DD')%>" required>
                     <% } else {%>
+                      <input type="hidden" name="date" class="form-control"  value="<%=moment(route.date).format('YYYY-MM-DD')%>" required>
                       <br><strong><%=moment(route.date).format('DD/MM/YYYY')%></strong>
                     <%}%>
                 </div>
@@ -100,6 +104,7 @@
                      <% if(route.status == 0) { %>
                     <input type="time" name="time_start" class="form-control"  value="<%=route.time%>" <% if(route.status == 1) { %>readonly<%}%> required>
                     <% } else {%>
+                      <input type="hidden" name="time_start" class="form-control"  value="<%=route.time%>" required>
                       <br><strong><%=route.time%></strong>
                     <%}%>
                 </div>
@@ -110,15 +115,22 @@
                 </div>
                 <%}%>
                 <div class="form-group mb-3">                
-                    <label for="location">น้ำหนักบรรทุก: </label>
+                    <label for="weight">น้ำหนักบรรทุก: </label>
                      <% if(route.status == 0) { %>
                     <input type="number" name="weight" class="form-control" value="<%=route.weight ?? 0%>" <% if(route.status == 1) { %>readonly<%}%> required>
                     <% } else {%>
+                      <input type="hidden" name="weight" class="form-control"  value="<%=route.weight%>" required>
                       <br><strong><%=route.weight%> กิโลกรัม</strong>
                     <%}%>
                 </div>
-  
-                <% if(route.status == 0) { %>
+                <div class="form-group mb-3">                
+                    <label for="status">สถานะ: </label>
+                    <select name="status" id="status" class="form-select">
+                      <option value="0" <% if(route.status == 0) { %>selected<%}%>>มอบหมายแล้ว</option>
+                      <option value="1" <% if(route.status == 1) { %>selected<%}%>>ส่งแล้ว</option>
+                    </select>
+                </div>
+                <% if(route.status == 0 || route.finish_at == null) { %>
                 <input type="submit" value="บันทึกการเปลี่ยนแปลง" class="btn btn-primary w-100">
                 <% } %>
               </form>

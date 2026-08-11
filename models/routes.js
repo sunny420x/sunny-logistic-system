@@ -61,7 +61,7 @@ function getMyRoutes(driver_id) {
 
 function getRouteById(id) {
     return new Promise(resolve => {
-        db.query(`SELECT r.id, r.date, r.time, c.customer_name, c.customer_id, c.id as customer_row_id, c.location, t.license_plate, r.driver_id, u.full_name as driver_full_name, r.weight, r.finish_at, r.arrivalImage, r.status 
+        db.query(`SELECT r.id, r.date, r.time, c.customer_name, c.customer_id, c.id as customer_row_id, c.location, t.license_plate, t.id as truck_id, r.driver_id, u.full_name as driver_full_name, r.weight, r.finish_at, r.arrivalImage, r.status 
             FROM transition_records as r JOIN customers as c ON c.id = r.customer_id 
             LEFT JOIN trucks as t ON t.id = r.truck_id 
             JOIN users as u ON u.id = r.driver_id WHERE r.id = ?`, [id], (err, result) => {
@@ -95,11 +95,12 @@ function editRoute(
     driver_id,
     date,
     time,
-    weight
+    weight,
+    status
 ) {
     return new Promise(resolve => {
-        db.query("UPDATE transition_records SET customer_id = ?, truck_id = ?, driver_id = ?, date = ?, time = ?, weight = ? WHERE id = ?", 
-            [customer_id, truck_id, driver_id, date, time, weight, id], (err) => {
+        db.query("UPDATE transition_records SET customer_id = ?, truck_id = ?, driver_id = ?, date = ?, time = ?, weight = ?, status = ? WHERE id = ?", 
+            [customer_id, truck_id, driver_id, date, time, weight, status, id], (err) => {
             if(err) console.error(err);
             resolve()
         })

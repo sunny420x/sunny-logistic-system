@@ -126,8 +126,9 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
     const date = req.body.date
     const time_start = req.body.time_start
     const weight = req.body.weight
+    const status = req.body.status
 
-    editRoute(id, customer_id, truck_id, driver_id, date, time_start, weight).then(() => {
+    editRoute(id, customer_id, truck_id, driver_id, date, time_start, weight, status).then(() => {
         res.redirect('/admin/routes/edit/'+id)
     })
 })
