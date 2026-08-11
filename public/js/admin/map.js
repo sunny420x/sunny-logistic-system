@@ -121,7 +121,7 @@ async function updateMap(options) {
     
                     vectorSource.addFeature(circleFeature);
 
-                    getPointOfInterest(routes, routes)
+                    getPointOfInterest(routes)
                 }
 
                 if (!isFit) {
@@ -351,7 +351,7 @@ async function updateMap(options) {
                     vectorSource.addFeature(destFeature);
                 });
 
-                getPointOfInterest(orderedStops, assignedStops)
+                getPointOfInterest(orderedStops)
             }));
         }
     } catch (error) {
@@ -383,10 +383,10 @@ function selectMark(customerId) {
     }
 }
 
-async function getPointOfInterest(orderedStops, assignedStops) {
+async function getPointOfInterest(orderedStops) {
     const poiGroupIds = [...new Set(orderedStops.map(s => s.group_id).filter(Boolean))];
     if (poiGroupIds.length === 0) {
-        console.warn('ไม่พบ group_id สำหรับ POI ใน assignedStops', assignedStops);
+        console.warn('ไม่พบ group_id สำหรับ POI ใน poiGroupIds', orderedStops);
     }
     await Promise.all(poiGroupIds.map(async groupId => {
         try {
