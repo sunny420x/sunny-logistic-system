@@ -164,16 +164,17 @@
 
         setTimeout(() => {
           renderPoiList()
-        }, 1500)
+        }, 1000)
       }
     }
 
     function renderPoiList() {
-        if(typeof document.getElementById('poiList') == undefined) {
+        const poiListElem = document.getElementById('poiList');
+        if (!poiListElem) {
           console.error("[!] #poiList element not found!")
           return;
         }
-        document.getElementById('poiList').innerHTML = ""
+        poiListElem.innerHTML = ""
         poi_list.forEach((poi) => {
           document.getElementById('poiList').innerHTML += `
           <tr>

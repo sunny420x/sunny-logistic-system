@@ -121,7 +121,10 @@ async function updateMap(options) {
     
                     vectorSource.addFeature(circleFeature);
 
-                    getPointOfInterest(routes)
+                    if (display_poi) {
+                        poi_list = [];
+                        await getPointOfInterest(routes);
+                    }
                 }
 
                 if (!isFit) {
@@ -351,7 +354,9 @@ async function updateMap(options) {
                     vectorSource.addFeature(destFeature);
                 });
 
-                getPointOfInterest(orderedStops)
+                if (display_poi) {
+                    await getPointOfInterest(orderedStops)
+                }
             }));
         }
     } catch (error) {
@@ -461,6 +466,10 @@ async function getPointOfInterest(orderedStops) {
             console.warn('เกิดข้อผิดพลาดในการดึง POI', e, 'groupId=', groupId);
         }
     }));
+
+    if (display_poi && typeof renderPoiList === 'function') {
+        renderPoiList();
+    }
 }
 
 function createGeoAltSvg(fillColor) {
