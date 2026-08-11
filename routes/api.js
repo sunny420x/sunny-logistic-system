@@ -7,7 +7,7 @@ const multer  = require('multer')
 const path  = require('path')
 
 const { getCustomers, getCustomerById, addCustomers, editCustomer, getCustomerGroups } = require('../models/customers')
-const { getMyRoutes } = require('../models/routes')
+const { getMyRoutes, getRoutes } = require('../models/routes')
 const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation, saveArrivalImageFile, ongoingDrivers } = require('../models/tracking')
 const { getSettings } = require('../models/settings')
 const { loginUser, initUserToken } = require('../models/users')
@@ -117,6 +117,22 @@ app.get('/api/admin/getAllCustomersLocation', async(req,res) => {
     if(!auth.user) res.redirect('/logout')
 
     const data = await getAllCustomersLocation()
+    res.json(data)
+})
+
+app.get('/api/admin/getCurrentRoutes', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+
+    const date = req.query.date ?? null
+    const search = req.query.search ?? null
+    const status = req.query.status ?? null
+
+    const data = await getRoutes(date, search, status)
     res.json(data)
 })
 

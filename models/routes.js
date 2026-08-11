@@ -4,9 +4,10 @@ function getRoutes(date = null, search = null, status = null) {
     return new Promise((resolve, reject) => {
         let query = `SELECT r.id, r.date, r.time, c.customer_name, c.customer_id, c.location, r.status, 
             t.license_plate, u.full_name as driver_full_name, r.driver_id, 
-            t.id as truck_id, r.weight, r.finish_at, r.arrivalImage 
+            t.id as truck_id, r.weight, r.finish_at, r.arrivalImage, cg.color, c.group_id   
         FROM transition_records as r 
         JOIN customers as c ON c.id = r.customer_id 
+        JOIN customer_groups as cg ON c.group_id = cg.id 
         LEFT JOIN trucks as t ON t.id = r.truck_id
         JOIN users as u ON u.id = r.driver_id`;
 
