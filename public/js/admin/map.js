@@ -390,6 +390,7 @@ function selectMark(customerId) {
 
 async function getPointOfInterest(orderedStops) {
     const poiGroupIds = [...new Set(orderedStops.map(s => s.group_id).filter(Boolean))];
+    console.debug('getPointOfInterest group IDs', poiGroupIds, 'display_poi=', display_poi);
     if (poiGroupIds.length === 0) {
         console.warn('ไม่พบ group_id สำหรับ POI ใน poiGroupIds', orderedStops);
     }
@@ -440,6 +441,7 @@ async function getPointOfInterest(orderedStops) {
                     customer_name: data.customer_name,
                     address: data.address
                 })
+                console.debug('POI added', data.customer_id, data.customer_name, 'group_id=', groupId)
 
                 const destFeature = new ol.Feature({
                     geometry: new ol.geom.Point(ol.proj.fromLonLat(poiPoint)),

@@ -149,11 +149,14 @@
     let poi_list = []
     document.getElementById('poiListWrapper').style.display = display_poi ? "block" : "none"
 
-    function toggleDisplayPOI() {
+    async function toggleDisplayPOI() {
       display_poi = !display_poi
       document.getElementById('poiListWrapper').style.display = display_poi ? "block" : "none"
       initializePOI()
-      updateMap('route')
+      if (display_poi) {
+        poi_list = []
+      }
+      await updateMap('route')
     }
 
     function initializePOI() {
@@ -161,8 +164,10 @@
         document.getElementById('togglePoiText').textContent = "แสดง Point of Interest (POI)"
       } else {
         document.getElementById('togglePoiText').textContent = "ซ่อน Point of Interest (POI)"
-
-        renderPoiList()
+        const poiListElem = document.getElementById('poiList')
+        if (poiListElem) {
+          poiListElem.innerHTML = `<tr><td colspan="3">กำลังโหลด Point of Interest...</td></tr>`
+        }
       }
     }
 
@@ -173,8 +178,12 @@
           return;
         }
         poiListElem.innerHTML = ""
+        if (poi_list.length === 0) {
+          poiListElem.innerHTML = `<tr><td colspan="3">ไม่มี Point of Interest</td></tr>`
+          return;
+        }
         poi_list.forEach((poi) => {
-          document.getElementById('poiList').innerHTML += `
+          poiListElem.innerHTML += `
           <tr>
             <td>${poi.customer_id}</td>
             <td><a href="/admin/customers/edit/${poi.id}" target="_blank">${poi.customer_name}</a></td>
