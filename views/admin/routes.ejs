@@ -30,8 +30,8 @@
   <div class="main-wrapper">
     <main class="container-fluid p-3 p-lg-4">
       <h2 class="fw-bold mb-3">📦 คิวส่งของ 
-        <button class="btn btn-outline-primary" onclick="window.location.href='/admin/routes/add'"><i class="bi bi-calendar-plus"></i> เพิ่มคิวส่งของ</button>
-        <button class="btn btn-outline-success" onclick="toggleDisplayPOI()"><i class="bi bi-people"></i> <span id="togglePoiText"></span></button>
+        <button class="btn btn-outline-primary" type="button" onclick="window.location.href='/admin/routes/add'"><i class="bi bi-calendar-plus"></i> เพิ่มคิวส่งของ</button>
+        <button id="togglePoiButton" class="btn btn-outline-success" type="button"><i class="bi bi-people"></i> <span id="togglePoiText"></span></button>
       </h2>
       <div>
         <div class="d-lg-flex flex-md-row gap-2 mb-4">
@@ -156,7 +156,15 @@
       if (display_poi) {
         poi_list = []
       }
-      await updateMap('route')
+      try {
+        await updateMap('route')
+      } catch (error) {
+        console.error('toggleDisplayPOI error', error)
+        const poiListElem = document.getElementById('poiList')
+        if (poiListElem) {
+          poiListElem.innerHTML = `<tr><td colspan="3">เกิดข้อผิดพลาดในการโหลด POI</td></tr>`
+        }
+      }
     }
 
     function initializePOI() {
@@ -182,15 +190,21 @@
           poiListElem.innerHTML = `<tr><td colspan="3">ไม่มี Point of Interest</td></tr>`
           return;
         }
+        let html = ''
         poi_list.forEach((poi) => {
-          poiListElem.innerHTML += `
+          html += `
           <tr>
             <td>${poi.customer_id}</td>
             <td><a href="/admin/customers/edit/${poi.id}" target="_blank">${poi.customer_name}</a></td>
             <td>${poi.address}</td>
           </tr>`
         })
+        poiListElem.innerHTML = html
     }
+
+    document.getElementById('togglePoiButton').addEventListener('click', async function() {
+      await toggleDisplayPOI();
+    });
 
     initializeMap()
     initializePOI()

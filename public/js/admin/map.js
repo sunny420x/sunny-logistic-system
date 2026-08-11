@@ -51,6 +51,7 @@ async function updateMap(options) {
                 throw new Error("ดึงข้อมูล ลูกค้าจากหลังบ้านไม่สำเร็จ");
             }
             const routes = await res.json();
+            console.debug('route data fetched', routes.length, routes.map(r => ({id:r.id, group_id:r.group_id, customer_id:r.customer_id})));
             routes.forEach(route => {
                 const [lon, lat] = route.location.split(',').map(Number);
                 const marker = new ol.Feature({ 
@@ -393,12 +394,26 @@ async function getPointOfInterest(orderedStops) {
     console.debug('getPointOfInterest group IDs', poiGroupIds, 'display_poi=', display_poi);
     if (poiGroupIds.length === 0) {
         console.warn('ไม่พบ group_id สำหรับ POI ใน poiGroupIds', orderedStops);
+        if (display_poi && typeof renderPoiList === 'function') {
+            renderPoiList();
+        }
+        return;
     }
     await Promise.all(poiGroupIds.map(async groupId => {
         try {
-            const pointOfInterestRes = await fetch(`/api/getPointOfInterest/${groupId}`);
+            const pointOfInterestRes = await fetch(`/api/getPointOfInterest/${groupId}`, {
+                credentials: 'same-origin'
+            });
             if (!pointOfInterestRes.ok) {
-                console.warn('ไม่สามารถดึง POI ได้', pointOfInterestRes.status, 'groupId=', groupId);
+                const text = await pointOfInterestRes.text();
+                console.warn('ไม่สามารถดึง POI ได้', pointOfInterestRes.status, pointOfInterestRes.statusText, 'groupId=', groupId, 'body=', text.substring(0, 200));
+                return;
+            }
+
+            const contentType = pointOfInterestRes.headers.get('content-type') || '';
+            if (!contentType.includes('application/json')) {
+                const text = await pointOfInterestRes.text();
+                console.warn('POI response ไม่ใช่ JSON', contentType, 'groupId=', groupId, 'body=', text.substring(0, 200));
                 return;
             }
 
@@ -440,8 +455,8 @@ async function getPointOfInterest(orderedStops) {
                     customer_id: data.customer_id,
                     customer_name: data.customer_name,
                     address: data.address
-                })
-                console.debug('POI added', data.customer_id, data.customer_name, 'group_id=', groupId)
+                });
+                console.debug('POI added', data.customer_id, data.customer_name, 'group_id=', groupId);
 
                 const destFeature = new ol.Feature({
                     geometry: new ol.geom.Point(ol.proj.fromLonLat(poiPoint)),
@@ -470,6 +485,7 @@ async function getPointOfInterest(orderedStops) {
     }));
 
     if (display_poi && typeof renderPoiList === 'function') {
+        console.debug('renderPoiList after POI fetch', poi_list.length);
         renderPoiList();
     }
 }
