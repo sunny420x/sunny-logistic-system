@@ -429,6 +429,13 @@ async function getPointOfInterest(orderedStops) {
                     return;
                 }
 
+                poi_list.push({
+                    id: data.id,
+                    customer_id: data.customer_id,
+                    customer_name: data.customer_name,
+                    address: data.address
+                })
+
                 const destFeature = new ol.Feature({
                     geometry: new ol.geom.Point(ol.proj.fromLonLat(poiPoint)),
                     name: data.customer_name

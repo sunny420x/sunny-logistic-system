@@ -11,6 +11,12 @@
       z-index: 1;
       overflow: hidden;
     }
+
+    #poiListWrapper {
+      height: 50vh;
+      overflow: auto;
+      border-radius: 0;
+    }
   </style>
 </head>
 <body>
@@ -66,7 +72,18 @@
           document.getElementById('statusSearch').value = getStatusQuery() ?? ''
         </script>
       </div>
-      <div id="map"></div>
+      <div class="row g-0 gap-0">
+        <div class="col-lg" id="map"></div>
+        <div class="col-lg table-responsive" id="poiListWrapper">
+          <table class="table">
+            <thead>
+              <th colspan="2">ลูกค้า</th>
+              <th>ที่อยู่</th>
+            </thead>
+            <tbody id="poiList"></tbody>
+          </table>
+        </div>
+      </div>
       <div class="table-responsive">
         <table class="table text-center">
           <thead>
@@ -129,9 +146,12 @@
     let status = getStatusQuery()
 
     let display_poi = false;
+    let poi_list = []
+    document.getElementById('poiListWrapper').style.display = display_poi ? "block" : "none"
 
     function toggleDisplayPOI() {
       display_poi = !display_poi
+      document.getElementById('poiListWrapper').style.display = display_poi ? "block" : "none"
       initializePOI()
       updateMap('route')
     }
@@ -141,7 +161,27 @@
         document.getElementById('togglePoiText').textContent = "แสดง Point of Interest (POI)"
       } else {
         document.getElementById('togglePoiText').textContent = "ซ่อน Point of Interest (POI)"
+
+        setTimeout(() => {
+          renderPoiList()
+        }, 1000)
       }
+    }
+
+    function renderPoiList() {
+        if(typeof document.getElementById('poiList') == undefined) {
+          console.error("[!] #poiList element not found!")
+          return;
+        }
+        document.getElementById('poiList').innerHTML = ""
+        poi_list.forEach((poi) => {
+          document.getElementById('poiList').innerHTML += `
+          <tr>
+            <td>${poi.customer_id}</td>
+            <td><a href="/admin/customers/edit/${poi.id}" target="_blank">${poi.customer_name}</a></td>
+            <td>${poi.address}</td>
+          </tr>`
+        })
     }
 
     initializeMap()

@@ -80,7 +80,7 @@ function getAllTruckLocation() {
 
 function getAllCustomersLocation(group_id = null) {
     return new Promise(resolve => {
-        let query = `SELECT c.id, c.customer_name, c.location, c.group_id, cg.name as group_name, cg.color FROM customers as c JOIN customer_groups as cg ON cg.id = c.group_id `
+        let query = `SELECT c.id, c.customer_name, c.customer_id, c.location, c.group_id, cg.name as group_name, cg.color, c.address FROM customers as c JOIN customer_groups as cg ON cg.id = c.group_id `
         let params = []
         if(group_id != null) {
             query += `WHERE c.group_id = ?`
