@@ -289,4 +289,22 @@ app.post('/api/driver/uploadArrivalImage', (req, res, next) => {
     }
 });
 
+app.get('/api/getCustomers', async (req, res) => {
+    try {
+        if (!req.cookies.auth) {
+            return res.status(401).json({ error: 'Unauthorized: Missing token' });
+        }
+        const auth = await initUserToken(req.cookies.auth);
+        if (!auth || !auth.user) {
+            return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+        }
+
+        const customers = await getCustomers(null, null);
+        return res.json(customers);
+    } catch (err) {
+        console.error('Error fetching customers:', err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 module.exports = app;

@@ -30,6 +30,7 @@
   <div class="main-wrapper">
     <main class="container-fluid p-3 p-lg-4">
       <h2 class="fw-bold mb-3">📦 คิวส่งของ 
+        <button class="btn btn-outline-primary" type="button" id="getTodayRouteBtn"><i class="bi bi-calendar-plus"></i> แสดงคิววันนี้</button>
         <button class="btn btn-outline-primary" type="button" onclick="window.location.href='/admin/routes/add'"><i class="bi bi-calendar-plus"></i> เพิ่มคิวส่งของ</button>
         <button id="togglePoiButton" class="btn btn-outline-success" type="button"><i class="bi bi-people"></i> <span id="togglePoiText"></span></button>
       </h2>
@@ -47,7 +48,7 @@
                 <option value="0">มอบหมายแล้ว</option>
                 <option value="1">ส่งแล้ว</option>
               </select>
-              <button class="btn btn-primary w-100"><i class="bi bi-filter"></i> กรองวันที่</button>
+              <button class="btn btn-primary w-100" id="filterBtn"><i class="bi bi-filter"></i> กรองวันที่</button>
             </div>
           </form>
         </div>
@@ -205,6 +206,12 @@
     document.getElementById('togglePoiButton').addEventListener('click', async function() {
       await toggleDisplayPOI();
     });
+
+    //โชว์คิวของวันนี้
+    document.getElementById('getTodayRouteBtn').addEventListener('click', function() {
+      document.getElementById('dateSearch').value = "<%=moment().format('YYYY-MM-DD')%>"
+      document.getElementById('filterBtn').click()
+    })
 
     initializeMap()
     initializePOI()

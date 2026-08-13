@@ -4,6 +4,10 @@
   <title>แก้ไขคิวส่งของ | <%=settings.company_name%></title>
   <%-include('../includes/head')%>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.10.0/ol.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/select2-bootstrap-5-theme@1.3.0/dist/select2-bootstrap-5-theme.min.css" />
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
   <style>
     #map {
       width: 100%;
@@ -13,9 +17,16 @@
       overflow: hidden;
     }
 
+    .route-info {
+      width: 500px;
+    }
+
     @media screen and (max-width: 1024px) {
       #map {
         height: 50vh;
+      }
+      .route-info {
+        width: 100%;
       }
     }
   </style>
@@ -37,7 +48,7 @@
           <h2 class="fw-bold mb-3">ข้อมูลคิวส่งของ #<%=route.id%></h2>
           <div class="d-lg-flex d-block">
             <div id="map"></div>
-            <div class="p-4 py-lg-0">
+            <div class="route-info p-4 py-lg-0">
               <%if(route.status) { %>
                 สถานะ: <span class="badge bg-success fw-normal mb-3">ส่งแล้ว</span>
               <% } else { %>
@@ -52,18 +63,65 @@
               <% } %>
               <form action="" method="post">
                 <div class="form-group mb-3">
-                    <label for="customer_id">ลูกค้า: </label>
-                     <% if(route.status == 0) { %>
-                    <select name="customer_id" class="form-select" onchange="selectMark(this.value)" required>
+                  <label for="customerSelect" class="form-label">ลูกค้า:</label>
+
+                  <% if(route.status == 0) { %>
+                    <!-- ใส่ ID ให้ select เพื่อเรียกใช้ Select2 -->
+                    <select id="customerSelect" name="customer_id" class="form-select" onchange="selectMark(this.value)" required>
+                      <option value="">-- เลือกลูกค้า --</option>
                       <% customers.forEach(customer => { %>
-                        <option value="<%=customer.id%>" <% if(route.customer_row_id == customer.id) {%>selected<%}%> ><%=customer.customer_name%></option>
+                        <option value="<%= customer.id %>" <%= route.customer_row_id == customer.id ? 'selected' : '' %>>
+                          <%= customer.customer_name %>
+                        </option>
                       <% }) %>
                     </select>
-                    <% } else { %>
-                      <input type="hidden" name="customer_id" class="form-control" value="<%=route.customer_row_id%>" required>
-                      <br><strong><%=route.customer_name%></strong>
-                    <% } %>
+                  <% } else { %>
+                    <input type="hidden" name="customer_id" value="<%= route.customer_row_id %>" required>
+                    <br><strong><%= route.customer_name %></strong>
+                  <% } %>
                 </div>
+                <script>
+                  function loadCustomers() {
+                    fetch('/api/getCustomers')
+                      .then(res => {
+                        if (res.status === 401) {
+                          window.location.href = '/login';
+                          return;
+                        }
+                        if (!res.ok) throw new Error('Failed to fetch customers');
+                        return res.json();
+                      })
+                      .then(customers => {
+                        const selectEl = $('#customerSelect');
+
+                        // 1. แปลงข้อมูลให้อยู่ในรูปแบบที่ Select2 ต้องการ { id, text }
+                        const data = customers.map(c => ({
+                          id: c.id,
+                          text: c.customer_name
+                        }));
+
+                        // 3. Initialize Select2
+                        selectEl.select2({
+                          theme: 'bootstrap-5',
+                          data: data,
+                          allowClear: true,
+                          width: '100%'
+                        });
+                      })
+                      .catch(err => console.error('Error fetching customers:', err));
+                  }
+
+                  document.addEventListener('DOMContentLoaded', () => {
+                    loadCustomers();
+
+                    $('#customerSelect').on('select2:select', function (e) {
+                      const selectedValue = e.params.data.id;
+                      if (typeof selectMark === 'function') {
+                        selectMark(selectedValue);
+                      }
+                    });
+                  });
+                </script>
                 <div class="form-group mb-3">
                     <label for="customer_id">รถที่ใช้ส่งสินค้า: </label>
                      <% if(route.status == 0) { %>
