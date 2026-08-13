@@ -21,10 +21,7 @@
 </head>
 <body>
   <%-include('includes/topbar')%>
-  <!-- Desktop Sidebar -->
   <%-include('includes/desktop-sidebar')%>
-
-  <!-- Mobile Sidebar -->
   <%-include('includes/mobile-sidebar')%>
 
   <div class="main-wrapper">
@@ -34,26 +31,24 @@
         <button class="btn btn-outline-primary" type="button" onclick="window.location.href='/admin/routes/add'"><i class="bi bi-calendar-plus"></i> เพิ่มคิวส่งของ</button>
         <button id="togglePoiButton" class="btn btn-outline-success" type="button"><i class="bi bi-people"></i> <span id="togglePoiText"></span></button>
       </h2>
-      <div>
-        <div class="d-lg-flex flex-md-row gap-2 mb-4">
-          <form action="" method="get" class="d-flex gap-2">
-            <div class="d-lg-flex w-100 gap-2">
-              <div class="input-group" style="min-width: 300px;">
-                  <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
-                  <input class="form-control bg-light" name="q" id="topbarSearch" type="search" placeholder="ค้นหา...">
-              </div>
-              <input type="date" class="form-control w-100" name="date" id="dateSearch" value="<% if(locals.date) {%><%=date%><%} else {%><%=moment().format('YYYY-MM-DD')%><%}%>" style="min-width: 200px;">
-              <select name="status" id="statusSearch" class="form-select w-100" style="min-width: 200px;">
-                <option value="">เลือกสถานะ</option>
-                <option value="0">มอบหมายแล้ว</option>
-                <option value="1">ส่งแล้ว</option>
-              </select>
-              <button class="btn btn-primary w-100 mt-2 mt-lg-0" id="filterBtn"><i class="bi bi-filter"></i> กรองวันที่</button>
+      <div class="d-lg-flex flex-md-row gap-2 mb-4">
+        <form action="" method="get" class="d-flex gap-2">
+          <div class="d-lg-flex w-100 gap-2">
+            <div class="input-group" style="min-width: 300px;">
+                <span class="input-group-text bg-light"><i class="bi bi-search"></i></span>
+                <input class="form-control bg-light" name="q" id="topbarSearch" type="search" placeholder="ค้นหา...">
             </div>
-          </form>
-          <div class="d-lg-block mt-2 mt-lg-0">
-            <button class="btn btn-secondary w-100" id="clearFilterBtn" onclick="clearFilters()"><i class="bi bi-x"></i> ล้างตัวกรอง</button>
+            <input type="date" class="form-control w-100" name="date" id="dateSearch" value="<% if(locals.date) {%><%=date%><%} else {%><%=moment().format('YYYY-MM-DD')%><%}%>" style="min-width: 200px;">
+            <select name="status" id="statusSearch" class="form-select w-100" style="min-width: 200px;">
+              <option value="">เลือกสถานะ</option>
+              <option value="0">มอบหมายแล้ว</option>
+              <option value="1">ส่งแล้ว</option>
+            </select>
+            <button class="btn btn-primary w-100 mt-2 mt-lg-0" id="filterBtn"><i class="bi bi-filter"></i> กรองวันที่</button>
           </div>
+        </form>
+        <div class="d-lg-block mt-2 mt-lg-0">
+          <button class="btn btn-secondary w-100" id="clearFilterBtn" onclick="clearFilters()"><i class="bi bi-x"></i> ล้างตัวกรอง</button>
         </div>
         <script>
           function getSearchQuery() {
@@ -78,11 +73,11 @@
       </div>
       <div class="row g-0 gap-0">
         <div class="col-lg" id="map"></div>
-        <div class="col-lg table-responsive" id="poiListWrapper">
+        <div class="col-lg-4 table-responsive" id="poiListWrapper">
           <table class="table">
             <thead>
               <th colspan="2">ลูกค้า</th>
-              <th>ที่อยู่</th>
+              <th>โทรศัพท์</th>
             </thead>
             <tbody id="poiList"></tbody>
           </table>
@@ -200,7 +195,7 @@
           <tr>
             <td>${poi.customer_id}</td>
             <td><a href="/admin/customers/edit/${poi.id}" target="_blank">${poi.customer_name}</a></td>
-            <td>${poi.address}</td>
+            <td>${formatPhoneNumber(poi.phone_number ?? "-")}</td>
           </tr>`
         })
         poiListElem.innerHTML = html
