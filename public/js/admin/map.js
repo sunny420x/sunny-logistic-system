@@ -526,7 +526,7 @@ async function getPointOfInterest(orderedStops) {
 //สำหรับประเทศไทยค่า Longtitude จะมากกว่า Latitude เสมอ
 function validateLocation() {
     const locationInput = document.querySelector('input[name="location"]')
-    const locationValue = locationInput.value.trim()
+    const locationValue = locationInput.value.trim().replace(" ", '')
     if(locationValue.split(',').length != 2) {
     return
     } else {
