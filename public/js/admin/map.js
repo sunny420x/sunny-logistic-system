@@ -365,7 +365,38 @@ async function updateMap(options) {
     }
 }
 
-function selectMark(customerId) {
+function setMarkOnMap(lon, lat) {
+    const parsedLon = parseFloat(lon);
+    const parsedLat = parseFloat(lat);
+
+    if (isNaN(parsedLon) || isNaN(parsedLat)) return;
+
+    vectorSource.clear();
+
+    const coord = ol.proj.fromLonLat([parsedLon, parsedLat]);
+
+    const marker = new ol.Feature({ 
+        geometry: new ol.geom.Point(coord),
+    });
+
+    marker.setStyle(function(feature, resolution) {
+        return new ol.style.Style({
+        image: new ol.style.Icon({
+            anchor: [0.5, 1],
+            src: createGeoAltSvg('#ff0000'),
+            scale: 0.8
+        }),
+        });
+    });
+
+    vectorSource.addFeature(marker);
+
+    if (map) {
+        map.getView().setCenter(coord);
+    }
+}
+
+function selectMark(customerId, moveToMap = false) {
     if (!customerId) return;
 
     // 1. ค้นหาหมุดจาก ID
@@ -383,7 +414,9 @@ function selectMark(customerId) {
             duration: 1000      // ความเร็ว animation (1000ms = 1 วินาที)
         });
 
-       window.location.href="#map"
+        if(moveToMap) {
+            window.location.href="#map"
+        }
     } else {
         console.warn(`ไม่พบหมุดสำหรับ Customer ID: ${customerId}`);
     }
@@ -487,6 +520,24 @@ async function getPointOfInterest(orderedStops) {
     if (display_poi && typeof renderPoiList === 'function') {
         console.debug('renderPoiList after POI fetch', poi_list.length);
         renderPoiList();
+    }
+}
+
+//สำหรับประเทศไทยค่า Longtitude จะมากกว่า Latitude เสมอ
+function validateLocation() {
+    const locationInput = document.querySelector('input[name="location"]')
+    const locationValue = locationInput.value.trim()
+    if(locationValue.split(',').length != 2) {
+    return
+    } else {
+    if (locationValue.split(',')[0] < locationValue.split(',')[1]) {
+        if(locationValue.split(',')[0] != "" && locationValue.split(',')[1] != "") {
+        locationInput.value = `${locationValue.split(',')[1]},${locationValue.split(',')[0]}`
+        }
+        setMarkOnMap(locationValue.split(',')[1], locationValue.split(',')[0])
+    } else {
+        setMarkOnMap(locationValue.split(',')[0], locationValue.split(',')[1])
+    }
     }
 }
 

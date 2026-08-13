@@ -30,7 +30,7 @@
   <div class="main-wrapper">
     <main class="container-fluid p-3 p-lg-4">
       <h2 class="fw-bold mb-3">📦 คิวส่งของ 
-        <button class="btn btn-outline-primary" type="button" id="getTodayRouteBtn"><i class="bi bi-calendar-plus"></i> แสดงคิววันนี้</button>
+        <button class="btn btn-outline-primary" type="button" id="getTodayRouteBtn"><i class="bi bi-calendar"></i> แสดงคิววันนี้</button>
         <button class="btn btn-outline-primary" type="button" onclick="window.location.href='/admin/routes/add'"><i class="bi bi-calendar-plus"></i> เพิ่มคิวส่งของ</button>
         <button id="togglePoiButton" class="btn btn-outline-success" type="button"><i class="bi bi-people"></i> <span id="togglePoiText"></span></button>
       </h2>
@@ -48,9 +48,12 @@
                 <option value="0">มอบหมายแล้ว</option>
                 <option value="1">ส่งแล้ว</option>
               </select>
-              <button class="btn btn-primary w-100" id="filterBtn"><i class="bi bi-filter"></i> กรองวันที่</button>
+              <button class="btn btn-primary w-100 mt-2 mt-lg-0" id="filterBtn"><i class="bi bi-filter"></i> กรองวันที่</button>
             </div>
           </form>
+          <div class="d-lg-block mt-2 mt-lg-0">
+            <button class="btn btn-secondary w-100" id="clearFilterBtn" onclick="clearFilters()"><i class="bi bi-x"></i> ล้างตัวกรอง</button>
+          </div>
         </div>
         <script>
           function getSearchQuery() {
@@ -216,6 +219,10 @@
     initializeMap()
     initializePOI()
     updateMap('route')
+
+    function clearFilters() {
+      window.location.href='/admin/routes'
+    }
   </script>
   <%-include('includes/footer')%>
 </body>
