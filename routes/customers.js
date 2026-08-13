@@ -179,10 +179,6 @@ app.post('/admin/customer_groups/add', async(req,res) => {
     const name = req.body.name
     const color = req.body.color
 
-    if(location.split(",").length != 2) {
-        res.end("พิกัดที่อยู่ลูกค้าไม่ถูกต้อง")
-    }
-
     addCustomerGroup(name, color).then(() => {
         res.redirect('/admin/customer_groups')
     })
