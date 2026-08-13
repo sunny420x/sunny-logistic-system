@@ -66,11 +66,12 @@ function addCustomers(
     customer_id,
     address,
     location,
-    group_id
+    group_id,
+    phone_number
 ) {
     return new Promise(resolve => {
-        db.query("INSERT INTO customers(customer_name, customer_id, location, address, group_id) VALUES(?,?,?,?,?)", 
-            [customer_name, customer_id, location, address, group_id], (err) => {
+        db.query("INSERT INTO customers(customer_name, customer_id, location, address, group_id, phone_number) VALUES(?,?,?,?,?,?)", 
+            [customer_name, customer_id, location, address, group_id, phone_number], (err) => {
             if(err) console.error(err);
             resolve()
         })
@@ -83,11 +84,12 @@ function editCustomer(
     customer_id,
     address,
     location,
-    group_id
+    group_id,
+    phone_number
 ) {
     return new Promise(resolve => {
-        db.query("UPDATE customers SET customer_name = ?, customer_id = ?, location = ?, address = ?, group_id = ? WHERE id = ?", 
-            [customer_name, customer_id, location, address, group_id, id], (err) => {
+        db.query("UPDATE customers SET customer_name = ?, customer_id = ?, location = ?, address = ?, group_id = ?, phone_number = ? WHERE id = ?", 
+            [customer_name, customer_id, location, address, group_id, phone_number, id], (err) => {
             if(err) console.error(err);
             resolve()
         })
