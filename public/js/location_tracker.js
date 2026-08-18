@@ -14,7 +14,7 @@ function handleNewPosition(lat, lon) {
       loadMyRoute();
     }
 
-    sendLocationToServer();
+    sendLocationToServer(lat, lon);
   }
 }
 
