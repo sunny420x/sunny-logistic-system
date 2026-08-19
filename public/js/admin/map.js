@@ -43,8 +43,7 @@ function isPointNearStops(point, stops, maxDistanceMeters = 500) {
 
 async function updateMap(options) {
     try {        
-        vectorSource.clear();
-
+        
         if(options == "route") {
             const res = await fetch(`/api/admin/getCurrentRoutes?date=${date}&search=${search}&status=${status}`);
             if (!res.ok) {
@@ -52,6 +51,8 @@ async function updateMap(options) {
             }
             const routes = await res.json();
             console.debug('route data fetched', routes.length, routes.map(r => ({id:r.id, group_id:r.group_id, customer_id:r.customer_id})));
+            
+            vectorSource.clear();
             routes.forEach(route => {
                 const [lon, lat] = route.location.split(',').map(Number);
                 const marker = new ol.Feature({ 
