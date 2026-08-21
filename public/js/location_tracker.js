@@ -28,7 +28,7 @@ function startLocationTracking() {
         window.LocationChannel.postMessage('requestLocation');
         console.log('[+] Requesting Location From Mobile App.');
       }
-    }, 20000);
+    }, 15000);
 
   } 
   else if (navigator.geolocation) {
@@ -36,7 +36,7 @@ function startLocationTracking() {
 
     const options = {
       enableHighAccuracy: true,
-      timeout: 10000,
+      timeout: 15000,
       maximumAge: 0
     };
 
@@ -62,7 +62,7 @@ function startLocationTracking() {
         console.log('[+] Sending location to server (30s interval).');
         sendLocationToServer(position_latitude, position_longitude);
       }
-    }, 30000); // 30,000 ms = 30 วินาที
+    }, 15000); // 30,000 ms = 30 วินาที
   }
 }
 
