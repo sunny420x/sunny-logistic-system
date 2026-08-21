@@ -117,13 +117,21 @@
                 </div>
                 <div class="form-group mb-3">                
                     <label for="time">เวลา: </label>
-                    <input type="time" name="time_start" class="form-control" value="<%=moment().format('HH:mm:ss')%>" required>
+                    <input type="time" name="time_start" class="form-control" value="<%=moment().format('HH:mm:ss')%>" step="1" required>
                 </div>
                 <div class="form-group mb-3">                
                     <label for="location">น้ำหนักบรรทุก: </label>
-                    <input type="number" name="weight" class="form-control" required>
+                    <input type="number" name="weight" class="form-control" value="0" required>
                 </div>
-                <input type="submit" value="เพิ่มลูกค้า" class="btn btn-primary w-100">
+                <div class="form-group mb-3">                
+                    <label for="driver_note">หมายเหตุสำหรับคนขับ: </label>
+                    <textarea name="driver_note" maxlength="200" placeholder="เช่น จุดวางของ เก็บเงินปลายทาง หรือนำภาชนะเดิมกลับ" class="form-control"></textarea>
+                </div>
+                <div class="form-group mb-3">                
+                    <label for="location_note">หมายเหตุสถานที่: </label>
+                    <textarea name="location_note" maxlength="200" placeholder="เช่น ตำแหน่งของจุดรับของเพิ่มเติม เลขที่อาคาร เลขที่บ้าน" class="form-control"></textarea>
+                </div>
+                <input type="submit" value="เพิ่มคิวส่งของ" class="btn btn-primary w-100">
               </form>
             </div>
           </div>

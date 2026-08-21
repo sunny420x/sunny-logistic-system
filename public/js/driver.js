@@ -32,11 +32,11 @@ async function loadMyRoute() {
             throw new Error("ดึงข้อมูลจากหลังบ้านไม่สำเร็จ");
         }
 
-        const customers = await response.json();
+        const routes = await response.json();
 
-        truck_id = customers[0].truck_id;
+        truck_id = routes[0].truck_id;
 
-        document.getElementById('license_plate').innerText = customers[0].license_plate;
+        document.getElementById('license_plate').innerText = routes[0].license_plate;
         
         vectorSource.clear();
 
@@ -58,12 +58,12 @@ async function loadMyRoute() {
             })
         }));
 
-        if (customers.some(customer => customer.status == 0)) {            
+        if (routes.some(route => route.status == 0)) {            
             vectorSource.addFeature(startMarker);
         }
 
         // แปลงข้อมูลลูกค้าทั้งหมดเตรียมไว้
-        let allCustomers = customers.map(c => {
+        let allRoutes = routes.map(c => {
             const [lon, lat] = c.location.split(',').map(Number);
             return {
                 id: c.id,
@@ -71,21 +71,23 @@ async function loadMyRoute() {
                 customerName: c.customer_name,
                 time: c.time,
                 status: c.status,
+                location_note: c.location_note,
+                driver_note: c.driver_note,
                 coords: [lon, lat],
                 distanceFromMe: null // เพิ่มตัวแปรเก็บระยะทาง
             };
         });
 
         // วาด Marker ลูกค้าทุกคนลงแผนที่ตามปกติ
-        allCustomers.forEach(customer => {
+        allRoutes.forEach(route => {
             const marker = new ol.Feature({ 
-                geometry: new ol.geom.Point(ol.proj.fromLonLat(customer.coords)) 
+                geometry: new ol.geom.Point(ol.proj.fromLonLat(route.coords)) 
             });
-            let markerIcon = customer.status == 1 ? '/icons/marker-success.png' : '/icons/marker-pending.png';
+            let markerIcon = route.status == 1 ? '/icons/marker-success.png' : '/icons/marker-pending.png';
             marker.setStyle(new ol.style.Style({
                 image: new ol.style.Icon({ anchor: [0.5, 1], src: markerIcon, scale: 0.5 }),
                 text: new ol.style.Text({
-                    text: `${customer.customerId} ${customer.customerName}`,
+                    text: `${route.customerId} ${route.customerName}`,
                     font: 'bold 13px Kanit',
                     offsetY: -35,
                     fill: new ol.style.Fill({ color: '#000000' }),
@@ -95,7 +97,7 @@ async function loadMyRoute() {
             vectorSource.addFeature(marker);
         });
 
-        if(allCustomers.every(route => route.status == 1)) {
+        if(allRoutes.every(route => route.status == 1)) {
             statusBarBody.innerHTML += `
             <tr>
                 <td colspan="2" class="text-success text-center">🎉 ส่งงานทั้งหมดเรียบร้อยแล้ว</td>
@@ -104,14 +106,14 @@ async function loadMyRoute() {
         }
 
         // --- กรองเฉพาะจุดที่ยังไม่ส่ง (status != 1) มาคำนวณหาตัวที่ใกล้ที่สุด ---
-        const pendingCustomers = allCustomers.filter(c => c.status != 1);
+        const pendingRoutes = allRoutes.filter(c => c.status != 1);
 
         let nextTarget = null;
 
-        if (pendingCustomers.length > 0) {
+        if (pendingRoutes.length > 0) {
             const coordsString = [
                 `${startCoords[0]},${startCoords[1]}`,
-                ...pendingCustomers.map(c => `${c.coords[0]},${c.coords[1]}`)
+                ...pendingRoutes.map(c => `${c.coords[0]},${c.coords[1]}`)
             ].join(';');
 
             // เพิ่ม &annotations=distance เพื่อดึงระยะทางหน่วยเป็น "เมตร"
@@ -126,8 +128,8 @@ async function loadMyRoute() {
                 let minVal = distancesFromStart[1];
 
                 // วนลูปเก็บระยะทางเข้าสู่ลูกค้าแต่ละคน และหาจุดที่ใกล้ที่สุด
-                for (let i = 1; i < pendingCustomers.length + 1; i++) {
-                    pendingCustomers[i - 1].distanceFromMe = distancesFromStart[i];
+                for (let i = 1; i < pendingRoutes.length + 1; i++) {
+                    pendingRoutes[i - 1].distanceFromMe = distancesFromStart[i];
 
                     if (distancesFromStart[i] < minVal) {
                         minVal = distancesFromStart[i];
@@ -135,7 +137,7 @@ async function loadMyRoute() {
                     }
                 }
 
-                nextTarget = pendingCustomers[minIndex - 1];
+                nextTarget = pendingRoutes[minIndex - 1];
             }
         }
 
@@ -165,7 +167,7 @@ async function loadMyRoute() {
         }
 
         // --- จัดเรียงตาราง UI ---
-        let sortedRoute = [...allCustomers].sort((a, b) => {
+        let sortedRoute = [...allRoutes].sort((a, b) => {
             if (a.status === 1 && b.status !== 1) return 1;
             if (b.status === 1 && a.status !== 1) return -1;
             if (nextTarget && a.id === nextTarget.id) return -1;
@@ -196,12 +198,37 @@ async function loadMyRoute() {
 
                 statusBarBody.innerHTML += `
                 <tr>
-                    <td>${route.customerId} ${route.customerName}${distText}${badge} <span class="badge bg-secondary fw-normal">${route.time}</span></td>
+                    <td>
+                    ${route.customerId} ${route.customerName}${distText}${badge} <span class="badge bg-secondary fw-normal">${route.time}</span>
+                    </td>
                     <td>
                         <a href="https://map.google.co.th/?q=${route.coords[1]},${route.coords[0]}" class="btn btn-light" target="_blank">📍 แผนที่</a>
                         <button class="btn btn-light" onclick="uploadArrivalImage('${route.id}')">✅ ส่งแล้ว</button>
                     </td>
-                </tr>`;
+                </tr>
+                `;
+
+                if(route.location_note) {
+                    statusBarBody.innerHTML += `
+                    <tr>
+                        <td colspan="2">
+                        <p>
+                        <strong>หมายเหตุสถานที่:</strong> ${route.location_note || "-"}
+                        </p>
+                        </td>
+                    </tr>`
+                }
+
+                if(route.driver_note) {
+                    statusBarBody.innerHTML += `
+                    <tr>
+                        <td colspan="2">
+                        <p>
+                        <strong>หมายเหตุคนส่งของ:</strong> ${route.driver_note || "-"}
+                        </p>
+                        </td>
+                    </tr>`
+                }
             }
         });
 

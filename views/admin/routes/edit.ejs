@@ -160,7 +160,7 @@
                 <div class="form-group mb-3">                
                     <label for="time">เวลา:</label>
                      <% if(route.status == 0) { %>
-                    <input type="time" name="time_start" class="form-control"  value="<%=route.time%>" <% if(route.status == 1) { %>readonly<%}%> required>
+                    <input type="time" name="time_start" class="form-control"  value="<%=route.time%>" <% if(route.status == 1) { %>readonly<%}%> step="1" required>
                     <% } else {%>
                       <input type="hidden" name="time_start" class="form-control"  value="<%=route.time%>" required>
                       <br><strong><%=route.time%></strong>
@@ -180,6 +180,14 @@
                       <input type="hidden" name="weight" class="form-control"  value="<%=route.weight%>" required>
                       <br><strong><%=route.weight%> กิโลกรัม</strong>
                     <%}%>
+                </div>
+              <div class="form-group mb-3">                
+                    <label for="driver_note">หมายเหตุสำหรับคนขับ: </label>
+                    <textarea name="driver_note" maxlength="200" placeholder="เช่น จุดวางของ เก็บเงินปลายทาง หรือนำภาชนะเดิมกลับ" <% if(route.status == 1) { %>readonly<%}%>  class="form-control"><%=route.driver_note%></textarea>
+                </div>
+                <div class="form-group mb-3">                
+                    <label for="location_note">หมายเหตุสถานที่: </label>
+                    <textarea name="location_note" maxlength="200" placeholder="เช่น ตำแหน่งของจุดรับของเพิ่มเติม เลขที่อาคาร เลขที่บ้าน" <% if(route.status == 1) { %>readonly<%}%>  class="form-control"><%=route.location_note%></textarea>
                 </div>
                 <div class="form-group mb-3">                
                     <label for="status">สถานะ: </label>

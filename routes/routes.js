@@ -77,8 +77,10 @@ app.post('/admin/routes/add', async(req,res) => {
     const date = req.body.date
     const time_start = req.body.time_start
     const weight = req.body.weight
+    const location_note = req.body.location_note
+    const driver_note = req.body.driver_note
 
-    addRoute(customer_id, truck_id, driver_id, date, time_start, weight).then(() => {
+    addRoute(customer_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note).then(() => {
         res.redirect('/admin/routes')
     })
 })
@@ -126,9 +128,11 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
     const date = req.body.date
     const time_start = req.body.time_start
     const weight = req.body.weight
+    const location_note = req.body.location_note
+    const driver_note = req.body.driver_note
     const status = req.body.status
 
-    editRoute(id, customer_id, truck_id, driver_id, date, time_start, weight, status).then(() => {
+    editRoute(id, customer_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, status).then(() => {
         res.redirect('/admin/routes/edit/'+id)
     })
 })
