@@ -11,16 +11,16 @@
   <style>
     #map {
       width: 100%;
-      height: 80vh;
+      height: 85vh;
       z-index: 1;
       border-radius: 20px;
       overflow: hidden;
     }
-
     .route-info {
-      width: 500px;
+      width: 700px;
+      max-height: 85vh;
+      overflow: auto;
     }
-
     @media screen and (max-width: 1024px) {
       #map {
         height: 50vh;
@@ -181,14 +181,6 @@
                       <br><strong><%=route.weight%> กิโลกรัม</strong>
                     <%}%>
                 </div>
-              <div class="form-group mb-3">                
-                    <label for="driver_note">หมายเหตุสำหรับคนขับ: </label>
-                    <textarea name="driver_note" maxlength="200" placeholder="เช่น จุดวางของ เก็บเงินปลายทาง หรือนำภาชนะเดิมกลับ" <% if(route.status == 1) { %>readonly<%}%>  class="form-control"><%=route.driver_note%></textarea>
-                </div>
-                <div class="form-group mb-3">                
-                    <label for="location_note">หมายเหตุสถานที่: </label>
-                    <textarea name="location_note" maxlength="200" placeholder="เช่น ตำแหน่งของจุดรับของเพิ่มเติม เลขที่อาคาร เลขที่บ้าน" <% if(route.status == 1) { %>readonly<%}%>  class="form-control"><%=route.location_note%></textarea>
-                </div>
                 <div class="form-group mb-3">                
                     <label for="status">สถานะ: </label>
                     <select name="status" id="status" class="form-select">
@@ -196,12 +188,20 @@
                       <option value="1" <% if(route.status == 1) { %>selected<%}%>>ส่งแล้ว</option>
                     </select>
                 </div>
+                <div class="form-group mb-3">
+                    <label for="driver_note">หมายเหตุสำหรับคนขับ: </label>
+                    <textarea name="driver_note" maxlength="200" placeholder="เช่น จุดวางของ เก็บเงินปลายทาง หรือนำภาชนะเดิมกลับ" <% if(route.status == 1) { %>readonly<%}%> class="form-control" style="height: 100px;"><%=route.driver_note%></textarea>
+                </div>
+                <div class="form-group mb-3">                
+                    <label for="location_note">หมายเหตุสถานที่: </label>
+                    <textarea name="location_note" maxlength="200" placeholder="เช่น ตำแหน่งของจุดรับของเพิ่มเติม เลขที่อาคาร เลขที่บ้าน" <% if(route.status == 1) { %>readonly<%}%> class="form-control" style="height: 100px;"><%=route.location_note%></textarea>
+                </div>
                 <% if(route.status == 0 || route.finish_at == null) { %>
-                <input type="submit" value="บันทึกการเปลี่ยนแปลง" class="btn btn-primary w-100">
+                <input type="submit" value="บันทึกการเปลี่ยนแปลง" class="btn btn-primary w-100 mt-2">
                 <% } %>
-              </form>
+              </div>
             </div>
-          </div>
+          </form>
         </div>
       </div>
 
