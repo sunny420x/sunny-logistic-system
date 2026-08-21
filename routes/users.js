@@ -1,6 +1,5 @@
 const express = require('express');
 const app = express.Router();
-const moment = require('moment');
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 

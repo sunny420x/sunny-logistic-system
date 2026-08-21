@@ -1,12 +1,11 @@
 const express = require('express');
 const app = express.Router();
 const moment = require('moment');
-const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 
 const { getRoutes, getRouteById, addRoute, editRoute, deleteRouteById } = require('../models/routes')
-const { getCustomers, getCustomerById, getCustomerGroups } = require('../models/customers')
-const { getTrucks, getTruckById } = require('../models/trucks')
+const { getCustomers } = require('../models/customers')
+const { getTrucks } = require('../models/trucks')
 const { getDrivers, initUserToken } = require('../models/users')
 const { getSettings } = require('../models/settings')
 
@@ -79,8 +78,9 @@ app.post('/admin/routes/add', async(req,res) => {
     const weight = req.body.weight
     const location_note = req.body.location_note
     const driver_note = req.body.driver_note
+    const temporary_location = req.body.temporary_location
 
-    addRoute(customer_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note).then(() => {
+    addRoute(customer_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location).then(() => {
         res.redirect('/admin/routes')
     })
 })
@@ -130,9 +130,10 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
     const weight = req.body.weight
     const location_note = req.body.location_note
     const driver_note = req.body.driver_note
+    const temporary_location = req.body.temporary_location
     const status = req.body.status
 
-    editRoute(id, customer_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, status).then(() => {
+    editRoute(id, customer_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, status).then(() => {
         res.redirect('/admin/routes/edit/'+id)
     })
 })

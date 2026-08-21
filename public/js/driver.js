@@ -51,7 +51,7 @@ async function loadMyRoute() {
                 stroke: new ol.style.Stroke({ color: '#FFFFFF', width: 2 }) 
             }),
             text: new ol.style.Text({ 
-                text: 'จุดเริ่มต้น', 
+                // text: 'จุดเริ่มต้น', 
                 font: 'bold 12px Kanit', 
                 stroke: new ol.style.Stroke({ color: '#FFFFFF', width: 3 }), 
                 offsetY: -15 
@@ -63,16 +63,22 @@ async function loadMyRoute() {
         }
 
         // แปลงข้อมูลลูกค้าทั้งหมดเตรียมไว้
-        let allRoutes = routes.map(c => {
-            const [lon, lat] = c.location.split(',').map(Number);
+        let allRoutes = routes.map(route => {
+            let [lon, lat] = []
+            if(!!route.temporary_location) {
+                [lon, lat] = route.temporary_location.split(',').map(Number);
+            } else {
+                [lon, lat] = route.location.split(',').map(Number);
+            }
+
             return {
-                id: c.id,
-                customerId: c.customer_id,
-                customerName: c.customer_name,
-                time: c.time,
-                status: c.status,
-                location_note: c.location_note,
-                driver_note: c.driver_note,
+                id: route.id,
+                customerId: route.customer_id,
+                customerName: route.customer_name,
+                time: route.time,
+                status: route.status,
+                location_note: route.location_note,
+                driver_note: route.driver_note,
                 coords: [lon, lat],
                 distanceFromMe: null // เพิ่มตัวแปรเก็บระยะทาง
             };

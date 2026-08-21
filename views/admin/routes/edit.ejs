@@ -149,6 +149,10 @@
                     <%}%>
                 </div>
                 <div class="form-group mb-3">                
+                    <label for="temporary_location">ตำแหน่งชั่วคราว (กรณีส่งนอกพิกัดเดิมของลูกค้า): </label>
+                    <input type="text" name="temporary_location" maxlength="100" class="form-control" value="<%=route.temporary_location%>" onblur="validateTempLocation()">
+                </div>
+                <div class="form-group mb-3">                
                     <label for="location">วันที่: </label>
                      <% if(route.status == 0) { %>
                     <input type="date" name="date" class="form-control" value="<%=moment(route.date).format('YYYY-MM-DD')%>" required>
@@ -216,10 +220,19 @@
     initializeMap();
     updateMap('customers');
   </script>
+
   <% if(route.customer_row_id) { %>
   <script>
     setTimeout(() => {
       selectMark('<%=route.customer_row_id%>')
+    }, 1000)
+  </script>
+  <%}%>
+
+  <%if(!!route.temporary_location) {%>
+  <script>
+    setTimeout(() => {
+      validateTempLocation()
     }, 1000)
   </script>
   <%}%>

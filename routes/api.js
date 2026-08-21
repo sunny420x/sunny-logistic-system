@@ -6,10 +6,9 @@ const cookieParser = require('cookie-parser')
 const multer  = require('multer')
 const path  = require('path')
 
-const { getCustomers, getCustomerById, addCustomers, editCustomer, getCustomerGroups } = require('../models/customers')
+const { getCustomers } = require('../models/customers')
 const { getMyRoutes, getRoutes } = require('../models/routes')
 const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation, saveArrivalImageFile, ongoingDrivers } = require('../models/tracking')
-const { getSettings } = require('../models/settings')
 const { loginUser, initUserToken } = require('../models/users')
 
 const storage = multer.diskStorage({

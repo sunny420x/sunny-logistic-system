@@ -1,9 +1,6 @@
 const express = require('express');
 const app = express.Router();
-const moment = require('moment');
-const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
-const path = require('path');
 
 const { getCustomers, getCustomerById, addCustomers, editCustomer, getCustomerGroups, addCustomerGroup, editCustomerGroup, getCustomerGroupById, deleteCustomerById, deleteCustomerGroupById } = require('../models/customers')
 const { initUserToken} = require('../models/users')

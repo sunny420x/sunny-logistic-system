@@ -7,7 +7,6 @@ const cookieParser = require('cookie-parser');
 const { getTrucks, getTruckById, addTruck, editTruck, deleteTruckById } = require('../models/trucks')
 const { initUserToken } = require('../models/users')
 const { getSettings } = require('../models/settings');
-const { time } = require('console');
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));

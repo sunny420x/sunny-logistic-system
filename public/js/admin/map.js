@@ -33,8 +33,13 @@ function metersBetween(coordA, coordB) {
 
 function isPointNearStops(point, stops, maxDistanceMeters = 500) {
     return stops.some(stop => {
+        let [stopLon, stopLat] = []
         if (!stop.location) return false;
-        const [stopLon, stopLat] = stop.location.split(',').map(Number);
+        if(!!stop.temporary_location) {
+            [stopLon, stopLat] = stop.temporary_location.split(',').map(Number);
+        } else {
+            [stopLon, stopLat] = stop.location.split(',').map(Number);
+        }
         if (Number.isNaN(stopLon) || Number.isNaN(stopLat)) return false;
         const distance = metersBetween(point, [stopLon, stopLat]);
         return distance <= maxDistanceMeters;
@@ -43,7 +48,6 @@ function isPointNearStops(point, stops, maxDistanceMeters = 500) {
 
 async function updateMap(options) {
     try {        
-        
         if(options == "route") {
             const res = await fetch(`/api/admin/getCurrentRoutes?date=${date}&search=${search}&status=${status}`);
             if (!res.ok) {
@@ -54,7 +58,12 @@ async function updateMap(options) {
             
             vectorSource.clear();
             routes.forEach(route => {
-                const [lon, lat] = route.location.split(',').map(Number);
+                let [lon, lat] = []
+                if(!!route.temporary_location) {
+                    [lon, lat] = route.temporary_location.split(',').map(Number);
+                } else {
+                    [lon, lat] = route.location.split(',').map(Number);
+                }
                 const marker = new ol.Feature({ 
                     geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat])),
                     customerData: route,
@@ -83,7 +92,12 @@ async function updateMap(options) {
             });
 
             const points = routes.map(s => {
-                const [lon, lat] = s.location.split(',').map(Number);
+                let [lon, lat] = []
+                if(!!route.temporary_location) {
+                    [lon, lat] = s.temporary_location.split(',').map(Number);
+                } else {
+                    [lon, lat] = s.location.split(',').map(Number);
+                }
                 return ol.proj.fromLonLat([lon, lat]);
             });
             if (points.length > 0) {
@@ -529,16 +543,33 @@ function validateLocation() {
     const locationInput = document.querySelector('input[name="location"]')
     const locationValue = locationInput.value.trim().replace(" ", '')
     if(locationValue.split(',').length != 2) {
-    return
+        return
     } else {
-    if (locationValue.split(',')[0] < locationValue.split(',')[1]) {
-        if(locationValue.split(',')[0] != "" && locationValue.split(',')[1] != "") {
-        locationInput.value = `${locationValue.split(',')[1]},${locationValue.split(',')[0]}`
+        if (locationValue.split(',')[0] < locationValue.split(',')[1]) {
+            if(locationValue.split(',')[0] != "" && locationValue.split(',')[1] != "") {
+            locationInput.value = `${locationValue.split(',')[1]},${locationValue.split(',')[0]}`
+            }
+            setMarkOnMap(locationValue.split(',')[1], locationValue.split(',')[0])
+        } else {
+            setMarkOnMap(locationValue.split(',')[0], locationValue.split(',')[1])
         }
-        setMarkOnMap(locationValue.split(',')[1], locationValue.split(',')[0])
-    } else {
-        setMarkOnMap(locationValue.split(',')[0], locationValue.split(',')[1])
     }
+}
+
+function validateTempLocation() {
+    const locationInput = document.querySelector('input[name="temporary_location"]')
+    const locationValue = locationInput.value.trim().replace(" ", '')
+    if(locationValue.split(',').length != 2) {
+        return
+    } else {
+        if (locationValue.split(',')[0] < locationValue.split(',')[1]) {
+            if(locationValue.split(',')[0] != "" && locationValue.split(',')[1] != "") {
+            locationInput.value = `${locationValue.split(',')[1]},${locationValue.split(',')[0]}`
+            }
+            setMarkOnMap(locationValue.split(',')[1], locationValue.split(',')[0])
+        } else {
+            setMarkOnMap(locationValue.split(',')[0], locationValue.split(',')[1])
+        }
     }
 }
 
