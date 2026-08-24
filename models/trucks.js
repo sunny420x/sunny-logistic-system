@@ -96,7 +96,11 @@ function getMaintenanceByTruckId(id = null, date = null) {
         }
 
         if(date) {
-            query += `AND m.created_at = ?`
+            if(id) {
+                query += `AND m.created_at = ?`
+            } else {
+                query += `WHERE m.created_at = ?`
+            }
             params.push(date)
         }
         
