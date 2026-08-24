@@ -82,13 +82,18 @@ function getMaintenanceTypeById(id) {
     })
 }
 
-function getMaintenanceByTruckId(id, date = null) {
+function getMaintenanceByTruckId(id = null, date = null) {
     return new Promise(resolve => {
-        let params = [id]
+        let params = []
         let query = `SELECT u.full_name, u.id, mt.name as maintenace_name, m.note, m.created_at, m.id, m.truck_id, m.maintenance_type 
             FROM truck_maintenance as m 
             JOIN maintenance_type as mt ON mt.id = m.maintenance_type
-            JOIN users as u ON u.id = m.user_id WHERE m.truck_id = ? `
+            JOIN users as u ON u.id = m.user_id `
+
+        if(id) {
+            query += `WHERE m.truck_id = ? `
+            params.push(id)
+        }
 
         if(date) {
             query += `AND m.created_at = ?`
@@ -133,6 +138,41 @@ function saveMaintenance(id, truck_id, maintenance_type, note) {
     })
 }
 
+function deleteMaintenance(id) {
+    return new Promise(resolve => {
+        db.query(`DELETE FROM truck_maintenance WHERE id = ?`, [id], (err) => {
+            if(err) console.error(err);
+            resolve()
+        })
+    })
+}
+
+function addMaintenanceType(name, round, created_at) {
+    return new Promise(resolve => {
+        db.query(`INSERT INTO maintenance_type(name, round, created_at) VALUES(?,?,?)`, [name, round, created_at], (err) => {
+            if(err) console.error(err);
+            resolve()
+        })
+    })
+}
+
+function saveMaintenanceType(id, name, round) {
+    return new Promise(resolve => {
+        db.query(`UPDATE maintenance_type SET name = ?, round = ? WHERE id = ?`, [name, round, id], (err) => {
+            if(err) console.error(err);
+            resolve()
+        })
+    })
+}
+
+function deleteMaintenanceType(id) {
+    return new Promise(resolve => {
+        db.query(`DELETE FROM maintenance_type WHERE id = ?`, [id], (err) => {
+            if(err) console.error(err);
+            resolve()
+        })
+    })
+}
 
 module.exports = {
     getTrucks,
@@ -145,5 +185,9 @@ module.exports = {
     getMaintenanceByTruckId,
     addMaintenance,
     saveMaintenance,
+    deleteMaintenance,
     getMaintenanceById,
+    addMaintenanceType, 
+    saveMaintenanceType,
+    deleteMaintenanceType,
 }

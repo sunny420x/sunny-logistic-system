@@ -4,6 +4,7 @@
     <% } %>
     <% if(auth.user.permission.split(',').includes('trucks')) { %>
     <a class="nav-link <% if(locals.page == 'trucks') { %>active<%}%>" href="/admin/trucks"><i class="bi bi-truck"></i> รถในระบบ</a>
+    <a class="nav-link <% if(locals.page == 'maintenance') { %>active<%}%>" href="/admin/trucks/maintenances"><i class="bi bi-truck"></i> การบำรุงรักษารถ</a>
     <% } %>
     <% if(auth.user.permission.split(',').includes('customers')) { %>
     <a class="nav-link <% if(locals.page == 'customers') { %>active<%}%>" href="/admin/customers"><i class="bi bi-people"></i> ลูกค้า</a>

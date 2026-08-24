@@ -30,7 +30,8 @@
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
             <div class="d-flex">
                 <h2 class="fw-bold mb-3">ประวัติการบำรุงรักษารถ
-                    <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/maintenances/add?id=<%=id%>'"><i class="bi bi-file-earmark-plus"></i> เพิ่มข้อมูลบำรุงรักษา</button>
+                    <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/maintenances/add?id=<%=locals.id%>'"><i class="bi bi-file-earmark-plus"></i> เพิ่มข้อมูลบำรุงรักษา</button>
+                    <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/maintenances/types'"><i class="bi bi-gear"></i> จัดการประเภทรถ</button>
                 </h2>
             </div>
             <form action="" method="get" class="d-flex gap-2">

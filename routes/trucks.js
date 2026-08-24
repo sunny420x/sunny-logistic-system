@@ -4,7 +4,11 @@ const moment = require('moment');
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 
-const { getTrucks, getTruckById, addTruck, editTruck, deleteTruckById, getMaintenanceByTruckId, getMaintenanceTypes, addMaintenance, saveMaintenance, getMaintenanceById } = require('../models/trucks')
+const { 
+    getTrucks, getTruckById, addTruck, editTruck, deleteTruckById, getMaintenanceByTruckId, 
+    getMaintenanceTypes, addMaintenance, saveMaintenance, getMaintenanceById, getMaintenanceTypeById,
+    addMaintenanceType, saveMaintenanceType, deleteMaintenanceType, deleteMaintenance
+} = require('../models/trucks')
 const { initUserToken } = require('../models/users')
 const { getSettings } = require('../models/settings');
 
@@ -147,6 +151,28 @@ app.get('/admin/trucks/delete/:id', async(req,res) => {
     })
 })
 
+app.get('/admin/trucks/maintenances', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
+   
+    const date = req.query.date ?? null
+
+    res.render('admin/maintenance', {
+        date: date,
+        maintenance: await getMaintenanceByTruckId(null, date) ?? [],
+        auth: auth,
+        moment: moment,
+        settings: await getSettings(),
+        page: 'maintenance'
+    })
+})
+
 app.get('/admin/trucks/maintenances/:id', async(req,res) => {
     if(!req.cookies.auth) {
         res.redirect('/login')
@@ -163,12 +189,12 @@ app.get('/admin/trucks/maintenances/:id', async(req,res) => {
     res.render('admin/maintenance', {
         id: id,
         date: date,
-        maintenance: await getMaintenanceByTruckId(id) ?? [],
+        maintenance: await getMaintenanceByTruckId(id, date) ?? [],
         truck_id: req.params.id,
         auth: auth,
         moment: moment,
         settings: await getSettings(),
-        page: 'trucks'
+        page: 'maintenance'
     })
 })
 
@@ -191,7 +217,7 @@ app.get('/admin/maintenances/add', async(req,res) => {
         trucks: await getTrucks(),
         maintenance_type: await getMaintenanceTypes(),
         settings: await getSettings(),
-        page: 'trucks'
+        page: 'maintenance'
     })
 })
 
@@ -236,7 +262,7 @@ app.get('/admin/maintenances/edit/:id', async(req,res) => {
         trucks: await getTrucks(),
         maintenance_type: await getMaintenanceTypes(),
         settings: await getSettings(),
-        page: 'trucks'
+        page: 'maintenance'
     })
 })
 
@@ -257,6 +283,142 @@ app.post('/admin/maintenances/edit/:id', async(req,res) => {
 
     saveMaintenance(id, truck_id, maintenance_type, note).then(() => {
         res.redirect('/admin/maintenances/edit/'+truck_id)
+    })
+})
+
+app.get('/admin/maintenances/delete/:id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
+   
+    const id = req.params.id ?? null
+
+    deleteMaintenance(id).then(() => {
+        res.redirect('/trucks/maintenances/')
+    })
+})
+
+app.get('/admin/maintenances/types', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
+
+    res.render('admin/maintenance_types', {
+        maintenance: await getMaintenanceTypes() ?? [],
+        auth: auth,
+        moment: moment,
+        settings: await getSettings(),
+        page: 'maintenance'
+    })
+})
+
+app.get('/admin/maintenances/types/add', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
+   
+    const id = req.query.id ?? null
+
+    res.render('admin/maintenance_type/add', {
+        id: id,
+        auth: auth,
+        moment: moment,
+        trucks: await getTrucks(),
+        maintenance_type: await getMaintenanceTypes(),
+        settings: await getSettings(),
+        page: 'maintenance'
+    })
+})
+
+app.post('/admin/maintenances/types/add', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
+   
+    const name = req.body.name ?? null
+    const round = req.body.round ?? null
+    const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
+
+    addMaintenanceType(name, round, created_at).then(() => {
+        res.redirect('/admin/maintenances/types')
+    })
+})
+
+app.get('/admin/maintenances/types/edit/:id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
+   
+    const id = req.params.id ?? null
+
+    res.render('admin/maintenance_type/edit', {
+        id:id,
+        maintenance: await getMaintenanceTypeById(id),
+        auth: auth,
+        moment: moment,
+        settings: await getSettings(),
+        page: 'maintenance'
+    })
+})
+
+app.post('/admin/maintenances/types/edit/:id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
+   
+    const id = req.params.id ?? null
+    const name = req.body.name ?? null
+    const round = req.body.round ?? null
+
+    saveMaintenanceType(id, name, round).then(() => {
+        res.redirect('/admin/maintenance/types/edit/'+id)
+    })
+})
+
+app.get('/admin/maintenances/types/delete/:id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
+   
+    const id = req.params.id ?? null
+
+    deleteMaintenanceType(id).then(() => {
+        res.redirect('/admin/maintenances/types')
     })
 })
 

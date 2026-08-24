@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>ประเภทการบำรุงรักษารถ | <%=settings.company_name%></title>
+  <%-include('includes/head')%>
+</head>
+<body>
+  <%-include('includes/topbar')%>
+
+  <!-- Desktop Sidebar -->
+  <%-include('includes/desktop-sidebar')%>
+
+  <!-- Mobile Sidebar -->
+  <%-include('includes/mobile-sidebar')%>
+
+  <div class="main-wrapper">
+    <main class="container-fluid p-3 p-lg-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div class="d-flex">
+                <h2 class="fw-bold mb-3">ประเภทการบำรุงรักษารถ
+                    <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/maintenances/types/add'"><i class="bi bi-file-earmark-plus"></i> เพิ่มประเภท</button>
+                </h2>
+            </div>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th style="width: 200px;">วันที่</th>
+                    <th>ประเภท</th>
+                    <th>จัดการ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% maintenance.forEach(row => { %>
+                    <tr>
+                        <td><%=moment(row.created_at).format("DD/MM/YYYY HH:mm:ss")%></td>
+                        <td><%=row.name%></td>
+                        <td>
+                            <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/maintenances/types/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="
+                            Swal.fire({
+                            title: 'คุณแน่ใจหรือไม่?',
+                            text: 'คุณต้องการลบข้อมูลนี้ออกจากระบบ',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'ใช่, ลบเลย!',
+                            cancelButtonText: 'ยกเลิก'
+                            }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href='/admin/maintenances/types/delete/<%=row.id%>'
+                            }
+                            })
+                            "><i class="bi bi-trash3"></i> ลบ</button>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </main>
+  </div>
+  <%-include('../includes/footer')%>
+</body>
+</html>

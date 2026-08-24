@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>แก้ไขประเภทการบำรุงรักษา | <%=settings.company_name%></title>
+  <%-include('../includes/head')%>
+</head>
+<body>
+  <%-include('../includes/topbar')%>
+  <%-include('../includes/desktop-sidebar')%>
+  <%-include('../includes/mobile-sidebar')%>
+  <div class="main-wrapper">
+    <main class="container-fluid p-3 p-lg-4">
+        <div>
+          <h2 class="fw-bold mb-3">แก้ไขประเภทการบำรุงรักษา</h2>
+          <p class="small">แก้ไขประเภทการบำรุงรักษา เพื่อใช้ติดตามรอบการบำรุงรักษา</p>
+          <form action="" method="post">
+            <div class="form-group mb-3">
+                <label for="maintenance_type">ชื่อประเภทการบำรุงรักษา:</label>
+                <input type="text" name="name" class="form-control" value="<%=maintenance.name%>">
+            </div>
+            <div class="form-group mb-3">
+                <label for="maintenance_round">เตือนให้บำรุงรักษาในอีก:</label>
+                <div class="input-group mb-3">
+                  <input type="number" name="round" class="form-control" value="<%=maintenance.round%>">
+                  <label class="input-group-text">วัน</label>
+                </div>
+            </div>
+            <input type="submit" value="แก้ไขประเภทการบำรุงรักษา" class="btn btn-primary w-100">
+          </form>
+        </div>
+    </main>
+  </div>
+
+  <%-include('../includes/footer')%>
+</body>
+</html>
