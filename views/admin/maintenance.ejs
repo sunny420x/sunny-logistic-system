@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>ประวัติการบำรุงรักษารถ | <%=settings.company_name%></title>
+  <%-include('includes/head')%>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.10.0/ol.css">
+  <style>
+    #map {
+      width: 100%;
+      height: 70vh;
+      z-index: 1;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <%-include('includes/topbar')%>
+
+  <!-- Desktop Sidebar -->
+  <%-include('includes/desktop-sidebar')%>
+
+  <!-- Mobile Sidebar -->
+  <%-include('includes/mobile-sidebar')%>
+
+  <div class="main-wrapper">
+
+
+    <main class="container-fluid p-3 p-lg-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div class="d-flex">
+                <h2 class="fw-bold mb-3">ประวัติการบำรุงรักษารถ
+                    <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/maintenances/add?id=<%=id%>'"><i class="bi bi-file-earmark-plus"></i> เพิ่มข้อมูลบำรุงรักษา</button>
+                </h2>
+            </div>
+            <form action="" method="get" class="d-flex gap-2">
+                <div class="d-flex gap-2">
+                    <input type="date" class="form-control" name="date" id="dateSearch" value="<% if(locals.date) {%><%=date%><%} else {%><%=moment().format('YYYY-MM-DD')%><%}%>">
+                    <button class="btn btn-outline-primary" style="width: 200px;"><i class="bi bi-filter"></i> กรองวันที่</button>
+                </div>
+            </form>
+            <script>
+                document.getElementById('dateSearch').value = getSearchQuery() ?? ''
+
+                function getSearchQuery() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    return urlParams.get('date');
+                }
+            </script>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>วันที่</th>
+                    <th>ผู้ตรวจเช็ค</th>
+                    <th>ประเภทตรวจเช็ค</th>
+                    <th>หมายเหตุ</th>
+                    <th>จัดการ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% maintenance.forEach(row => { %>
+                    <tr>
+                        <td><%=moment(row.created_at).format("DD/MM/YYYY HH:mm:ss")%></td>
+                        <td><%=row.full_name%></td>
+                        <td><%=row.maintenace_name%></td>
+                        <td><%=row.note ?? "-"%></td>
+                        <td>
+                            <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/maintenances/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
+                            <button class="btn btn-outline-danger btn-sm" onclick="
+                            Swal.fire({
+                            title: 'คุณแน่ใจหรือไม่?',
+                            text: 'คุณต้องการลบข้อมูลนี้ออกจากระบบ',
+                            icon: 'warning',
+                            showCancelButton: true,
+                            confirmButtonColor: '#3085d6',
+                            cancelButtonColor: '#d33',
+                            confirmButtonText: 'ใช่, ลบเลย!',
+                            cancelButtonText: 'ยกเลิก'
+                            }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href='/admin/maintenances/delete/<%=row.id%>'
+                            }
+                            })
+                            "><i class="bi bi-trash3"></i> ลบ</button>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/moment-timezone@0.5.37/builds/moment-timezone-with-data.js"></script>
+  </div>
+  <%-include('../includes/footer')%>
+</body>
+</html>

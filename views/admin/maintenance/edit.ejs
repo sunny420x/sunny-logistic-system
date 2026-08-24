@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>แก้ไขข้อมูลการบำรุงรักษา | <%=settings.company_name%></title>
+  <%-include('../includes/head')%>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@v10.10.0/ol.css">
+</head>
+<body>
+  <%-include('../includes/topbar')%>
+  <%-include('../includes/desktop-sidebar')%>
+  <%-include('../includes/mobile-sidebar')%>
+  <div class="main-wrapper">
+    <main class="container-fluid p-3 p-lg-4">
+        <div>
+          <h2 class="fw-bold mb-3">แก้ไขข้อมูลการบำรุงรักษา</h2>
+          <p class="small">แก้ไขข้อมูลการบำรุงรักษา เพื่อใช้ติดตามรอบการบำรุงรักษา</p>
+          <form action="" method="post">
+            <div class="form-group mb-3">
+                <label for="truck_id">เลือกรถ:</label>
+                <select name="truck_id" class="form-select" required>
+                    <% trucks.forEach(truck => { %>
+                    <option value="<%=truck.id%>" <%if(truck.id == maintenance.truck_id) {%>selected<%}%>><%=truck.license_plate%></option>
+                    <% }) %>
+                </select>
+            </div>
+            <div class="form-group mb-3">
+                <label for="maintenance_type">เลือกประเภทการบำรุงรักษา:</label>
+                <select name="maintenance_type" class="form-select" required>
+                    <% maintenance_type.forEach(type => { %>
+                        <option value="<%=type.id%>" <%if(maintenance.maintenance_type == type.id) {%>selected<%}%>><%=type.name%></option>
+                    <% }) %>
+                </select>
+            </div>
+            <div class="form-group mb-3">
+                <label for="note">หมายเหตุ (รายละเอียดการบำรุงรักษา): </label>
+                <textarea name="note" id="note" class="form-control"><%=maintenance.note%></textarea>
+            </div>
+            <input type="submit" value="บันทึกข้อมูลการบำรุงรักษา" class="btn btn-primary w-100">
+          </form>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/ol@v10.10.0/dist/ol.js"></script>
+    </main>
+  </div>
+
+  <%-include('../includes/footer')%>
+</body>
+</html>

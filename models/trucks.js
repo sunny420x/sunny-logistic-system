@@ -64,10 +64,86 @@ function deleteTruckById(id) {
     })
 }
 
+function getMaintenanceTypes() {
+    return new Promise(resolve => {
+        db.query(`SELECT * FROM maintenance_type ORDER BY id ASC`, (err, results) => {
+            if(err) console.error(err);
+            resolve(results)
+        })
+    })
+}
+
+function getMaintenanceTypeById(id) {
+    return new Promise(resolve => {
+        db.query(`SELECT * FROM maintenance_type WHERE id = ?`, [id], (err, result) => {
+            if(err) console.error(err);
+            resolve(result[0])
+        })
+    })
+}
+
+function getMaintenanceByTruckId(id, date = null) {
+    return new Promise(resolve => {
+        let params = [id]
+        let query = `SELECT u.full_name, u.id, mt.name as maintenace_name, m.note, m.created_at, m.id, m.truck_id, m.maintenance_type 
+            FROM truck_maintenance as m 
+            JOIN maintenance_type as mt ON mt.id = m.maintenance_type
+            JOIN users as u ON u.id = m.user_id WHERE m.truck_id = ? `
+
+        if(date) {
+            query += `AND m.created_at = ?`
+            params.push(date)
+        }
+        
+        db.query(query, params, (err, results) => {
+            if(err) console.error(err);
+            resolve(results)
+        })
+    })
+}
+
+function getMaintenanceById(id = null) {
+    return new Promise(resolve => {
+        db.query(`SELECT u.full_name, u.id, mt.name as maintenace_name, m.note, m.created_at, m.id, m.truck_id, m.maintenance_type
+            FROM truck_maintenance as m 
+            JOIN maintenance_type as mt ON mt.id = m.maintenance_type
+            JOIN users as u ON u.id = m.user_id 
+            WHERE m.id = ?`, [id], (err, result) => {
+            if(err) console.error(err);
+            resolve(result[0])
+        })
+    })
+}
+
+function addMaintenance(truck_id, user_id, maintenance_type, note, created_at) {
+    return new Promise(resolve => {
+        db.query(`INSERT INTO truck_maintenance(truck_id, user_id, maintenance_type, note, created_at) VALUES(?,?,?,?,?)`, [truck_id, user_id, maintenance_type, note, created_at], (err) => {
+            if(err) console.error(err);
+            resolve()
+        })
+    })
+}
+
+function saveMaintenance(id, truck_id, maintenance_type, note) {
+    return new Promise(resolve => {
+        db.query(`UPDATE truck_maintenance SET truck_id = ?, maintenance_type = ?, note = ? WHERE id = ?`, [truck_id, maintenance_type, note, id], (err) => {
+            if(err) console.error(err);
+            resolve()
+        })
+    })
+}
+
+
 module.exports = {
     getTrucks,
     getTruckById,
     addTruck,
     editTruck,
     deleteTruckById,
+    getMaintenanceTypes,
+    getMaintenanceTypeById,
+    getMaintenanceByTruckId,
+    addMaintenance,
+    saveMaintenance,
+    getMaintenanceById,
 }

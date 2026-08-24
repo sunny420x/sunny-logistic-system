@@ -40,10 +40,11 @@
           <thead>
             <th style="width: 40px;">#</th>
             <th style="width: 150px;">ทะเบียนรถ</th>
-            <th style="width: 150px;">ยี่ห้อ</th>
-            <th style="width: 150px;">รุ่น</th>
-            <th style="width: 350px;">ค่าใช้จ่าย/กิโลเมตร</th>
-            <th style="width: 250px;">จัดการ</th>
+            <th style="width: 100px;">ยี่ห้อ</th>
+            <th style="width: 100px;">รุ่น</th>
+            <th style="width: 150px;">ค่าใช้จ่าย/กิโลเมตร</th>
+            <th style="width: 200px;">ข้อมูล</th>
+            <th style="width: 200px;">จัดการ</th>
           </thead>
           <tbody>
             <% trucks.forEach(row => { %>
@@ -54,7 +55,10 @@
               <td><%=row.model ?? "-"%></td>
               <td><%=row.cost_per_km ?? 0%> บาท/กิโลเมตร</td>
               <td>
-                <button class="btn btn-outline-success btn-sm" onclick="window.location.href='/admin/trucks/locations/<%=row.id%>'"><i class="bi bi-archive"></i> ดูประวัติ</button>
+                <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/trucks/locations/<%=row.id%>'"><i class="bi bi-archive"></i> ดูประวัติ</button>
+                <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/trucks/maintenances/<%=row.id%>'"><i class="bi bi-archive"></i> การบำรุงรักษา</button>
+              </td>
+              <td>
                 <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/trucks/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
                 <button class="btn btn-outline-danger btn-sm" onclick="
                 Swal.fire({
