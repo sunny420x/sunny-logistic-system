@@ -18,6 +18,22 @@ function finishDelivery(id, finish_at) {
     })
 }
 
+function arrivalAtWarehouse(id, time) {
+    return new Promise(resolve => {
+        db.query("UPDATE transition_records SET arrival_at_warehouse = ? WHERE id = ?", [time, id], (err) => {
+            if(err) {
+                resolve({
+                    status: "error",
+                    message: err.message
+                })
+            }
+            resolve({
+                status: "success"
+            })
+        })
+    })
+}
+
 function saveLocation(truck_id, driver_id, position_latitude, position_longitude) {
     return new Promise(resolve => {
         const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
@@ -182,4 +198,5 @@ module.exports = {
     getAllCustomersLocation,
     ongoingDrivers,
     saveArrivalImageFile,
+    arrivalAtWarehouse,
 }

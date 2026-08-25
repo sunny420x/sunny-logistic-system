@@ -8,7 +8,7 @@ const path  = require('path')
 
 const { getCustomers } = require('../models/customers')
 const { getMyRoutes, getRoutes } = require('../models/routes')
-const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation, saveArrivalImageFile, ongoingDrivers } = require('../models/tracking')
+const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation, saveArrivalImageFile, ongoingDrivers, arrivalAtWarehouse } = require('../models/tracking')
 const { loginUser, initUserToken } = require('../models/users')
 
 const storage = multer.diskStorage({
@@ -200,6 +200,35 @@ app.get('/api/finishDelivery/:id', async (req, res) => {
             });
         }
 
+    } catch (error) {
+        console.error("เกิดข้อผิดพลาดขณะอัปเดตงาน:", error);
+        return res.status(500).json({
+            status: "error",
+            message: error.message
+        });
+    }
+});
+
+app.post('/api/arrivalAtWarehouse', async (req, res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+
+    try {
+        const routes = req.body.routes;
+        const arrival_at = moment().format("YYYY-MM-DD HH:mm:ss");
+        
+        await Promise.all(
+            routes.map(route => arrivalAtWarehouse(route, arrival_at))
+        );
+
+        return res.json({
+            status: "success",
+            message: "อัปเดตสถานะว่ากลับถึงโกดังสินค้าแล้ว"
+        });
     } catch (error) {
         console.error("เกิดข้อผิดพลาดขณะอัปเดตงาน:", error);
         return res.status(500).json({

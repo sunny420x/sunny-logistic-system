@@ -79,6 +79,7 @@ async function loadMyRoute() {
                 status: route.status,
                 location_note: route.location_note,
                 driver_note: route.driver_note,
+                arrival_at_warehouse: route.arrival_at_warehouse,
                 coords: [lon, lat],
                 distanceFromMe: null // เพิ่มตัวแปรเก็บระยะทาง
             };
@@ -104,10 +105,18 @@ async function loadMyRoute() {
         });
 
         if(allRoutes.every(route => route.status == 1)) {
-            statusBarBody.innerHTML += `
-            <tr>
-                <td colspan="2" class="text-success text-center">🎉 ส่งงานทั้งหมดเรียบร้อยแล้ว</td>
-            </tr>`;
+            if(!allRoutes[0].arrival_at_warehouse) {
+                statusBarBody.innerHTML += `
+                <tr>
+                    <td class="text-success text-center">🎉 ส่งงานทั้งหมดเรียบร้อยแล้ว</td>
+                    <td><button class="btn btn-primary" onclick="arrivalAtWarehouse([${allRoutes.map(route => route.id)}])">✅ ฉันกลับมาถึงโกดังสินค้าแล้ว</td>
+                </tr>`;
+            } else {
+                statusBarBody.innerHTML += `
+                <tr>
+                    <td colspan="2" class="text-success text-center">🎉 ส่งงานทั้งหมดเรียบร้อยแล้ว</td>
+                </tr>`;
+            }
             return;
         }
 
@@ -266,4 +275,30 @@ function finishDelivery(route_id) {
         .catch(error => {
             console.error("❌ เกิดข้อผิดพลาดในการ Fetch ข้อมูล:", error);
         });
+}
+
+function arrivalAtWarehouse(routes) {
+    fetch(`/api/arrivalAtWarehouse`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+            routes: routes
+        })
+    })
+    .then(response => {
+        if(!response.ok) {
+            throw new Error(`เซิร์ฟเวอร์ตอบกลับด้วยสถานะ: ${response.status}`)
+        }
+        return response.json();
+    })
+    .then(data => {
+        if(data.status == 'success') {
+            loadMyRoute();
+        }
+    })
+    .catch(error => {
+        console.error("❌ เกิดข้อผิดพลาดในการ Fetch ข้อมูล:", error);
+    })
 }
