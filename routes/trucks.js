@@ -299,7 +299,7 @@ app.get('/admin/maintenances/delete/:id', async(req,res) => {
     const id = req.params.id ?? null
 
     deleteMaintenance(id).then(() => {
-        res.redirect('/trucks/maintenances/')
+        res.redirect('/admin/trucks/maintenances/')
     })
 })
 
