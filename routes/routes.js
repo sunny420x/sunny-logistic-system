@@ -36,6 +36,29 @@ app.get('/admin/routes', async(req,res) => {
         page: 'routes'
     })
 })
+app.get('/admin/routes/calendar', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
+    
+    const search = req.query.q ?? null
+    const date = req.query.date ?? null
+    const status = req.query.status ?? null
+   
+    const routes = await getRoutes(date, search, status)
+    res.render('admin/routes/calendar', {
+        routes: routes,
+        auth: auth,
+        moment:moment,
+        settings: await getSettings(),
+        page: 'routes'
+    })
+})
 app.get('/admin/routes/add', async(req,res) => {
     if(!req.cookies.auth) {
         res.redirect('/login')
