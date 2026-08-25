@@ -91,12 +91,12 @@ async function updateMap(options) {
                 vectorSource.addFeature(marker);
             });
 
-            const points = routes.map(s => {
+            const points = routes.map(route => {
                 let [lon, lat] = []
                 if(!!route.temporary_location) {
-                    [lon, lat] = s.temporary_location.split(',').map(Number);
+                    [lon, lat] = route.temporary_location.split(',').map(Number);
                 } else {
-                    [lon, lat] = s.location.split(',').map(Number);
+                    [lon, lat] = route.location.split(',').map(Number);
                 }
                 return ol.proj.fromLonLat([lon, lat]);
             });
