@@ -401,7 +401,7 @@ app.post('/admin/maintenances/types/edit/:id', async(req,res) => {
     const round = req.body.round ?? null
 
     saveMaintenanceType(id, name, round).then(() => {
-        res.redirect('/admin/maintenance/types/edit/'+id)
+        res.redirect('/admin/maintenances/types/edit/'+id)
     })
 })
 
