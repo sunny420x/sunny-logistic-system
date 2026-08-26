@@ -156,9 +156,13 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
     const temporary_location = req.body.temporary_location
     const status = req.body.status
 
-    const arrival_at_warehouse_date = req.body.arrival_at_warehouse_date
-    const arrival_at_warehouse_time = req.body.arrival_at_warehouse_time
-    const arrival_at_warehouse = `${arrival_at_warehouse_date} ${arrival_at_warehouse_time}`
+    const arrival_at_warehouse_date = req.body.arrival_at_warehouse_date ?? null
+    const arrival_at_warehouse_time = req.body.arrival_at_warehouse_time ?? null
+    let arrival_at_warehouse = null
+    
+    if(arrival_at_warehouse_date && arrival_at_warehouse_time) {
+        arrival_at_warehouse = `${arrival_at_warehouse_date} ${arrival_at_warehouse_time}`
+    }
 
     editRoute(id, customer_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, status, arrival_at_warehouse).then(() => {
         res.redirect('/admin/routes/edit/'+id)
