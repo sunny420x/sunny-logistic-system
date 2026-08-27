@@ -99,7 +99,7 @@ body {
 }
 
 .table > :not(caption) > * > * {
-    padding: .95rem .75rem;
+    /* padding: .95rem .75rem; */
     vertical-align: middle;
 }
 
