@@ -13,12 +13,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: 20px;
-    background:
-        linear-gradient(
-            135deg,
-            rgba(0, 102, 204, 0.92),
-            rgba(0, 190, 180, 0.88)
-        );
+    background: #ffff;
 }
 
 .login-container {
