@@ -104,6 +104,7 @@ app.post('/admin/routes/add', async(req,res) => {
     const temporary_location = req.body.temporary_location
 
     addRoute(customer_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location).then(() => {
+        res.cookie('alert', 'success')
         res.redirect('/admin/routes')
     })
 })
@@ -165,6 +166,7 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
     }
 
     editRoute(id, customer_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, status, arrival_at_warehouse).then(() => {
+        res.cookie('alert', 'success')
         res.redirect('/admin/routes/edit/'+id)
     })
 })
@@ -181,6 +183,7 @@ app.get('/admin/routes/delete/:id', async(req,res) => {
     const id = req.params.id;
 
     deleteRouteById(id).then(() => {
+        res.cookie('alert', 'success')
         res.redirect('/admin/routes')
     })
 })
