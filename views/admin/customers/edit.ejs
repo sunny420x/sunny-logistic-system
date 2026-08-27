@@ -68,7 +68,12 @@
 
             <div class="form-group mb-3">                
                 <label for="location">พิกัดที่อยู่: </label>
-                <input type="text" name="location" class="form-control" value="<%=customer.location%>" onblur="setLocation()" required>
+                <div class="input-group">
+                  <input type="text" name="location" class="form-control" value="<%=customer.location%>" onblur="setLocation()" required>
+                  <%if(customer.location) {%>
+                  <a href="https://map.google.co.th/?q=<%=customer.location.split(',')[1]%>,<%=customer.location.split(',')[0]%>" target="_blank" class="btn btn-primary">เปิดใน Google Map</a>
+                  <%}%>
+                </div>
                 <small>รูปแบบ: Longtitude,Latitude</small>
             </div>
 
