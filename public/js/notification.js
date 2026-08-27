@@ -14,10 +14,19 @@ if(getCookie('alert')) {
         Swal.fire({
             position: "top-end",
             icon: "success",
-            title: "Your work has been saved",
+            title: "บันทึกข้อมูลสำเร็จ",
             showConfirmButton: false,
             timer: 1500
         });
-        deleteCookie("alert");
     }
+    if(alert == "delete_success") {
+        Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: "ลบข้อมูลสำเร็จ",
+            showConfirmButton: false,
+            timer: 1500
+        });
+    }
+    deleteCookie("alert");
 }

@@ -76,6 +76,7 @@ app.post('/admin/customers/add', async(req,res) => {
     }
 
     addCustomers(customer_name, customer_id, address, location, group_id, phone_number).then(() => {
+        res.cookie('alert', 'success')
         res.redirect('/admin/customers')
     })
 })
@@ -124,6 +125,7 @@ app.post('/admin/customers/edit/:id', async(req,res) => {
     }
 
     editCustomer(id, customer_name, customer_id, address, location, group_id, phone_number).then(() => {
+        res.cookie('alert', 'success')
         res.redirect('/admin/customers/edit/'+id)
     })
 })
@@ -156,13 +158,11 @@ app.get('/admin/customer_groups/add', async(req,res) => {
     if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('customers')) res.end("Permission denial") //Check Permission
-
-    const customer_groups = await getCustomerGroups() ?? [];
     
     res.render('admin/customer_groups/add', {
         auth: auth,
         settings: await getSettings(),
-        page: 'customecustomer_groupsrs'
+        page: 'customer_groupsrs'
     })
 })
 app.post('/admin/customer_groups/add', async(req,res) => {
@@ -179,6 +179,7 @@ app.post('/admin/customer_groups/add', async(req,res) => {
     const color = req.body.color
 
     addCustomerGroup(name, color).then(() => {
+        res.cookie('alert', 'success')
         res.redirect('/admin/customer_groups')
     })
 })
@@ -217,6 +218,7 @@ app.post('/admin/customer_groups/edit/:id', async(req,res) => {
     const color = req.body.color
 
     editCustomerGroup(id, name, color).then(() => {
+        res.cookie('alert', 'success')
         res.redirect('/admin/customer_groups/edit/'+id)
     })
 })
@@ -234,6 +236,7 @@ app.get('/admin/customers/delete/:id', async(req,res) => {
     const id = req.params.id;
 
     deleteCustomerById(id).then(() => {
+        res.cookie('alert', 'delete_success')
         res.redirect('/admin/customers')
     })
 })
@@ -251,6 +254,7 @@ app.get('/admin/customer_groups/delete/:id', async(req,res) => {
     const id = req.params.id;
 
     deleteCustomerGroupById(id).then(() => {
+        res.cookie('alert', 'delete_success')
         res.redirect('/admin/customer_groups')
     })
 })

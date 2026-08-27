@@ -69,6 +69,7 @@ app.post('/admin/trucks/add', async(req,res) => {
     const cost_per_km = req.body.cost_per_km ?? 0
 
     addTruck(license_plate, brand, model, cost_per_km).then(() => {
+        res.cookie('alert', 'success')
         res.redirect('/admin/trucks')
     })
 })
@@ -108,6 +109,7 @@ app.post('/admin/trucks/edit/:id', async(req,res) => {
     const cost_per_km = req.body.cost_per_km ?? 0
 
     editTruck(id, license_plate, brand, model, cost_per_km).then(() => {
+        res.cookie('alert', 'success')
         res.redirect('/admin/trucks/edit/'+id)
     })
 })
@@ -147,6 +149,7 @@ app.get('/admin/trucks/delete/:id', async(req,res) => {
     const id = req.params.id;
 
     deleteTruckById(id).then(() => {
+        res.cookie('alert', 'delete_success')
         res.redirect('/admin/trucks')
     })
 })
@@ -238,6 +241,7 @@ app.post('/admin/maintenances/add', async(req,res) => {
     const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
 
     addMaintenance(truck_id, user_id, maintenance_type, note, created_at).then(() => {
+        res.cookie('alert', 'success')
         res.redirect('/admin/trucks/maintenances/'+truck_id)
     })
 })
@@ -282,6 +286,7 @@ app.post('/admin/maintenances/edit/:id', async(req,res) => {
     const note = req.body.note
 
     saveMaintenance(id, truck_id, maintenance_type, note).then(() => {
+        res.cookie('alert', 'success')
         res.redirect('/admin/maintenances/edit/'+truck_id)
     })
 })
@@ -299,6 +304,7 @@ app.get('/admin/maintenances/delete/:id', async(req,res) => {
     const id = req.params.id ?? null
 
     deleteMaintenance(id).then(() => {
+        res.cookie('alert', 'delete_success')
         res.redirect('/admin/trucks/maintenances/')
     })
 })
@@ -360,6 +366,7 @@ app.post('/admin/maintenances/types/add', async(req,res) => {
     const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
 
     addMaintenanceType(name, round, created_at).then(() => {
+        res.cookie('alert', 'success')
         res.redirect('/admin/maintenances/types')
     })
 })
@@ -401,6 +408,7 @@ app.post('/admin/maintenances/types/edit/:id', async(req,res) => {
     const round = req.body.round ?? null
 
     saveMaintenanceType(id, name, round).then(() => {
+        res.cookie('alert', 'success')
         res.redirect('/admin/maintenances/types/edit/'+id)
     })
 })
@@ -418,6 +426,7 @@ app.get('/admin/maintenances/types/delete/:id', async(req,res) => {
     const id = req.params.id ?? null
 
     deleteMaintenanceType(id).then(() => {
+        res.cookie('alert', 'delete_success')
         res.redirect('/admin/maintenances/types')
     })
 })

@@ -66,6 +66,7 @@ app.post('/admin/users/add', async(req,res) => {
     const full_name = req.body.full_name
 
     registerUser(username, password_hash, full_name, type_id, phone_number).then(() => {
+        res.cookie('alert', 'success')
         res.redirect('/admin/users')
     })
 })
@@ -110,10 +111,12 @@ app.post('/admin/users/edit/:id', async(req,res) => {
     if(password) {
         const password_hash = crypto.createHash('sha256').update(password).digest('hex');
         editUser(id, username, full_name, type_id, phone_number, password_hash).then(() => {
+            res.cookie('alert', 'success')
             res.redirect('/admin/users/edit/'+id)
         })
     } else {
         editUser(id, username, full_name, type_id, phone_number).then(() => {
+            res.cookie('alert', 'success')
             res.redirect('/admin/users/edit/'+id)
         })
     }
@@ -169,6 +172,7 @@ app.post('/admin/user_types/add', async(req,res) => {
     const color = req.body.color
 
     addUserType(user_type, permission, color).then(() => {
+        res.cookie('alert', 'success')
         res.redirect('/admin/user_types')
     })
 })
@@ -209,6 +213,7 @@ app.post('/admin/user_types/edit/:id', async(req,res) => {
     const color = req.body.color
 
     editUserType(id, user_type, permission, color).then(() => {
+        res.cookie('alert', 'success')
         res.redirect('/admin/user_types/edit/'+id)
     })
 })

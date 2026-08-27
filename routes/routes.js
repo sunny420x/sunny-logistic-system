@@ -183,7 +183,7 @@ app.get('/admin/routes/delete/:id', async(req,res) => {
     const id = req.params.id;
 
     deleteRouteById(id).then(() => {
-        res.cookie('alert', 'success')
+        res.cookie('alert', 'delete_success')
         res.redirect('/admin/routes')
     })
 })
