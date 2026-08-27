@@ -9,7 +9,7 @@ const cookieParser = require('cookie-parser');
 // Models
 const { getCustomers, getCustomerById, addCustomers, editCustomer, getCustomerGroups } = require('./models/customers')
 const { getDashboardAllPackages, getDashboardCustomers, getDashboardDelivered, getDashboardUsers } = require('./models/dashboard')
-const { getTrucks, getTruckById, addTruck, editTruck } = require('./models/trucks')
+const { getMaintenanceAlerts } = require('./models/trucks')
 const { getRoutes, getMyRoutes, getRouteById, addRoute, editRoute } = require('./models/routes')
 const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation, ongoingDrivers } = require('./models/tracking')
 const { getSettings, saveSettings } = require('./models/settings')
@@ -110,6 +110,8 @@ app.get('/admin', async(req,res) => {
     const customer_groups = await getCustomerGroups()
     const ongoing_drivers = await ongoingDrivers()
 
+    const maintenance_alerts = await getMaintenanceAlerts()
+
     res.render('admin/dashboard', {
         page: 'dashboard',
         moment: moment,
@@ -120,6 +122,7 @@ app.get('/admin', async(req,res) => {
         ongoing_drivers:ongoing_drivers,
         auth: auth,
         users:users,
+        maintenance_alerts: maintenance_alerts ?? [],
         settings: await getSettings(),
     })
 })

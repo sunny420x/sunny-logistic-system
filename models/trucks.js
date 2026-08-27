@@ -178,6 +178,19 @@ function deleteMaintenanceType(id) {
     })
 }
 
+function getMaintenanceAlerts() {
+    return new Promise(resolve => {
+        db.query(`SELECT mt.round, mt.name, t.license_plate, DATEDIFF(m.created_at + INTERVAL mt.round DAY, NOW()) as days_left 
+        FROM truck_maintenance as m 
+        JOIN maintenance_type as mt ON mt.id = m.maintenance_type 
+        JOIN trucks as t ON m.truck_id = t.id 
+        WHERE DATEDIFF(m.created_at + INTERVAL mt.round DAY, NOW()) < 30`, (err, results) => {
+            if(err) console.error(err);
+            resolve(results)
+        })
+    })
+}
+
 module.exports = {
     getTrucks,
     getTruckById,
@@ -194,4 +207,5 @@ module.exports = {
     addMaintenanceType, 
     saveMaintenanceType,
     deleteMaintenanceType,
+    getMaintenanceAlerts,
 }
