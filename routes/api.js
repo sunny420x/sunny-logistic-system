@@ -8,7 +8,7 @@ const path  = require('path')
 
 const { getCustomers } = require('../models/customers')
 const { getMyRoutes, getRoutes } = require('../models/routes')
-const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation, saveArrivalImageFile, ongoingDrivers, arrivalAtWarehouse } = require('../models/tracking')
+const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation, saveArrivalImageFile, ongoingDrivers, arrivalAtWarehouse, calculateTruckStats } = require('../models/tracking')
 const { loginUser, initUserToken } = require('../models/users')
 
 const storage = multer.diskStorage({
@@ -158,6 +158,13 @@ app.get('/api/driver/getTruckLocation/:truck_id', async(req,res) => {
     const truck_id = req.params.truck_id;
     const data = await getTruckLocation(null, truck_id)
 
+    if (data.status !== "success") {
+        res.json(data);
+        return;
+    }
+
+    const stats = calculateTruckStats(data.locations);
+
     res.json({
         status: "success",
         locations: data.locations,
@@ -176,8 +183,20 @@ app.get('/api/driver/getTruckLocation/:truck_id/:date', async(req,res) => {
 
     const truck_id = req.params.truck_id;
     const date = req.params.date ?? null
-    const data = await getTruckLocation(date, truck_id)
-    res.json(data)
+    const data = await getTruckLocation(date, truck_id);
+
+    if (data.status !== "success") {
+        res.json(data);
+        return;
+    }
+
+    const stats = calculateTruckStats(data.locations);
+
+    res.json({
+        status: "success",
+        locations: data.locations,
+        stats: stats
+    });
 })
 
 app.get('/api/finishDelivery/:id', async (req, res) => {
