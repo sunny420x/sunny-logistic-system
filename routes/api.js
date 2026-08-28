@@ -157,6 +157,13 @@ app.get('/api/driver/getTruckLocation/:truck_id', async(req,res) => {
 
     const truck_id = req.params.truck_id;
     const data = await getTruckLocation(null, truck_id)
+    const stats = calculateTruckStats(data.locations);
+
+    res.json({
+        status: "success",
+        locations: data.locations,
+        stats: stats
+    });
     res.json(data)
 })
 

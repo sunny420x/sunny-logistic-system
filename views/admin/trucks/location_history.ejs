@@ -9,7 +9,6 @@
       width: 100%;
       height: 70vh;
       z-index: 1;
-      border-radius: 20px;
       overflow: hidden;
     }
   </style>
@@ -47,6 +46,28 @@
             </script>
         </div>
         <div id="map"></div>
+        <div class="table-responsive mb-4">
+            <table class="table">
+                <thead class="table-light">
+                    <tr>
+                        <th>วันที่</th>
+                        <th>ทะเบียนรถ</th>
+                        <th>ระยะทางรวม</th>
+                        <th>เวลาเดินทาง</th>
+                        <th>ความเร็วเฉลี่ย</th>
+                        <th>ความเร็วสูงสุด</th>
+                    </tr>
+                </thead>
+
+                <tbody id="truckStatsTable">
+                    <tr>
+                        <td colspan="6" class="text-muted">
+                            กำลังโหลดข้อมูล...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
         <script src="https://cdn.jsdelivr.net/npm/ol@v10.10.0/dist/ol.js"></script>
         <script>
             let map = null
@@ -116,7 +137,93 @@
 
             setInterval(() => {
                 updateTruckLocations();
+                renderTruckStats(data);
             }, 30000);
+
+            function renderTruckStats(data) {
+                const tbody = document.getElementById('truckStatsTable');
+                if (!data || data.status !== 'success') {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-danger">
+                                ไม่สามารถโหลดข้อมูลได้
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                const stats = data.stats;
+                const locations = data.locations;
+
+                if (!stats || !locations || locations.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-muted">
+                                ไม่มีข้อมูลการเดินทาง
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+
+                // วันที่จากจุดแรก
+                const date = moment(locations[0].created_at)
+                    .format('DD/MM/YYYY');
+
+                // ทะเบียนรถ
+                const licensePlate =
+                    locations[0].license_plate ?? '-';
+
+                // แปลงเวลาเดินทาง
+                const totalMinutes = Math.floor(
+                    stats.total_time / (1000 * 60)
+                );
+
+                const hours = Math.floor(totalMinutes / 60);
+                const minutes = totalMinutes % 60;
+
+                let travelTime = '';
+
+                if (hours > 0) {
+                    travelTime += `${hours} ชม. `;
+                }
+
+                travelTime += `${minutes} นาที`;
+
+                tbody.innerHTML = `
+                    <tr>
+                        <td>${date}</td>
+
+                        <td class="fw-bold">
+                            ${licensePlate}
+                        </td>
+
+                        <td>
+                            ${Number(stats.total_distance).toFixed(2)}
+                            km
+                        </td>
+
+                        <td>
+                            ${travelTime}
+                        </td>
+
+                        <td>
+                            <span class="badge text-bg-primary">
+                                ${Number(stats.average_speed).toFixed(2)}
+                                km/h
+                            </span>
+                        </td>
+
+                        <td>
+                            <span class="badge text-bg-danger">
+                                ${Number(stats.max_speed).toFixed(2)}
+                                km/h
+                            </span>
+                        </td>
+                    </tr>
+                `;
+            }
         </script>
     </main>
     <script src="

@@ -149,6 +149,103 @@ function getTruckLocation(date = null, truck_id) {
     })
 }
 
+function calculateTruckStats(locations) {
+    if (!locations || locations.length < 2) {
+        return {
+            total_distance: 0,
+            total_time: 0,
+            average_speed: 0,
+            max_speed: 0
+        };
+    }
+    let totalDistance = 0;
+    let maxSpeed = 0;
+    for (let i = 1; i < locations.length; i++) {
+        const previous = locations[i - 1];
+        const current = locations[i];
+        const lat1 = parseFloat(previous.position_latitude);
+        const lon1 = parseFloat(previous.position_longitude);
+        const lat2 = parseFloat(current.position_latitude);
+        const lon2 = parseFloat(current.position_longitude);
+
+        if (
+            !Number.isFinite(lat1) ||
+            !Number.isFinite(lon1) ||
+            !Number.isFinite(lat2) ||
+            !Number.isFinite(lon2)
+        ) {
+            continue;
+        }
+
+        const distance = calculateDistance(
+            lat1,
+            lon1,
+            lat2,
+            lon2
+        );
+
+        totalDistance += distance;
+
+        const timeDiff =
+            new Date(current.created_at) -
+            new Date(previous.created_at);
+
+        if (timeDiff > 0) {
+
+            const hours = timeDiff / (1000 * 60 * 60);
+
+            const speed = distance / hours;
+
+            if (speed > maxSpeed) {
+                maxSpeed = speed;
+            }
+        }
+    }
+
+    // เวลาตั้งแต่จุดแรกถึงจุดสุดท้าย
+    const startTime = new Date(locations[0].created_at);
+    const endTime = new Date(
+        locations[locations.length - 1].created_at
+    );
+
+    const totalTime =
+        endTime - startTime;
+
+    const totalHours =
+        totalTime / (1000 * 60 * 60);
+
+    const averageSpeed =
+        totalHours > 0
+            ? totalDistance / totalHours
+            : 0;
+
+    return {
+        total_distance: Number(totalDistance.toFixed(2)),
+        total_time: totalTime,
+        average_speed: Number(averageSpeed.toFixed(2)),
+        max_speed: Number(maxSpeed.toFixed(2))
+    };
+}
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371;
+    const dLat =
+        (lat2 - lat1) * Math.PI / 180;
+    const dLon =
+        (lon2 - lon1) * Math.PI / 180;
+    const a =
+        Math.sin(dLat / 2) ** 2 +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon / 2) ** 2;
+    const c =
+        2 * Math.atan2(
+            Math.sqrt(a),
+            Math.sqrt(1 - a)
+        );
+    return R * c;
+}
+
 function ongoingDrivers() {
     return new Promise(resolve => {
         db.query(`SELECT r.id, u.full_name, u.id as driver_id, t.license_plate, t.id as truck_id, r.time, c.location, c.customer_name, c.customer_id, cg.color, cg.id as group_id  
