@@ -54,15 +54,13 @@ function startLocationTracking() {
     console.error('[!] Geolocation is not supported Browser not support');
   }
 
-  // --- เพิ่ม Interval สำหรับส่งข้อมูลไป Server ทุกๆ 30 วินาที ---
   if (!serverSyncIntervalId) {
     serverSyncIntervalId = setInterval(() => {
-      // เช็คว่ามีค่าละติจูด/ลองจิจูดแล้วหรือยัง ก่อนที่จะส่งไป Server
       if (position_latitude && position_longitude) {
-        console.log('[+] Sending location to server (30s interval).');
+        console.log('[+] Sending location to server (60s interval).');
         sendLocationToServer(position_latitude, position_longitude);
       }
-    }, 15000); // 30,000 ms = 30 วินาที
+    }, 60000); //ส่งข้อมูลตำแหน่งไปที่ Server ทุก ๆ 1 นาที
   }
 }
 
