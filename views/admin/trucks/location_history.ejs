@@ -125,7 +125,7 @@
 
                         vectorSource.addFeature(marker);
                     });
-
+                    renderTruckStats(data);
                 } catch (error) {
                     console.error("เกิดข้อผิดพลาดในการอัปเดตพิกัด:", error);
                 }
@@ -137,7 +137,6 @@
 
             setInterval(() => {
                 updateTruckLocations();
-                renderTruckStats(data);
             }, 30000);
 
             function renderTruckStats(data) {
