@@ -412,26 +412,39 @@ function setMarkOnMap(lon, lat) {
 }
 
 function selectMark(customerId, moveToMap = false) {
+
     if (!customerId) return;
 
-    // 1. ค้นหาหมุดจาก ID
     const marker = vectorSource.getFeatureById(customerId);
-
     if (marker) {
-        // 2. ดึงพิกัด (Geometry) ของหมุดนั้น
+
         const geometry = marker.getGeometry();
         const coordinate = geometry.getCoordinates();
 
-        // 3. เลื่อนแผนที่ไปที่พิกัดนั้นพร้อมซูมเข้ามา (Animate)
         map.getView().animate({
-            center: coordinate, // เลื่อนจุดศูนย์กลางไปที่หมุด
-            zoom: 16,           // ระดับการซูม (ปรับตามความเหมาะสม เช่น 15 - 17)
-            duration: 1000      // ความเร็ว animation (1000ms = 1 วินาที)
+            center: coordinate,
+            zoom: 16,
+            duration: 1000
         });
-
-        if(moveToMap) {
-            window.location.href="#map"
+        if (moveToMap) {
+            window.location.href = "#map";
         }
+
+        let count = 0;
+        const originalStyle = marker.getStyle();
+        const blinkInterval = setInterval(() => {
+            if (count % 2 === 0) {
+                marker.setStyle(null);
+            } else {
+                marker.setStyle(originalStyle);
+            }
+            count++;
+
+            if (count >= 12) {
+                clearInterval(blinkInterval);
+                marker.setStyle(originalStyle);
+            }
+        }, 200);
     } else {
         console.warn(`ไม่พบหมุดสำหรับ Customer ID: ${customerId}`);
     }
