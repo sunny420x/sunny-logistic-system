@@ -69,7 +69,6 @@ function getRouteById(id) {
             JOIN users as u ON u.id = r.driver_id WHERE r.id = ?`, [id], (err, result) => {
             if(err) console.error(err);
             resolve(result)
-            console.log(result)
         })
     })    
 }
