@@ -4,7 +4,7 @@
 
 ## Supported Browser
 
-สามารถทำงานได้บน Web Browser (Google Chrome) และ Android Application สามารถส่งพิกัดตำแหน่งปัจจุบันได้อย่างแม่นยำ 
+สามารถทำงานได้บน Web Browser (Google Chrome) และ Android Application สามารถส่งพิกัดตำแหน่งปัจจุบันได้อย่างแม่นยำ โดยรองรับการส่งพิกัดแบบพื้นหลัง (Background Process) บน Android Web View
 
 ## Technologies
 
