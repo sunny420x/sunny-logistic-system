@@ -170,7 +170,6 @@ app.get('/api/driver/getTruckLocation/:truck_id', async(req,res) => {
         locations: data.locations,
         stats: stats
     });
-    res.json(data)
 })
 
 app.get('/api/driver/getTruckLocation/:truck_id/:date', async(req,res) => {
