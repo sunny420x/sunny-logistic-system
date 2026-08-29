@@ -90,4 +90,4 @@ function sendLocationToServer(lat, lon) {
     });
 }
 
-// startLocationTracking();
+startLocationTracking();
