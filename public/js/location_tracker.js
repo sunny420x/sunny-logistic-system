@@ -11,8 +11,10 @@ function handleNewPosition(lat, lon) {
     
     console.log(`📍 [Saved Location] Lat: ${lat}, Lon: ${lon}`);
 
-    if (typeof loadMyRoute === 'function') {
-      loadMyRoute();
+    if (typeof updateDriverMap === 'function') {
+      updateDriverMap();
+      initRoute();
+      calculateRoutes()
     }
   }
 }
