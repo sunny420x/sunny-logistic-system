@@ -85,9 +85,10 @@ function getMaintenanceTypeById(id) {
 function getMaintenanceByTruckId(id = null, date = null) {
     return new Promise(resolve => {
         let params = []
-        let query = `SELECT u.full_name, u.id, mt.name as maintenace_name, m.note, m.created_at, m.id, m.truck_id, m.maintenance_type 
+        let query = `SELECT t.license_plate, u.full_name, u.id, mt.name as maintenace_name, m.note, m.created_at, m.updated_at, m.id, m.truck_id, m.maintenance_type 
             FROM truck_maintenance as m 
-            JOIN maintenance_type as mt ON mt.id = m.maintenance_type
+            JOIN maintenance_type as mt ON mt.id = m.maintenance_type 
+            JOIN trucks as t ON t.id = m.truck_id 
             JOIN users as u ON u.id = m.user_id `
 
         if(id) {
@@ -113,7 +114,7 @@ function getMaintenanceByTruckId(id = null, date = null) {
 
 function getMaintenanceById(id = null) {
     return new Promise(resolve => {
-        db.query(`SELECT u.full_name, u.id, mt.name as maintenace_name, m.note, m.created_at, m.id, m.truck_id, m.maintenance_type
+        db.query(`SELECT u.full_name, u.id, mt.name as maintenace_name, m.note, m.created_at, m.updated_at, m.id, m.truck_id, m.maintenance_type
             FROM truck_maintenance as m 
             JOIN maintenance_type as mt ON mt.id = m.maintenance_type
             JOIN users as u ON u.id = m.user_id 
@@ -133,9 +134,9 @@ function addMaintenance(truck_id, user_id, maintenance_type, note, created_at) {
     })
 }
 
-function saveMaintenance(id, truck_id, maintenance_type, note) {
+function saveMaintenance(id, truck_id, maintenance_type, note, updated_at) {
     return new Promise(resolve => {
-        db.query(`UPDATE truck_maintenance SET truck_id = ?, maintenance_type = ?, note = ? WHERE id = ?`, [truck_id, maintenance_type, note, id], (err) => {
+        db.query(`UPDATE truck_maintenance SET truck_id = ?, maintenance_type = ?, note = ?, updated_at = ? WHERE id = ?`, [truck_id, maintenance_type, note, updated_at, id], (err) => {
             if(err) console.error(err);
             resolve()
         })
@@ -191,6 +192,15 @@ function getMaintenanceAlerts() {
     })
 }
 
+function getLicensePlateByTruckId(id) {
+    return new Promise(resolve => {
+        db.query(`SELECT license_plate FROM trucks WHERE id = ?`, [id], (err, result) => {
+            if(err) console.error(err);
+            resolve(result[0].license_plate)
+        })
+    })
+}
+
 module.exports = {
     getTrucks,
     getTruckById,
@@ -208,4 +218,5 @@ module.exports = {
     saveMaintenanceType,
     deleteMaintenanceType,
     getMaintenanceAlerts,
+    getLicensePlateByTruckId,
 }

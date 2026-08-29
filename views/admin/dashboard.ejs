@@ -44,25 +44,8 @@
   <div class="main-wrapper">
 
     <main class="container-fluid p-3 p-lg-4">
-      <% 
-      if(locals.maintenance_alerts) { 
-        maintenance_alerts.forEach(maintenance_alert => {
-      %>
-      <div class="alert alert-danger alert-dismissible fade show" role="alert">
-        รถทะเบียน: <%=maintenance_alert.license_plate%> ถึงเวลา "<%=maintenance_alert.name%>" 
-        <% if(maintenance_alert.days_left < 0) { %>
-          แล้วเมื่อ <%=maintenance_alert.days_left * -1%> วันก่อน
-        <% } else if(maintenance_alert.days_left == 0) { %>
-          แล้ววันนี้
-        <% } else { %>
-          ในอีก <%=maintenance_alert.days_left%> วัน
-        <% } %>
-        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-      </div>
-      <%
-        }) 
-      } 
-      %>
+      <%-include('includes/maintenance_alert')%>
+      
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
           <h2 class="fw-bold mb-1">📋 ภาพรวมระบบ</h2>

@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <title>ประวัติการบำรุงรักษารถ | <%=settings.company_name%></title>
+  <title>รายการบำรุงรักษารถ | <%=settings.company_name%></title>
   <%-include('includes/head')%>
   <style>
     #map {
@@ -23,12 +23,12 @@
   <%-include('includes/mobile-sidebar')%>
 
   <div class="main-wrapper">
-
-
     <main class="container-fluid p-3 p-lg-4">
+    <%-include('includes/maintenance_alert')%>
+
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
             <div class="d-flex">
-                <h2 class="fw-bold mb-3">ประวัติการบำรุงรักษารถ
+                <h2 class="fw-bold mb-3">รายการบำรุงรักษารถ<% if(locals.license_plate) { %>: <div class="badge bg-primary"><%=locals.license_plate%></div> <% } %>
                     <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/maintenances/add?id=<%=locals.id%>'"><i class="bi bi-file-earmark-plus"></i> เพิ่มข้อมูลบำรุงรักษา</button>
                     <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/maintenances/types'"><i class="bi bi-gear"></i> จัดการประเภทการบำรุงรักษา</button>
                 </h2>
@@ -51,7 +51,10 @@
         <table class="table">
             <thead>
                 <tr>
-                    <th>วันที่</th>
+                    <% if(!locals.license_plate) { %>
+                    <th>ทะเบียนรถ</th>
+                    <% } %>
+                    <th>วันที่ตรวจเช็คล่าสุด</th>
                     <th>ผู้ตรวจเช็ค</th>
                     <th>ประเภทตรวจเช็ค</th>
                     <th>หมายเหตุ</th>
@@ -61,7 +64,10 @@
             <tbody>
                 <% maintenance.forEach(row => { %>
                     <tr>
-                        <td><%=moment(row.created_at).format("DD/MM/YYYY HH:mm:ss")%></td>
+                        <% if(!locals.license_plate) { %>
+                        <td><%=row.license_plate%></td>
+                        <% } %>
+                        <td><%if(row.updated_at) {%><%=moment(row.updated_at).format("DD/MM/YYYY HH:mm:ss")%><% } else {%><%=moment(row.created_at).format("DD/MM/YYYY HH:mm:ss")%><%}%></td>
                         <td><%=row.full_name%></td>
                         <td><%=row.maintenace_name%></td>
                         <td><%=row.note ?? "-"%></td>

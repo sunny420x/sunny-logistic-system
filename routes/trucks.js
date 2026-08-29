@@ -5,9 +5,9 @@ const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 
 const { 
-    getTrucks, getTruckById, addTruck, editTruck, deleteTruckById, getMaintenanceByTruckId, 
+    getTrucks, getTruckById, addTruck, editTruck, deleteTruckById, getMaintenanceByTruckId, getLicensePlateByTruckId, 
     getMaintenanceTypes, addMaintenance, saveMaintenance, getMaintenanceById, getMaintenanceTypeById,
-    addMaintenanceType, saveMaintenanceType, deleteMaintenanceType, deleteMaintenance
+    addMaintenanceType, saveMaintenanceType, deleteMaintenanceType, deleteMaintenance, getMaintenanceAlerts
 } = require('../models/trucks')
 const { initUserToken } = require('../models/users')
 const { getSettings } = require('../models/settings');
@@ -165,9 +165,12 @@ app.get('/admin/trucks/maintenances', async(req,res) => {
     if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
    
     const date = req.query.date ?? null
+    
+    const maintenance_alerts = await getMaintenanceAlerts()
 
     res.render('admin/maintenance', {
         date: date,
+        maintenance_alerts:maintenance_alerts ?? [],
         maintenance: await getMaintenanceByTruckId(null, date) ?? [],
         auth: auth,
         moment: moment,
@@ -188,10 +191,12 @@ app.get('/admin/trucks/maintenances/:id', async(req,res) => {
    
     const id = req.params.id ?? null
     const date = req.query.date ?? null
+    const license_plate = await getLicensePlateByTruckId(id)
 
     res.render('admin/maintenance', {
         id: id,
         date: date,
+        license_plate: license_plate ?? null,
         maintenance: await getMaintenanceByTruckId(id, date) ?? [],
         truck_id: req.params.id,
         auth: auth,
@@ -284,8 +289,9 @@ app.post('/admin/maintenances/edit/:id', async(req,res) => {
     const truck_id = req.body.truck_id ?? null
     const maintenance_type = req.body.maintenance_type  ?? null
     const note = req.body.note
+    const updated_at = moment().format("YYYY-MM-DD HH:mm:ss")
 
-    saveMaintenance(id, truck_id, maintenance_type, note).then(() => {
+    saveMaintenance(id, truck_id, maintenance_type, note, updated_at).then(() => {
         res.cookie('alert', 'success')
         res.redirect('/admin/maintenances/edit/'+truck_id)
     })

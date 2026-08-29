@@ -1,0 +1,19 @@
+<% 
+if(locals.maintenance_alerts) { 
+    maintenance_alerts.forEach(maintenance_alert => {
+%>
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="bi bi-exclamation-circle me-3"></i>รถทะเบียน: <%=maintenance_alert.license_plate%> ถึงเวลา "<%=maintenance_alert.name%>" 
+    <% if(maintenance_alert.days_left < 0) { %>
+        แล้วเมื่อ <%=maintenance_alert.days_left * -1%> วันก่อน
+    <% } else if(maintenance_alert.days_left == 0) { %>
+        แล้ววันนี้
+    <% } else { %>
+        ในอีก <%=maintenance_alert.days_left%> วัน
+    <% } %>
+    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+</div>
+<%
+    }) 
+} 
+%>
