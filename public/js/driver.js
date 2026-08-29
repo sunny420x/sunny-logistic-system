@@ -313,7 +313,6 @@ async function finishDelivery(route_id) {
 
                 calculateRoutes().then(async() => {
                     await updateDriverMap()
-                    updateRouteTable()
                     drawCustomerMarkers()
                 })
             }
@@ -345,7 +344,6 @@ function arrivalAtWarehouse(routes) {
             
             calculateRoutes().then(async() => {
                 await updateDriverMap()
-                updateRouteTable()
                 drawCustomerMarkers()
             })
         }

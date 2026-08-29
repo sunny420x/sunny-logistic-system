@@ -13,8 +13,6 @@ function handleNewPosition(lat, lon) {
 
     if (typeof updateDriverMap === 'function') {
       updateDriverMap();
-      initRoute();
-      calculateRoutes()
     }
   }
 }
