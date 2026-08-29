@@ -98,12 +98,14 @@ function getMaintenanceByTruckId(id = null, date = null) {
 
         if(date) {
             if(id) {
-                query += `AND m.created_at = ?`
+                query += `AND m.created_at = ? `
             } else {
-                query += `WHERE m.created_at = ?`
+                query += `WHERE m.created_at = ? `
             }
             params.push(date)
         }
+
+        query += `ORDER BY m.id DESC`
         
         db.query(query, params, (err, results) => {
             if(err) console.error(err);
@@ -181,11 +183,30 @@ function deleteMaintenanceType(id) {
 
 function getMaintenanceAlerts() {
     return new Promise(resolve => {
-        db.query(`SELECT mt.round, mt.name, t.license_plate, DATEDIFF(m.created_at + INTERVAL mt.round DAY, NOW()) as days_left 
-        FROM truck_maintenance as m 
-        JOIN maintenance_type as mt ON mt.id = m.maintenance_type 
-        JOIN trucks as t ON m.truck_id = t.id 
-        WHERE DATEDIFF(m.created_at + INTERVAL mt.round DAY, NOW()) < 30`, (err, results) => {
+        db.query(`SELECT 
+            mt.round,
+            mt.name,
+            t.license_plate,
+            DATEDIFF(
+                m.created_at + INTERVAL mt.round DAY,
+                NOW()
+            ) AS days_left
+        FROM (
+            SELECT 
+                m.*,
+                ROW_NUMBER() OVER (
+                    PARTITION BY m.truck_id, m.maintenance_type
+                    ORDER BY m.id DESC
+                ) AS rn
+            FROM truck_maintenance AS m
+        ) AS m
+        JOIN maintenance_type AS mt 
+            ON mt.id = m.maintenance_type
+        JOIN trucks AS t 
+            ON m.truck_id = t.id
+        WHERE m.rn = 1
+        AND DATEDIFF(m.created_at + INTERVAL mt.round DAY, NOW()) < 30
+        ORDER BY m.id DESC`, (err, results) => {
             if(err) console.error(err);
             resolve(results)
         })
