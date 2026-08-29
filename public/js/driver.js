@@ -315,7 +315,6 @@ async function finishDelivery(route_id) {
                     await updateDriverMap()
                     updateRouteTable()
                     drawCustomerMarkers()
-                    updateRouteTable()
                 })
             }
         })
@@ -348,7 +347,6 @@ function arrivalAtWarehouse(routes) {
                 await updateDriverMap()
                 updateRouteTable()
                 drawCustomerMarkers()
-                updateRouteTable()
             })
         }
     })
