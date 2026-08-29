@@ -12,7 +12,7 @@ function handleNewPosition(lat, lon) {
     console.log(`📍 [Saved Location] Lat: ${lat}, Lon: ${lon}`);
 
     if (typeof updateDriverMap === 'function') {
-      updateDriverMap();
+      // updateDriverMap();
     }
   }
 }
