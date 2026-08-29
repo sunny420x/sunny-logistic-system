@@ -67,10 +67,10 @@
                         <% if(!locals.license_plate) { %>
                         <td><%=row.license_plate%></td>
                         <% } %>
-                        <td><%if(row.updated_at) {%><%=moment(row.updated_at).format("DD/MM/YYYY HH:mm:ss")%><% } else {%><%=moment(row.created_at).format("DD/MM/YYYY HH:mm:ss")%><%}%></td>
+                        <td><%=moment(row.created_at).format("DD/MM/YYYY HH:mm:ss")%></td>
                         <td><%=row.full_name%></td>
                         <td><%=row.maintenace_name%></td>
-                        <td><%=row.note ?? "-"%></td>
+                        <td><%=row.note || "-"%></td>
                         <td>
                             <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/maintenances/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
                             <button class="btn btn-outline-danger btn-sm" onclick="
