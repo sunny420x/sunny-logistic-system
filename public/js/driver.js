@@ -144,6 +144,7 @@ function drawCustomerMarkers() {
         }));
         vectorSource.addFeature(marker);
     });
+    updateRouteTable()
 }
 
 async function calculateRoutes() {
@@ -211,8 +212,6 @@ async function calculateRoutes() {
             }
         }
     }
-
-    updateRouteTable()
 }
 
 function updateRouteTable() {
@@ -316,7 +315,7 @@ async function finishDelivery(route_id) {
                     await updateDriverMap()
                     updateRouteTable()
                     drawCustomerMarkers()
-                    calculateRoutes()
+                    updateRouteTable()
                 })
             }
         })
@@ -349,7 +348,7 @@ function arrivalAtWarehouse(routes) {
                 await updateDriverMap()
                 updateRouteTable()
                 drawCustomerMarkers()
-                calculateRoutes()
+                updateRouteTable()
             })
         }
     })
