@@ -18,6 +18,12 @@ function handleNewPosition(lat, lon) {
 }
 
 function startLocationTracking() {
+
+  if (locationIntervalId || watchId) {
+    console.log('⚠️ Location tracking already started');
+    return;
+  }
+
   if (window.LocationChannel) {
     console.log('[+] Using Mobile App Location Channel.');
 
