@@ -68,10 +68,6 @@ async function updateDriverMap() {
             driverMarker.getGeometry().setCoordinates(startTransformed);
         }
 
-        if (routes.some(route => route.status == 0)) {            
-            vectorSource.addFeature(driverMarker);
-        }
-
         initRoute();
 
         if (!customerMarkersInitialized) {
