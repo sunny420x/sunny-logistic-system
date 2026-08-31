@@ -74,8 +74,8 @@ async function updateDriverMap() {
             customerMarkersInitialized = true;
 
             drawCustomerMarkers(allRoutes);
-            await calculateRoutes(allRoutes, startCoords);
         }
+        await calculateRoutes(allRoutes, startCoords);
     } catch (error) {
         console.error("เกิดข้อผิดพลาดในการโหลดแผนที่และเส้นทาง:", error);
     }
