@@ -249,15 +249,15 @@ async function updateMap(options) {
             }
             drivers_data = await drivers.json();
 
-            await drawCustomers()
-            await drawDrivers()
+            await drawCustomers(drivers_data)
+            await drawDrivers(drivers_data)
         }
     } catch (error) {
         console.error("เกิดข้อผิดพลาดในการอัปเดตพิกัด:", error);
     }
 }
 
-async function drawDrivers() {
+async function drawDrivers(drivers_data) {
     await Promise.all(drivers_data.locations.map(async truck => {
         let driverMarker = vectorSource.getFeatureById('current-location-'+truck.license_plate);
         
@@ -350,7 +350,7 @@ async function drawRoutes(truckLon, truckLat) {
 
 } 
 
-async function drawCustomers() {
+async function drawCustomers(drivers_data) {
     await Promise.all(drivers_data.locations.map(async truck => {
         let ongoing_data = { status: 'error', data: [] };
         try {
