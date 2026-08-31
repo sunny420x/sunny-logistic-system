@@ -1,19 +1,16 @@
 const express = require('express');
 const app = express();
 const path = require('path');
-const db = require('./database');
 const moment = require('moment-timezone');
-const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 
 // Models
-const { getCustomers, getCustomerById, addCustomers, editCustomer, getCustomerGroups } = require('./models/customers')
+const { getCustomers, getCustomerGroups } = require('./models/customers')
 const { getDashboardAllPackages, getDashboardCustomers, getDashboardDelivered, getDashboardUsers } = require('./models/dashboard')
 const { getMaintenanceAlerts } = require('./models/trucks')
-const { getRoutes, getMyRoutes, getRouteById, addRoute, editRoute } = require('./models/routes')
-const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation, ongoingDrivers } = require('./models/tracking')
+const { ongoingDrivers } = require('./models/tracking')
 const { getSettings, saveSettings } = require('./models/settings')
-const { loginUser, getUsers, registerUser, getUserTypes, getUserById, editUser, getDrivers, initUserToken, getUserTypeById, editUserType, addUserType } = require('./models/users')
+const { initUserToken} = require('./models/users')
 
 app.set('trust proxy', 1)
 moment.tz.setDefault(process.env.TIMEZONE);

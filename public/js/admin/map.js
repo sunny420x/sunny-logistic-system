@@ -260,7 +260,7 @@ async function updateMap(options) {
 async function drawDrivers(drivers_data) {
     await Promise.all(drivers_data.locations.map(async truck => {
         let driverMarker = vectorSource.getFeatureById('current-location-'+truck.license_plate);
-        
+        console.log("truck", truck)
         if(!driverMarker) {
             const truckLon = parseFloat(truck.position_longitude);
             const truckLat = parseFloat(truck.position_latitude);
@@ -285,7 +285,7 @@ async function drawDrivers(drivers_data) {
             }));
     
             vectorSource.addFeature(driverMarker);
-            await drawRoutes(truckLon, truckLat)
+            await drawRoutes(truck.license_plate, truckLon, truckLat)
         } else {
             const truckLon = parseFloat(truck.position_longitude);
             const truckLat = parseFloat(truck.position_latitude);
@@ -296,11 +296,16 @@ async function drawDrivers(drivers_data) {
     }));
 }
 
-async function drawRoutes(truckLon, truckLat) {
+async function drawRoutes(license_plate, truckLon, truckLat) {
+    await initOrderedStop()
+    const matchedStop = orderedStops.find(stop => stop.license_plate === license_plate);
+
     const routeCoords = [
-        `${truckLon},${truckLat}`,
-        ...orderedStops.map(stop => stop.location.trim())
-    ].join(';');
+    `${truckLon},${truckLat}`,
+    matchedStop?.location?.trim()
+    ].filter(Boolean).join(';');
+
+    console.log(routeCoords)
     
     try {
         const routeUrl = `https://router.project-osrm.org/route/v1/driving/${routeCoords}?overview=full&geometries=geojson`;
@@ -314,7 +319,7 @@ async function drawRoutes(truckLon, truckLat) {
                 geometry: new ol.geom.LineString(transformedRouteCoords)
             });
             routeLine.setStyle(new ol.style.Style({
-                stroke: new ol.style.Stroke({ color: '#0000FF', width: 4, lineDash: [10, 10] })
+                stroke: new ol.style.Stroke({ color: orderedStops.find(orderedStops => orderedStops.license_plate === license_plate).color, width: 4, lineDash: [10, 10] })
             }));
             vectorSource.addFeature(routeLine);
             try {
@@ -328,7 +333,7 @@ async function drawRoutes(truckLon, truckLat) {
             }
         }
     } catch (e) {
-        console.warn('ไม่สามารถดึงเส้นทาง OSRM ได้สำหรับ', truck.license_plate, e);
+        console.warn('ไม่สามารถดึงเส้นทาง OSRM ได้', e);
     }
     // Fallback: if OSRM didn't return a route, fit view to truck + stops
     try {
@@ -348,9 +353,9 @@ async function drawRoutes(truckLon, truckLat) {
         console.error(`Error: ${e}`)
     }
 
-} 
+}
 
-async function drawCustomers(drivers_data) {
+async function initOrderedStop() {
     await Promise.all(drivers_data.locations.map(async truck => {
         let ongoing_data = { status: 'error', data: [] };
         try {
@@ -368,7 +373,6 @@ async function drawCustomers(drivers_data) {
             acc[key].push(item);
             return acc;
         }, {});
-    
         
         const assignedStops = assignedByTruck[truck.truck_id] || assignedByTruck[truck.license_plate] || [];
         if (assignedStops.length === 0) {
@@ -379,6 +383,12 @@ async function drawCustomers(drivers_data) {
             if (a.time === b.time) return a.customer_name.localeCompare(b.customer_name);
             return a.time.localeCompare(b.time);
         });
+    }))
+}
+
+async function drawCustomers(drivers_data) {
+    await Promise.all(drivers_data.locations.map(async truck => {
+        await initOrderedStop()
     
         if(!initializeCustomer) {
             orderedStops.forEach(assigned => {
