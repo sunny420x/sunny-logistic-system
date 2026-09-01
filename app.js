@@ -171,8 +171,9 @@ app.post('/admin/settings', async(req,res) => {
     const company_name = req.body.company_name
     const company_logo = req.body.company_logo
     const company_banner = req.body.company_banner
+    const zone = req.body.company_zone
 
-    saveSettings(company_name, company_logo, company_banner).then(() => {
+    saveSettings(company_name, company_logo, company_banner, zone).then(() => {
         res.redirect('/admin/settings')
     })
 })

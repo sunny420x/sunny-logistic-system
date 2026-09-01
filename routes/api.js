@@ -8,8 +8,10 @@ const path  = require('path')
 
 const { getCustomers } = require('../models/customers')
 const { getMyRoutes, getRoutes } = require('../models/routes')
-const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation, saveArrivalImageFile, ongoingDrivers, arrivalAtWarehouse, calculateTruckStats } = require('../models/tracking')
+const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation, 
+    saveArrivalImageFile, ongoingDrivers, arrivalAtWarehouse, calculateTruckStats } = require('../models/tracking')
 const { loginUser, initUserToken } = require('../models/users')
+const { getCurrentZone } = require('../models/settings')
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -92,6 +94,18 @@ app.get('/api/driver/getAllTruckLocation', async(req,res) => {
     if(!auth.user) res.redirect('/logout')
 
     const data = await getAllTruckLocation()
+    res.json(data)
+})
+
+app.get('/api/getCurrentZone', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+
+    const data = await getCurrentZone()
     res.json(data)
 })
 

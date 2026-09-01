@@ -9,9 +9,16 @@ let nextTarget = null;
 
 let customerMarkersInitialized = false;
 
-function initMap() {
+async function initMap() {
     vectorSource = new ol.source.Vector();
     const vectorLayer = new ol.layer.Vector({ source: vectorSource });
+
+        const res = await fetch(`/api/getCurrentZone`);
+    if (!res.ok) {
+        throw new Error("ดึงข้อมูล โซนการทำงานของบริษัทจากหลังบ้านไม่สำเร็จ");
+    }
+    const current_zone = await res.json();
+    current_zone_location = current_zone[0].zone.split(',').map(Number);
 
     map = new ol.Map({
         target: 'map',
@@ -20,7 +27,7 @@ function initMap() {
             vectorLayer
         ],
         view: new ol.View({ 
-            center: ol.proj.fromLonLat([98.9817, 18.7883]), 
+            center: ol.proj.fromLonLat(current_zone_location), 
             zoom: 14 
         })
     });
@@ -35,6 +42,11 @@ async function updateDriverMap() {
         }
 
         routes = await response.json();
+
+        if(!routes[0]) {
+            alert("คุณยังไม่มีงานส่งของในวันนี้");
+            return;
+        }
 
         truck_id = routes[0].truck_id;
 

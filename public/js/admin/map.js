@@ -8,9 +8,16 @@ let orderedStopsByTruck = {}
 
 let initializeCustomer = false
 
-function initializeMap(zoom = 15) {
+async function initializeMap(zoom = 15) {
     vectorSource = new ol.source.Vector();
     const vectorLayer = new ol.layer.Vector({ source: vectorSource });
+
+    const res = await fetch(`/api/getCurrentZone`);
+    if (!res.ok) {
+        throw new Error("ดึงข้อมูล โซนการทำงานของบริษัทจากหลังบ้านไม่สำเร็จ");
+    }
+    const current_zone = await res.json();
+    current_zone_location = current_zone[0].zone.split(',').map(Number);
 
     map = new ol.Map({
         target: 'map',
@@ -19,7 +26,7 @@ function initializeMap(zoom = 15) {
             vectorLayer
         ],
         view: new ol.View({ 
-            center: ol.proj.fromLonLat([98.9817, 18.7883]), 
+            center: ol.proj.fromLonLat(current_zone_location), 
             zoom: zoom 
         })
     });
