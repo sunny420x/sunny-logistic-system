@@ -11,7 +11,7 @@ const { getMyRoutes, getRoutes } = require('../models/routes')
 const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation, 
     saveArrivalImageFile, ongoingDrivers, arrivalAtWarehouse, calculateTruckStats } = require('../models/tracking')
 const { loginUser, initUserToken } = require('../models/users')
-const { getCurrentZone } = require('../models/settingsettings')
+const { getCurrentZone } = require('../models/settings')
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
