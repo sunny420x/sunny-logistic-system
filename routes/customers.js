@@ -4,7 +4,7 @@ const cookieParser = require('cookie-parser');
 
 const { getCustomers, getCustomerById, addCustomers, editCustomer, getCustomerGroups, addCustomerGroup, editCustomerGroup, getCustomerGroupById, deleteCustomerById, deleteCustomerGroupById } = require('../models/customers')
 const { initUserToken} = require('../models/users')
-const { getSettings } = require('../models/settings')
+const { getSettings, getCurrentVersion } = require('../models/settings')
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
@@ -33,6 +33,7 @@ app.get('/admin/customers', async(req,res) => {
         auth: auth,
         page: 'customers',
         settings: await getSettings(),
+        version: await getCurrentVersion(),
     })
 })
 app.get('/admin/customers/add', async(req,res) => {
@@ -51,6 +52,7 @@ app.get('/admin/customers/add', async(req,res) => {
         auth: auth,
         customer_groups: customer_groups,
         settings: await getSettings(),
+        version: await getCurrentVersion(),
         page: 'customers'
     })
 })
@@ -99,6 +101,7 @@ app.get('/admin/customers/edit/:id', async(req,res) => {
         customer_groups: customer_groups,
         auth: auth,
         settings: await getSettings(),
+        version: await getCurrentVersion(),
         page: 'customers'
     })
 })
@@ -147,6 +150,7 @@ app.get('/admin/customer_groups', async(req,res) => {
         auth: auth,
         page: 'customer_groups',
         settings: await getSettings(),
+        version: await getCurrentVersion(),
     })
 })
 app.get('/admin/customer_groups/add', async(req,res) => {
@@ -162,6 +166,7 @@ app.get('/admin/customer_groups/add', async(req,res) => {
     res.render('admin/customer_groups/add', {
         auth: auth,
         settings: await getSettings(),
+        version: await getCurrentVersion(),
         page: 'customer_groupsrs'
     })
 })
@@ -200,6 +205,7 @@ app.get('/admin/customer_groups/edit/:id', async(req,res) => {
         customer_group: customer_group,
         auth: auth,
         settings: await getSettings(),
+        version: await getCurrentVersion(),
         page: 'customer_groups'
     })
 })

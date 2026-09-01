@@ -10,7 +10,7 @@ const {
     addMaintenanceType, saveMaintenanceType, deleteMaintenanceType, deleteMaintenance, getMaintenanceAlerts
 } = require('../models/trucks')
 const { initUserToken } = require('../models/users')
-const { getSettings } = require('../models/settings');
+const { getSettings, getCurrentVersion } = require('../models/settings');
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
@@ -34,6 +34,7 @@ app.get('/admin/trucks', async(req,res) => {
         trucks: trucks,
         auth: auth,
         settings: await getSettings(),
+        version: await getCurrentVersion(),
         page: 'trucks'
     })
 })
@@ -50,6 +51,7 @@ app.get('/admin/trucks/add', async(req,res) => {
     res.render('admin/trucks/add', {
         auth: auth,
         settings: await getSettings(),
+        version: await getCurrentVersion(),
         page: 'trucks'
     })
 })
@@ -89,6 +91,7 @@ app.get('/admin/trucks/edit/:id', async(req,res) => {
         truck: truck[0],
         auth: auth,
         settings: await getSettings(),
+        version: await getCurrentVersion(),
         page: 'trucks'
     })
 })
@@ -132,6 +135,7 @@ app.get('/admin/trucks/locations/:id', async(req,res) => {
         auth: auth,
         moment: moment,
         settings: await getSettings(),
+        version: await getCurrentVersion(),
         page: 'trucks'
     })
 })
@@ -175,6 +179,7 @@ app.get('/admin/trucks/maintenances', async(req,res) => {
         auth: auth,
         moment: moment,
         settings: await getSettings(),
+        version: await getCurrentVersion(),
         page: 'maintenance'
     })
 })
@@ -202,6 +207,7 @@ app.get('/admin/trucks/maintenances/:id', async(req,res) => {
         auth: auth,
         moment: moment,
         settings: await getSettings(),
+        version: await getCurrentVersion(),
         page: 'maintenance'
     })
 })
@@ -225,6 +231,7 @@ app.get('/admin/maintenances/add', async(req,res) => {
         trucks: await getTrucks(),
         maintenance_type: await getMaintenanceTypes(),
         settings: await getSettings(),
+        version: await getCurrentVersion(),
         page: 'maintenance'
     })
 })
@@ -271,6 +278,7 @@ app.get('/admin/maintenances/edit/:id', async(req,res) => {
         trucks: await getTrucks(),
         maintenance_type: await getMaintenanceTypes(),
         settings: await getSettings(),
+        version: await getCurrentVersion(),
         page: 'maintenance'
     })
 })
@@ -330,6 +338,7 @@ app.get('/admin/maintenances/types', async(req,res) => {
         auth: auth,
         moment: moment,
         settings: await getSettings(),
+        version: await getCurrentVersion(),
         page: 'maintenance'
     })
 })
@@ -353,6 +362,7 @@ app.get('/admin/maintenances/types/add', async(req,res) => {
         trucks: await getTrucks(),
         maintenance_type: await getMaintenanceTypes(),
         settings: await getSettings(),
+        version: await getCurrentVersion(),
         page: 'maintenance'
     })
 })
@@ -395,6 +405,7 @@ app.get('/admin/maintenances/types/edit/:id', async(req,res) => {
         auth: auth,
         moment: moment,
         settings: await getSettings(),
+        version: await getCurrentVersion(),
         page: 'maintenance'
     })
 })

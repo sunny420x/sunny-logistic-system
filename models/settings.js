@@ -1,4 +1,5 @@
 const db = require('../database');
+const { exec } = require('child_process');
 
 function getSettings() {
     return new Promise(resolve => {
@@ -27,8 +28,21 @@ function getCurrentZone() {
     })
 }
 
+function getCurrentVersion() {
+    return new Promise(resolve => {
+        exec('git rev-list --count HEAD', (err, stdout, stderr) => {
+            if(err) {
+                console.error(err);
+                resolve(null);
+            }
+            resolve(stdout.trim());
+        })
+    })
+}
+
 module.exports = {
     getSettings,
     saveSettings,
-    getCurrentZone
+    getCurrentZone,
+    getCurrentVersion,
 }

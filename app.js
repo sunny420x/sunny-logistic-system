@@ -9,7 +9,7 @@ const { getCustomers, getCustomerGroups } = require('./models/customers')
 const { getDashboardAllPackages, getDashboardCustomers, getDashboardDelivered, getDashboardUsers } = require('./models/dashboard')
 const { getMaintenanceAlerts } = require('./models/trucks')
 const { ongoingDrivers } = require('./models/tracking')
-const { getSettings, saveSettings } = require('./models/settings')
+const { getSettings, saveSettings, getCurrentVersion } = require('./models/settings')
 const { initUserToken} = require('./models/users')
 
 app.set('trust proxy', 1)
@@ -67,6 +67,7 @@ app.get('/login', async(req,res) => {
     } else {
         res.render('login', {
             settings: await getSettings(),
+        version: await getCurrentVersion(),
         })
     }
 })
@@ -87,6 +88,7 @@ app.get('/driver/myRoute', async(req, res) => {
     res.render('driver', {
         auth: auth,
         settings: await getSettings(),
+        version: await getCurrentVersion(),
     });
 });
 
@@ -121,6 +123,7 @@ app.get('/admin', async(req,res) => {
         users:users,
         maintenance_alerts: maintenance_alerts ?? [],
         settings: await getSettings(),
+        version: await getCurrentVersion(),
     })
 })
 app.get('/admin/help', async(req,res) => {
@@ -138,6 +141,7 @@ app.get('/admin/help', async(req,res) => {
         auth: auth,
         page: 'help',
         settings: await getSettings(),
+        version: await getCurrentVersion(),
     })
 })
 
@@ -154,6 +158,7 @@ app.get('/admin/settings', async(req,res) => {
     res.render('admin/settings', {
         auth: auth,
         settings: await getSettings(),
+        version: await getCurrentVersion(),
         page: 'settings'
     })
 })
