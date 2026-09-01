@@ -4,7 +4,7 @@ let watchId = null;
 let locationIntervalId = null;
 let serverSyncIntervalId = null; // เพิ่มตัวแปรสำหรับเก็บ ID ของ Interval ตัวใหม่
 
-function handleNewPosition(lat, lon) {
+async function handleNewPosition(lat, lon) {
   if (position_latitude !== lat || position_longitude !== lon) {
     position_latitude = lat;
     position_longitude = lon;
@@ -12,7 +12,8 @@ function handleNewPosition(lat, lon) {
     console.log(`📍 [Saved Location] Lat: ${lat}, Lon: ${lon}`);
 
     if (typeof updateDriverMap === 'function') {
-      updateDriverMap();
+      await updateDriverMap();
+      updateRouteTable();
     }
   }
 }
@@ -47,8 +48,8 @@ function startLocationTracking() {
     };
 
     watchId = navigator.geolocation.watchPosition(
-      (position) => {
-        handleNewPosition(position.coords.latitude, position.coords.longitude);
+      async (position) => {
+        await handleNewPosition(position.coords.latitude, position.coords.longitude);
       },
       (error) => {
         console.error('[!] Browser Geolocation Error:', error.message);
