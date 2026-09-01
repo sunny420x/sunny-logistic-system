@@ -11,14 +11,14 @@
   <style>
     #map {
       width: 100%;
-      height: 85vh;
+      height: 87vh;
       z-index: 1;
       border-radius: 20px;
       overflow: hidden;
     }
     .route-info {
       width: 700px;
-      max-height: 85vh;
+      max-height: 87vh;
       overflow: auto;
     }
     @media screen and (max-width: 1024px) {
@@ -150,7 +150,7 @@
                 </div>
                 <div class="form-group mb-3">                
                     <label for="temporary_location">ตำแหน่งชั่วคราว (กรณีส่งนอกพิกัดเดิมของลูกค้า): </label>
-                    <input type="text" name="temporary_location" maxlength="100" class="form-control" value="<%=route.temporary_location%>" onblur="validateTempLocation()">
+                    <input type="text" name="temporary_location" maxlength="100" class="form-control" value="<%=route.temporary_location%>" <% if(route.status == 1) { %>readonly<%}%> onblur="validateTempLocation()">
                 </div>
                 <div class="form-group mb-3">                
                     <label for="location">วันที่: </label>
@@ -194,7 +194,7 @@
                 </div>
                 <div class="form-group mb-3">                
                     <label for="status">สถานะ: </label>
-                    <select name="status" id="status" class="form-select">
+                    <select name="status" id="status" class="form-select" <% if(route.status == 1) { %>disabled<%}%>>
                       <option value="0" <% if(route.status == 0) { %>selected<%}%>>มอบหมายแล้ว</option>
                       <option value="1" <% if(route.status == 1) { %>selected<%}%>>ส่งแล้ว</option>
                     </select>
