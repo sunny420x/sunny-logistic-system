@@ -24,7 +24,7 @@ body {
     /* height: 63px; */
     display: flex;
     align-items: center;
-    padding: 5.5px 10px;
+    padding: 5.5px 30px;
     font-weight: 700;
     font-size: 1.15rem;
     border-bottom: 1px solid rgba(255,255,255,.08);

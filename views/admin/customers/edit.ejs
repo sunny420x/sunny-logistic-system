@@ -113,9 +113,11 @@
         }
       </script>
       <!-- Set Mark On Map -->
-      <% if (customer && customer.location && customer.location.includes(',')) { %>
+      <% if (customer.location.includes(',')) { %>
       <script>
+      setTimeout(() => {
         setMarkOnMap("<%= customer.location.split(',')[0].trim() %>", "<%= customer.location.split(',')[1].trim() %>");
+      }, 1000);
       </script>
       <% } %>
     </main>
