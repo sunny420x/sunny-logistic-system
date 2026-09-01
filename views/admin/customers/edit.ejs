@@ -7,7 +7,7 @@
   <style>
     #map {
       width: 50%;
-      height: 80vh;
+      height: 85vh;
       z-index: 1;
       overflow: hidden;
     }
@@ -82,8 +82,24 @@
                 <input type="text" name="phone_number" class="form-control" value="<%=customer.phone_number%>">
             </div>
 
-            <input type="submit" value="บันทึกการเปลี่ยนแปลง" class="btn btn-primary w-100">
+            <input type="submit" value="บันทึกการเปลี่ยนแปลง" class="btn btn-primary w-100 mb-2">
           </form>
+          <button class="btn btn-outline-danger w-100" onclick="
+          Swal.fire({
+            title: 'คุณแน่ใจหรือไม่?',
+            text: 'คุณต้องการลบลูกค้ารายนี้ออกจากระบบ',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'ใช่, ลบเลย!',
+            cancelButtonText: 'ยกเลิก'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              window.location.href='/admin/customers/delete/<%=customer.id%>'
+            }
+          })
+          "><i class="bi bi-trash3"></i>ลบ</button>
         </div>
       </div>
       <script src="https://cdn.jsdelivr.net/npm/ol@v10.10.0/dist/ol.js"></script>
