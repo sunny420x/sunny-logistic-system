@@ -52,7 +52,6 @@
     <main class="container-fluid p-3 p-lg-4">
       <h2 class="fw-bold mb-3">ลูกค้าในระบบ
         <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/customers/add'"><i class="bi bi-person-plus"></i> เพิ่มลูกค้า</button>
-        <button class="btn btn-outline-primary btn-sm ms-2" onclick="toggleCustomerGroups()"><i class="bi bi-person-lines-fill"></i> แสดงกลุ่มลูกค้า</button>
       </h2>
       <div class="d-lg-flex">
         <div id="mapWrapper">        
@@ -80,15 +79,6 @@
               function getSearchQuery() {
                   const urlParams = new URLSearchParams(window.location.search);
                   return urlParams.get('q');
-              }
-
-              function toggleCustomerGroups() {
-                  const customerGroupsDiv = document.getElementById('customer_groups');
-                  if (customerGroupsDiv.style.display === 'none') {
-                      customerGroupsDiv.style.display = 'block';
-                  } else {
-                      customerGroupsDiv.style.display = 'none';
-                  }
               }
           </script>
           <div class="table-responsive" id="customer_table_wrapper">
