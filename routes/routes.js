@@ -7,7 +7,7 @@ const { getRoutes, getRouteById, addRoute, editRoute, deleteRouteById } = requir
 const { getCustomers } = require('../models/customers')
 const { getTrucks } = require('../models/trucks')
 const { getDrivers, initUserToken } = require('../models/users')
-const { getSettings, getCurrentVersion } = require('../models/settings')
+const { getSettings } = require('../models/settings')
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
@@ -33,7 +33,6 @@ app.get('/admin/routes', async(req,res) => {
         auth: auth,
         moment:moment,
         settings: await getSettings(),
-        version: await getCurrentVersion(),
         page: 'routes'
     })
 })
@@ -57,7 +56,6 @@ app.get('/admin/routes/calendar', async(req,res) => {
         auth: auth,
         moment:moment,
         settings: await getSettings(),
-        version: await getCurrentVersion(),
         page: 'routes'
     })
 })
@@ -82,7 +80,6 @@ app.get('/admin/routes/add', async(req,res) => {
         trucks:trucks,
         drivers:drivers,
         settings: await getSettings(),
-        version: await getCurrentVersion(),
         page: 'routes'
     })
 })
@@ -135,7 +132,6 @@ app.get('/admin/routes/edit/:id', async(req,res) => {
         page: 'routes',
         drivers:drivers,
         settings: await getSettings(),
-        version: await getCurrentVersion(),
         moment: moment
     })
 })

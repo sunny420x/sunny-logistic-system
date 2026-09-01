@@ -4,7 +4,7 @@ const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 
 const { getUsers, registerUser, getUserTypes, getUserById, editUser, initUserToken, getUserTypeById, editUserType, addUserType } = require('../models/users')
-const { getSettings, getCurrentVersion } = require('../models/settings')
+const { getSettings } = require('../models/settings')
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
@@ -27,7 +27,6 @@ app.get('/admin/users', async(req,res) => {
         users: users,
         auth: auth,
         settings: await getSettings(),
-        version: await getCurrentVersion(),
         page: 'users'
     })
 })
@@ -46,7 +45,6 @@ app.get('/admin/users/add', async(req,res) => {
         page: 'users',
         auth: auth,
         settings: await getSettings(),
-        version: await getCurrentVersion(),
         user_types: user_types
     })
 })
@@ -90,7 +88,6 @@ app.get('/admin/users/edit/:id', async(req,res) => {
         auth: auth,
         user_types: user_types,
         settings: await getSettings(),
-        version: await getCurrentVersion(),
         page: 'users'
     })
 })
@@ -141,7 +138,6 @@ app.get('/admin/user_types', async(req,res) => {
         user_types: user_types,
         auth: auth,
         settings: await getSettings(),
-        version: await getCurrentVersion(),
         page: 'user_types'
     })
 })
@@ -159,7 +155,6 @@ app.get('/admin/user_types/add', async(req,res) => {
         page: 'user_types',
         auth: auth,
         settings: await getSettings(),
-        version: await getCurrentVersion(),
     })
 })
 app.post('/admin/user_types/add', async(req,res) => {
@@ -199,7 +194,6 @@ app.get('/admin/user_types/edit/:id', async(req,res) => {
         auth: auth,
         user_types: user_types,
         settings: await getSettings(),
-        version: await getCurrentVersion(),
         page: 'user_types'
     })
 })
