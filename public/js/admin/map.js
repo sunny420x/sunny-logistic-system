@@ -298,22 +298,43 @@ async function drawDrivers(drivers_data) {
             const startCoords = [parseFloat(truckLon), parseFloat(truckLat)];
             const startTransformed = ol.proj.fromLonLat(startCoords);
             driverMarker.getGeometry().setCoordinates(startTransformed);
+            await drawRoutes(truck.license_plate, truckLon, truckLat, truckKey);
         }
     }));
 }
 
-async function drawRoutes(license_plate, truckLon, truckLat, truckKey = license_plate) {
-    const stopsForTruck = orderedStopsByTruck[truckKey] || orderedStopsByTruck[license_plate] || [];
-    const matchedStop = stopsForTruck.find(stop => stop && stop.location) || null;
+function parseStopCoordinates(stop) {
+    if (!stop) return null;
 
-    if (!matchedStop) {
+    const rawLocation = stop.temporary_location || stop.location;
+    if (!rawLocation) return null;
+
+    const [lon, lat] = String(rawLocation).split(',').map(value => Number(value.trim()));
+    if (Number.isNaN(lon) || Number.isNaN(lat)) return null;
+
+    return [lon, lat];
+}
+
+async function drawRoutes(license_plate, truckLon, truckLat, truckKey = license_plate) {
+    const stopsForTruck = (orderedStopsByTruck[truckKey] || orderedStopsByTruck[license_plate] || []).filter(stop => stop && parseStopCoordinates(stop));
+
+    if (stopsForTruck.length === 0) {
         return;
     }
 
-    const routeCoords = [
-        `${truckLon},${truckLat}`,
-        matchedStop.location.trim()
-    ].filter(Boolean).join(';');
+    const routePoints = [
+        [truckLon, truckLat],
+        ...stopsForTruck.map(stop => parseStopCoordinates(stop))
+    ].filter(Boolean);
+
+    const routeCoords = routePoints.map(([lon, lat]) => `${lon},${lat}`).join(';');
+    const routeColor = stopsForTruck[0].color || stopsForTruck[0].customer_group_color || '#2E8B57';
+    const routeFeatureId = 'truck-route-' + (truckKey || license_plate);
+
+    const existingRoute = vectorSource.getFeatureById(routeFeatureId);
+    if (existingRoute) {
+        vectorSource.removeFeature(existingRoute);
+    }
     
     try {
         const routeUrl = `https://router.project-osrm.org/route/v1/driving/${routeCoords}?overview=full&geometries=geojson`;
@@ -326,7 +347,7 @@ async function drawRoutes(license_plate, truckLon, truckLat, truckKey = license_
             const routeLine = new ol.Feature({
                 geometry: new ol.geom.LineString(transformedRouteCoords)
             });
-            const routeColor = matchedStop.color || matchedStop.customer_group_color || '#2E8B57';
+            routeLine.setId(routeFeatureId);
             routeLine.setStyle(new ol.style.Style({
                 stroke: new ol.style.Stroke({ color: routeColor, width: 4, lineDash: [10, 10] })
             }));
@@ -344,14 +365,9 @@ async function drawRoutes(license_plate, truckLon, truckLat, truckKey = license_
     } catch (e) {
         console.warn('ไม่สามารถดึงเส้นทาง OSRM ได้', e);
     }
-    // Fallback: if OSRM didn't return a route, fit view to truck + stops
+
     try {
-        const points = [ol.proj.fromLonLat([truckLon, truckLat])].concat(stopsForTruck.map(s => {
-            if (!s || !s.location) return null;
-            const [lon, lat] = s.location.split(',').map(Number);
-            if (Number.isNaN(lon) || Number.isNaN(lat)) return null;
-            return ol.proj.fromLonLat([lon, lat]);
-        }).filter(Boolean));
+        const points = routePoints.map(([lon, lat]) => ol.proj.fromLonLat([lon, lat]));
         if (points.length > 0) {
             const extent = ol.extent.boundingExtent(points);
             if(!isFit) {
