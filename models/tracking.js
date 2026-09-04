@@ -119,11 +119,14 @@ function getAllCustomersLocation(group_id = null) {
 
 function getTruckLocation(date = null, truck_id) {
     return new Promise(resolve => {
-        let query = `SELECT lr.position_latitude, lr.position_longitude, lr.created_at, u.full_name as driver_full_name, t.license_plate
-            FROM location_records as lr
-            JOIN trucks as t ON t.id = lr.truck_id
-            JOIN users as u ON u.id = lr.driver_id
-            WHERE lr.truck_id = ?`
+        let query = `SELECT lr.position_latitude, lr.position_longitude, lr.created_at, u.full_name as driver_full_name, t.license_plate, tr.customer_id,
+        tr.status as transition_status, tr.arrival_at_warehouse, tr.finish_at, c.id as customer_row_id, c.customer_name, c.location
+        FROM location_records as lr
+        JOIN trucks as t ON t.id = lr.truck_id
+        JOIN users as u ON u.id = lr.driver_id 
+        JOIN transition_records as tr ON tr.truck_id = lr.truck_id AND tr.driver_id = lr.driver_id AND DATE(tr.date) = DATE(lr.created_at) 
+        JOIN customers AS c ON c.id = tr.customer_id 
+        WHERE lr.truck_id = ?`
 
         const params = [truck_id]
 

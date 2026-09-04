@@ -141,6 +141,42 @@
                 }));
             }
 
+            function drawCustomerMarkers(locations) {
+                const drawnCustomers = new Set();
+
+                locations.forEach(truck => {
+                    const customerKey = truck.customer_row_id ?? `${truck.customer_name}|${truck.location}`;
+                    if (drawnCustomers.has(customerKey) || !truck.location) {
+                        return;
+                    }
+
+                    const [longitude, latitude] = truck.location.split(',').map(Number);
+                    if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+                        return;
+                    }
+
+                    drawnCustomers.add(customerKey);
+                    const marker = new ol.Feature({
+                        geometry: new ol.geom.Point(
+                            ol.proj.fromLonLat([longitude, latitude])
+                        )
+                    });
+
+                    marker.setStyle(new ol.style.Style({
+                        image: new ol.style.Icon({ anchor: [0.5, 1], src: '/icons/marker-success.png', scale: 0.5 }),
+                        text: new ol.style.Text({
+                            text: `${truck.customer_name}`,
+                            font: 'bold 13px Kanit',
+                            offsetY: -35,
+                            fill: new ol.style.Fill({ color: '#222222' }),
+                            stroke: new ol.style.Stroke({ color: '#FFFFFF', width: 3 })
+                        })
+                    }));
+
+                    vectorSource.addFeature(marker);
+                });
+            }
+
             async function updateTruckLocations() {
                 try {
                     const response = await fetch("/api/driver/getTruckLocation/<%=truck_id%>/<%=date%>");
@@ -155,6 +191,8 @@
                     vectorSource.clear();
                     routeSource.clear();
                     const routeCoordinates = [];
+
+                    drawCustomerMarkers(data.locations);
 
                     // วนลูปสร้าง Marker ใหม่
                     data.locations.forEach(truck => {
@@ -204,7 +242,7 @@
 
             setInterval(() => {
                 updateTruckLocations();
-            }, 30000);
+            }, 60000);
 
             function renderTruckStats(data) {
                 const tbody = document.getElementById('truckStatsTable');
