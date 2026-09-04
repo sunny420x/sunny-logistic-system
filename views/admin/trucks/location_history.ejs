@@ -74,15 +74,27 @@
         <script>
             let map = null
             let vectorSource = null;
+            let routeSource = null;
 
             function initializeMap() {
                 vectorSource = new ol.source.Vector();
+                routeSource = new ol.source.Vector();
+                const routeLayer = new ol.layer.Vector({
+                    source: routeSource,
+                    style: new ol.style.Style({
+                        stroke: new ol.style.Stroke({
+                            color: '#0d6efd',
+                            width: 4
+                        })
+                    })
+                });
                 const vectorLayer = new ol.layer.Vector({ source: vectorSource });
 
                 map = new ol.Map({
                     target: 'map',
                     layers: [
                         new ol.layer.Tile({ source: new ol.source.OSM() }),
+                        routeLayer,
                         vectorLayer
                     ],
                     view: new ol.View({ 
@@ -104,14 +116,22 @@
 
                     // เคลียร์เฉพาะ Marker เก่าออกจาก VectorSource (ไม่กระทบตัวแผนที่)
                     vectorSource.clear();
+                    routeSource.clear();
+                    const routeCoordinates = [];
 
                     // วนลูปสร้าง Marker ใหม่
                     data.locations.forEach(truck => {
+                        const latitude = parseFloat(truck.position_latitude);
+                        const longitude = parseFloat(truck.position_longitude);
+                        if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+                            return;
+                        }
+
+                        routeCoordinates.push(ol.proj.fromLonLat([longitude, latitude]));
                         const marker = new ol.Feature({ 
-                            geometry: new ol.geom.Point(ol.proj.fromLonLat([
-                                parseFloat(truck.position_longitude),
-                                parseFloat(truck.position_latitude)
-                            ])) 
+                            geometry: new ol.geom.Point(
+                                ol.proj.fromLonLat([longitude, latitude])
+                            )
                         });
 
                         marker.setStyle(new ol.style.Style({
@@ -127,6 +147,12 @@
 
                         vectorSource.addFeature(marker);
                     });
+
+                    if (routeCoordinates.length > 1) {
+                        routeSource.addFeature(new ol.Feature({
+                            geometry: new ol.geom.LineString(routeCoordinates)
+                        }));
+                    }
                     renderTruckStats(data);
                 } catch (error) {
                     console.error("เกิดข้อผิดพลาดในการอัปเดตพิกัด:", error);
