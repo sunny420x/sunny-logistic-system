@@ -239,17 +239,6 @@
                 const licensePlate =
                     locations[0].license_plate ?? '-';
 
-                if(stats.total_distance == 0 && stats.total_time == 0 && stats.average_speed == 0 && stats.max_speed == 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="text-muted">
-                                ไม่มีข้อมูลการเดินทาง
-                            </td>
-                        </tr>
-                    `;
-                    return;
-                }
-
                 tbody.innerHTML = Object.entries(statsByDate).map(([date, stats]) => {
                     const totalMinutes = Math.floor(stats.total_time / (1000 * 60));
                     const hours = Math.floor(totalMinutes / 60);
