@@ -1,5 +1,5 @@
 const db = require('../database')
-const moment = require('moment')
+const moment = require('moment-timezone')
 moment.tz.setDefault(process.env.TIMEZONE);
 
 function finishDelivery(id, finish_at) {
@@ -191,8 +191,29 @@ function saveArrivalImageFile(route_id, file_names) {
 }
 
 function calculateTruckStats(locations) {
+    if (!locations || locations.length === 0) {
+        return {};
+    }
 
-    if (!locations || locations.length < 2) {
+    const locationsByDate = locations.reduce((groups, location) => {
+        const date = moment(location.created_at).format('YYYY-MM-DD');
+        if (!groups[date]) {
+            groups[date] = [];
+        }
+        groups[date].push(location);
+        return groups;
+    }, {});
+
+    return Object.fromEntries(
+        Object.entries(locationsByDate).map(([date, dailyLocations]) => [
+            date,
+            calculateDailyTruckStats(dailyLocations)
+        ])
+    );
+}
+
+function calculateDailyTruckStats(locations) {
+    if (locations.length < 2) {
         return {
             total_distance: 0,
             total_time: 0,
@@ -200,21 +221,15 @@ function calculateTruckStats(locations) {
             max_speed: 0
         };
     }
-
     let totalDistance = 0;
     let maxSpeed = 0;
-
     for (let i = 1; i < locations.length; i++) {
-
         const previous = locations[i - 1];
         const current = locations[i];
-
         const lat1 = parseFloat(previous.position_latitude);
         const lon1 = parseFloat(previous.position_longitude);
-
         const lat2 = parseFloat(current.position_latitude);
         const lon2 = parseFloat(current.position_longitude);
-
         if (
             !Number.isFinite(lat1) ||
             !Number.isFinite(lon1) ||
@@ -223,50 +238,34 @@ function calculateTruckStats(locations) {
         ) {
             continue;
         }
-
         const distance = calculateDistance(
             lat1,
             lon1,
             lat2,
             lon2
         );
-
         totalDistance += distance;
-
         // เวลาเป็น milliseconds
         const timeDiff =
             new Date(current.created_at) -
             new Date(previous.created_at);
 
         if (timeDiff > 0) {
-
             const hours = timeDiff / (1000 * 60 * 60);
-
             const speed = distance / hours;
-
             if (speed > maxSpeed) {
                 maxSpeed = speed;
             }
         }
     }
-
     // เวลาตั้งแต่จุดแรกถึงจุดสุดท้าย
     const startTime = new Date(locations[0].created_at);
     const endTime = new Date(
         locations[locations.length - 1].created_at
     );
-
-    const totalTime =
-        endTime - startTime;
-
-    const totalHours =
-        totalTime / (1000 * 60 * 60);
-
-    const averageSpeed =
-        totalHours > 0
-            ? totalDistance / totalHours
-            : 0;
-
+    const totalTime = endTime - startTime;
+    const totalHours = totalTime / (1000 * 60 * 60);
+    const averageSpeed = totalHours > 0 ? totalDistance / totalHours : 0;
     return {
         total_distance: Number(totalDistance.toFixed(2)),
         total_time: totalTime,
@@ -275,27 +274,14 @@ function calculateTruckStats(locations) {
     };
 }
 function calculateDistance(lat1, lon1, lat2, lon2) {
-
     const R = 6371;
-
-    const dLat =
-        (lat2 - lat1) * Math.PI / 180;
-
-    const dLon =
-        (lon2 - lon1) * Math.PI / 180;
-
-    const a =
-        Math.sin(dLat / 2) ** 2 +
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat / 2) ** 2 +
         Math.cos(lat1 * Math.PI / 180) *
         Math.cos(lat2 * Math.PI / 180) *
         Math.sin(dLon / 2) ** 2;
-
-    const c =
-        2 * Math.atan2(
-            Math.sqrt(a),
-            Math.sqrt(1 - a)
-        );
-
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     return R * c;
 }
 
