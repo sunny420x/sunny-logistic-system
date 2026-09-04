@@ -221,11 +221,16 @@ function calculateDailyTruckStats(locations) {
             max_speed: 0
         };
     }
+
+    const orderedLocations = [...locations].sort((first, second) =>
+        new Date(first.created_at) - new Date(second.created_at)
+    );
+    const maxReasonableSpeed = 120;
     let totalDistance = 0;
     let maxSpeed = 0;
-    for (let i = 1; i < locations.length; i++) {
-        const previous = locations[i - 1];
-        const current = locations[i];
+    for (let i = 1; i < orderedLocations.length; i++) {
+        const previous = orderedLocations[i - 1];
+        const current = orderedLocations[i];
         const lat1 = parseFloat(previous.position_latitude);
         const lon1 = parseFloat(previous.position_longitude);
         const lat2 = parseFloat(current.position_latitude);
@@ -244,25 +249,22 @@ function calculateDailyTruckStats(locations) {
             lat2,
             lon2
         );
-        totalDistance += distance;
-        // เวลาเป็น milliseconds
-        const timeDiff =
-            new Date(current.created_at) -
-            new Date(previous.created_at);
+        const timeDiff = new Date(current.created_at) - new Date(previous.created_at);
+        const hours = timeDiff / (1000 * 60 * 60);
 
-        if (timeDiff > 0) {
-            const hours = timeDiff / (1000 * 60 * 60);
+        if (hours > 0) {
             const speed = distance / hours;
-            if (speed > maxSpeed) {
+
+            if (speed <= maxReasonableSpeed) {
+                totalDistance += distance;
+            }
+            if (speed > maxSpeed && speed <= maxReasonableSpeed) {
                 maxSpeed = speed;
             }
         }
     }
-    // เวลาตั้งแต่จุดแรกถึงจุดสุดท้าย
-    const startTime = new Date(locations[0].created_at);
-    const endTime = new Date(
-        locations[locations.length - 1].created_at
-    );
+    const startTime = new Date(orderedLocations[0].created_at);
+    const endTime = new Date(orderedLocations[orderedLocations.length - 1].created_at);
     const totalTime = endTime - startTime;
     const totalHours = totalTime / (1000 * 60 * 60);
     const averageSpeed = totalHours > 0 ? totalDistance / totalHours : 0;
