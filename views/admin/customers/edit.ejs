@@ -44,12 +44,12 @@
           <p class="small">แก้ไขข้อมูลลูกค้าในระบบ เช่น ชื่อลูกค้า รหัสลูกค้าในระบบ Express กลุ่มลูกค้า และตำแหน่งที่อยู่</p>
           <form action="" method="post">
             <div class="form-group mb-3">
-                <label for="customer_name">ชื่อลูกค้าที่แสดงในระบบ: </label>
-                <input type="text" name="customer_name" class="form-control" value="<%=customer.customer_name%>" required>
+                <label for="customer_id">รหัสลูกค้าที่แสดงในระบบ: </label>
+                <input type="text" name="customer_id" class="form-control" value="<%=customer.customer_id%>" placeholder="เช่น CE0000" required>
             </div>
             <div class="form-group mb-3">
-                <label for="customer_id">รหัสลูกค้าที่แสดงในระบบ: </label>
-                <input type="text" name="customer_id" class="form-control" value="<%=customer.customer_id%>" required>
+                <label for="customer_name">ชื่อลูกค้าที่แสดงในระบบ: </label>
+                <input type="text" name="customer_name" class="form-control" value="<%=customer.customer_name%>" placeholder="ชื่อลูกค้า" required>
             </div>
 
             <div class="form-group mb-3">
