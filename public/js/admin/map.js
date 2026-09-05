@@ -684,3 +684,10 @@ function formatPhoneNumber(phone_number) {
     }
     return phone_number
 }
+
+function validatePhoneNumber() {
+    const phoneInput = document.querySelector('input[name="phone_number"]');
+    const phoneValue = phoneInput.value.trim();
+    
+    phoneInput.value = phoneValue.replace(/[^0-9]/g, ''); // Remove non-numeric characters
+}
