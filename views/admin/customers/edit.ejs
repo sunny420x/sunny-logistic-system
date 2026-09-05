@@ -63,13 +63,13 @@
 
             <div class="form-group mb-3">
                 <label for="address">ที่อยู่: </label>
-                <input type="text" name="address" class="form-control" value="<%=customer.address%>" required>
+                <input type="text" name="address" class="form-control" value="<%=customer.address%>" placeholder="ที่อยู่อย่างย่อ เช่น 123 ถนนสุขุมวิท" required>
             </div>
 
             <div class="form-group mb-3">                
                 <label for="location">พิกัดที่อยู่: </label>
                 <div class="input-group">
-                  <input type="text" name="location" class="form-control" value="<%=customer.location%>" onblur="setLocation()" required>
+                  <input type="text" name="location" class="form-control" value="<%=customer.location%>" onblur="setLocation()" placeholder="Longitude,Latitude" required>
                   <%if(customer.location) {%>
                   <a href="https://map.google.co.th/?q=<%=customer.location.split(',')[1]%>,<%=customer.location.split(',')[0]%>" target="_blank" class="btn btn-primary">เปิดใน Google Map</a>
                   <%}%>
@@ -79,7 +79,7 @@
 
             <div class="form-group mb-3">
                 <label for="address">เบอร์โทรศัพท์: </label>
-                <input type="text" name="phone_number" class="form-control" value="<%=customer.phone_number%>">
+                <input type="text" name="phone_number" class="form-control" value="<%=customer.phone_number%>" placeholder="เบอร์โทรศัพท์">
             </div>
 
             <input type="submit" value="บันทึกการเปลี่ยนแปลง" class="btn btn-primary w-100 mb-2">
