@@ -51,6 +51,7 @@
                 <thead class="table-light">
                     <tr>
                         <th>วันที่</th>
+                        <th>พนักงานขับรถ</th>
                         <th>ทะเบียนรถ</th>
                         <th>ระยะทางรวม</th>
                         <th>เวลาเดินทาง</th>
@@ -61,7 +62,7 @@
 
                 <tbody id="truckStatsTable">
                     <tr>
-                        <td colspan="6" class="text-muted">
+                        <td colspan="8" class="text-muted">
                             กำลังโหลดข้อมูล...
                         </td>
                     </tr>
@@ -190,7 +191,7 @@
                     // เคลียร์เฉพาะ Marker เก่าออกจาก VectorSource (ไม่กระทบตัวแผนที่)
                     vectorSource.clear();
                     routeSource.clear();
-                    const routeCoordinates = [];
+                    const routeCoordinatesByDate = {};
 
                     drawCustomerMarkers(data.locations);
 
@@ -202,7 +203,11 @@
                             return;
                         }
 
-                        routeCoordinates.push([longitude, latitude]);
+                        const locationDate = moment(truck.created_at).format('YYYY-MM-DD');
+                        if (!routeCoordinatesByDate[locationDate]) {
+                            routeCoordinatesByDate[locationDate] = [];
+                        }
+                        routeCoordinatesByDate[locationDate].push([longitude, latitude]);
                         const marker = new ol.Feature({ 
                             geometry: new ol.geom.Point(
                                 ol.proj.fromLonLat([longitude, latitude])
@@ -212,7 +217,7 @@
                         marker.setStyle(new ol.style.Style({
                             image: new ol.style.Icon({ anchor: [0.5, 1], src: '/icons/marker-pending.png', scale: 0.5 }),
                             text: new ol.style.Text({
-                                text: `${moment(truck.created_at).format('YYYY-MM-DD HH:mm:ss')} - ${truck.driver_full_name}`,
+                                text: `${moment(truck.created_at).format('YYYY-MM-DD HH:mm:ss')}`,
                                 font: 'bold 13px Kanit',
                                 offsetY: -35,
                                 fill: new ol.style.Fill({ color: '#000000' }),
@@ -223,11 +228,13 @@
                         vectorSource.addFeature(marker);
                     });
 
-                    if (routeCoordinates.length > 1) {
-                        try {
-                            await drawOsrmRoute(routeCoordinates);
-                        } catch (error) {
-                            console.error('ไม่สามารถสร้างเส้นทางด้วย OSRM:', error);
+                    for (const routeCoordinates of Object.values(routeCoordinatesByDate)) {
+                        if (routeCoordinates.length > 1) {
+                            try {
+                                await drawOsrmRoute(routeCoordinates);
+                            } catch (error) {
+                                console.error('ไม่สามารถสร้างเส้นทางด้วย OSRM:', error);
+                            }
                         }
                     }
                     renderTruckStats(data);
@@ -249,7 +256,7 @@
                 if (!data || data.status !== 'success') {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="6" class="text-danger">
+                            <td colspan="8" class="text-danger">
                                 ไม่สามารถโหลดข้อมูลได้
                             </td>
                         </tr>
@@ -265,7 +272,7 @@
                 if (!statsByDate || Object.keys(statsByDate).length === 0 || !locations || locations.length === 0) {
                     tbody.innerHTML = `
                         <tr>
-                            <td colspan="6" class="text-muted">
+                            <td colspan="8" class="text-muted">
                                 ไม่มีข้อมูลการเดินทาง
                             </td>
                         </tr>
@@ -277,20 +284,38 @@
                 const licensePlate =
                     locations[0].license_plate ?? '-';
 
+                const driver_name =
+                    locations[0].driver_full_name ?? '-';
+
+                let current_driver = null;
+                let current_license_plate = null;
+                let html = '';
+
                 tbody.innerHTML = Object.entries(statsByDate).map(([date, stats]) => {
                     const totalMinutes = Math.floor(stats.total_time / (1000 * 60));
                     const hours = Math.floor(totalMinutes / 60);
                     const minutes = totalMinutes % 60;
                     const travelTime = `${hours > 0 ? `${hours} ชม. ` : ''}${minutes} นาที`;
 
-                    return `
+                    html = `
                     <tr>
-                        <td>${moment(date).format('DD/MM/YYYY')}</td>
+                        <td>${moment(date).format('DD/MM/YYYY')}</td>`
 
-                        <td class="fw-bold">
-                            ${licensePlate}
-                        </td>
+                    if(current_driver !== driver_name) {
+                        html += `<td>${driver_name}</td>`;
+                        current_driver = driver_name;
+                    } else {
+                        html += `<td></td>`;
+                    }
 
+                    if(current_license_plate !== licensePlate) {
+                        html += `<td>${licensePlate}</td>`;
+                        current_license_plate = licensePlate;
+                    } else {
+                        html += `<td></td>`;
+                    }
+                        
+                    html +=`
                         <td>
                             ${Number(stats.total_distance).toFixed(2)}
                             km
