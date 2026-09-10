@@ -1,6 +1,7 @@
 let map = null
 let vectorSource = null;
 let isFit = false
+let current_zone_location = null
 
 let drivers_data = null
 let orderedStops = null
@@ -59,6 +60,64 @@ function isPointNearStops(point, stops, maxDistanceMeters = 500) {
     });
 }
 
+async function drawAssignedRouteFromZone(routes) {
+    const assignedRoutes = routes.filter(route => route.driver_id != null);
+    if (assignedRoutes.length === 0) return;
+
+    const currentZoneMarker = vectorSource.getFeatureById('current-zone-location');
+    const startCoordinate = currentZoneMarker?.getGeometry()?.getCoordinates();
+    const zoneLocation = startCoordinate
+        ? ol.proj.toLonLat(startCoordinate)
+        : current_zone_location;
+
+    if (!zoneLocation || zoneLocation.some(value => Number.isNaN(Number(value)))) {
+        return;
+    }
+
+    const routePoints = assignedRoutes
+        .map(route => {
+            const location = route.temporary_location || route.location;
+            if (!location) return null;
+
+            const [lon, lat] = location.split(',').map(value => Number(value.trim()));
+            return Number.isNaN(lon) || Number.isNaN(lat) ? null : [lon, lat];
+        })
+        .filter(Boolean);
+
+    if (routePoints.length === 0) return;
+
+    const routeFeatureId = 'current-zone-routes';
+    const existingRoute = vectorSource.getFeatureById(routeFeatureId);
+    if (existingRoute) {
+        vectorSource.removeFeature(existingRoute);
+    }
+
+    try {
+        const routeCoords = [zoneLocation, ...routePoints]
+            .map(([lon, lat]) => `${lon},${lat}`)
+            .join(';');
+        const routeResponse = await fetch(
+            `https://router.project-osrm.org/route/v1/driving/${routeCoords}?overview=full&geometries=geojson`
+        );
+        const routeData = await routeResponse.json();
+
+        if (!routeResponse.ok || !routeData.routes?.length) return;
+
+        const transformedRouteCoords = routeData.routes[0].geometry.coordinates
+            .map(coordinate => ol.proj.fromLonLat(coordinate));
+        const routeLine = new ol.Feature({
+            geometry: new ol.geom.LineString(transformedRouteCoords)
+        });
+        routeLine.setId(routeFeatureId);
+        routeLine.setStyle(new ol.style.Style({
+            stroke: new ol.style.Stroke({ color: routes[0].color, width: 4 })
+        }));
+        vectorSource.addFeature(routeLine);
+    } catch (error) {
+        console.warn('ไม่สามารถดึงเส้นทาง OSRM จากจุดเริ่มต้นได้', error);
+    }
+}
+
 async function updateMap(options) {
     try {        
         if(options == "route") {
@@ -103,6 +162,8 @@ async function updateMap(options) {
                 });
                 vectorSource.addFeature(marker);
             });
+
+            await drawAssignedRouteFromZone(routes);
 
             const points = routes.map(route => {
                 let [lon, lat] = []
@@ -180,8 +241,6 @@ async function updateMap(options) {
                     customerData: customer,
                 });
                 marker.setId(customer.id || customer._id);
-
-                // createGeoAltSvg is defined above
 
                 // 2. นำไปใช้ใน Marker
                 const groupColor = customer.color
@@ -265,6 +324,36 @@ async function updateMap(options) {
     } catch (error) {
         console.error("เกิดข้อผิดพลาดในการอัปเดตพิกัด:", error);
     }
+}
+
+async function drawStartingPoint() {
+    const company_location_result = await fetch(`/api/getCurrentZone`);
+    if (!company_location_result.ok) {
+        throw new Error("ดึงข้อมูล โซนการทำงานของบริษัทจากหลังบ้านไม่สำเร็จ");
+    }
+    const current_zone = await company_location_result.json();
+    current_zone_location = current_zone[0].zone.split(',').map(Number);
+
+    const currentZoneMarker = new ol.Feature({
+        geometry: new ol.geom.Point(ol.proj.fromLonLat(current_zone_location))
+    });
+
+    currentZoneMarker.setId('current-zone-location');
+    currentZoneMarker.setStyle(new ol.style.Style({
+        image: new ol.style.Icon({
+            anchor: [0.5, 1],
+            src: createGeoAltSvg('#FF0000'),
+            scale: 0.8
+        }),
+        text: new ol.style.Text({
+            text: `ที่อยู่บริษัท`,
+            font: 'bold 12px Kanit',
+            offsetY: -32,
+            fill: new ol.style.Fill({ color: '#222' }),
+            stroke: new ol.style.Stroke({ color: '#FFFFFF', width: 3 })
+        })
+    }));
+    vectorSource.addFeature(currentZoneMarker);
 }
 
 async function drawDrivers(drivers_data) {
