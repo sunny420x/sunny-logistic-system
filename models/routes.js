@@ -9,7 +9,7 @@ function getRoutes(date = null, search = null, status = null) {
         JOIN customers as c ON c.id = r.customer_id 
         JOIN customer_groups as cg ON c.group_id = cg.id 
         LEFT JOIN trucks as t ON t.id = r.truck_id
-        JOIN users as u ON u.id = r.driver_id`;
+        LEFT JOIN users as u ON u.id = r.driver_id`;
 
         let conditions = [];
         let params = [];
@@ -66,7 +66,7 @@ function getRouteById(id) {
             u.full_name as driver_full_name, r.weight, r.finish_at, r.arrivalImage, r.status, r.location_note, r.driver_note, r.temporary_location, r.arrival_at_warehouse 
             FROM transition_records as r JOIN customers as c ON c.id = r.customer_id 
             LEFT JOIN trucks as t ON t.id = r.truck_id 
-            JOIN users as u ON u.id = r.driver_id WHERE r.id = ?`, [id], (err, result) => {
+            LEFT JOIN users as u ON u.id = r.driver_id WHERE r.id = ?`, [id], (err, result) => {
             if(err) console.error(err);
             resolve(result)
         })

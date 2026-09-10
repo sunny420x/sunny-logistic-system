@@ -94,8 +94,8 @@ app.post('/admin/routes/add', async(req,res) => {
     if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
    
     const customer_id = req.body.customer_id
-    const truck_id = req.body.truck_id
-    const driver_id = req.body.driver_id
+    const truck_id = req.body.truck_id || null
+    const driver_id = req.body.driver_id || null
     const date = req.body.date
     const time_start = req.body.time_start
     const weight = req.body.weight
@@ -147,8 +147,8 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
    
     const id = req.params.id
     const customer_id = req.body.customer_id
-    const truck_id = req.body.truck_id
-    const driver_id = req.body.driver_id
+    const truck_id = req.body.truck_id || null
+    const driver_id = req.body.driver_id || null
     const date = req.body.date
     const time_start = req.body.time_start
     const weight = req.body.weight

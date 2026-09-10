@@ -125,7 +125,8 @@
                 <div class="form-group mb-3">
                     <label for="customer_id">รถที่ใช้ส่งสินค้า: </label>
                      <% if(route.status == 0) { %>
-                    <select name="truck_id" class="form-select" required>
+                    <select name="truck_id" class="form-select">
+                      <option value="">ยังไม่กำหนดตอนนี้</option>
                       <% trucks.forEach(truck => { %>
                         <option value="<%=truck.id%>" <% if(route.truck_id == truck.id) {%>selected<%}%>><%=truck.license_plate%></option>
                       <% }) %>
@@ -138,7 +139,8 @@
                 <div class="form-group mb-3">
                     <label for="driver_id">พนักงานปฏิบัติการ (คนขับรถ): </label>
                      <% if(route.status == 0) { %>
-                    <select name="driver_id" class="form-select" required>
+                    <select name="driver_id" class="form-select">
+                      <option value="">ยังไม่กำหนดตอนนี้</option>
                       <% drivers.forEach(driver => { %>
                         <option value="<%=driver.id%>" <% if(route.driver_id == driver.id) {%>selected<%}%>><%=driver.full_name%></option>
                       <% }) %>
