@@ -100,7 +100,10 @@
             <th>จัดการ</th>
           </thead>
           <tbody>
-            <% routes.forEach(row => { %>
+            <% 
+            let current_driver = null;
+            routes.forEach(row => { 
+            %>
             <tr>
               <td><%=row.id%></td>
               <td><%=moment(row.date).format("DD/MM/YY")%></td>
@@ -116,7 +119,11 @@
               </td>
               <td>
                 <% if(row.driver_full_name) { %>
-                <a href="/admin/users/edit/<%=row.driver_id%>" class="badge bg-secondary fw-normal" style="text-decoration: none;"><%=row.driver_full_name%></a>
+                  <% if(current_driver != row.driver_full_name) { %>
+                  <a href="/admin/users/edit/<%=row.driver_id%>" class="badge bg-secondary fw-normal" style="text-decoration: none;"><%=row.driver_full_name%></a>
+                  <% current_driver = row.driver_full_name
+                  }
+                  %>
                 <% } else { %>
                 <span class="badge bg-warning">ยังไม่ได้กำหนด</span>
                 <% } %>
