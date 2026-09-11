@@ -171,11 +171,11 @@
                     <%}%>
                 </div>
                 <div class="form-group mb-3">                
-                    <label for="time">เวลา:</label>
                      <% if(route.status == 0) { %>
-                    <input type="time" name="time_start" class="form-control"  value="<%=route.time%>" <% if(route.status == 1) { %>readonly<%}%> step="1" required>
+                    <input type="checkbox" id="alreadyBooked" onchange="toggleTimeField()" <%if(route.time) {%>checked<%}%>> นัดลูกค้าไว้แล้ว
+                    <input type="<%if(route.time) {%>time<%} else {%>hidden<%}%>" name="time_start" class="form-control"  value="<%=route.time%>" <% if(route.status == 1) { %>readonly<%}%> step="1">
                     <% } else {%>
-                      <input type="hidden" name="time_start" class="form-control"  value="<%=route.time%>" required>
+                      <input type="hidden" name="time_start" class="form-control"  value="<%=route.time%>">
                       <br><strong><%=route.time%></strong>
                     <%}%>
                 </div>
@@ -244,6 +244,15 @@
   <script>
     initializeMap();
     updateMap('customers');
+
+    function toggleTimeField() {
+      if(document.getElementById('alreadyBooked').checked) {
+        document.getElementsByName('time_start')[0].setAttribute('type', 'time')
+      } else {
+        document.getElementsByName('time_start')[0].setAttribute('type', 'hidden')
+        document.getElementsByName('time_start')[0].setAttribute('value', '')
+      }
+    }
   </script>
 
   <% if(route.customer_row_id) { %>

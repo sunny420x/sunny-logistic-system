@@ -107,7 +107,7 @@ app.post('/admin/routes/add', async(req,res) => {
 
     addRoute(customer_id, billing_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, round).then(() => {
         res.cookie('alert', 'success')
-        res.redirect('/admin/routes')
+        res.redirect('/admin/routes/?date='+moment().format('YYYY-MM-DD'))
     })
 })
 app.get('/admin/routes/edit/:id', async(req,res) => {
@@ -188,7 +188,7 @@ app.get('/admin/routes/delete/:id', async(req,res) => {
 
     deleteRouteById(id).then(() => {
         res.cookie('alert', 'delete_success')
-        res.redirect('/admin/routes')
+        res.redirect('/admin/routes/?date='+moment().format('YYYY-MM-DD'))
     })
 })
 

@@ -159,6 +159,11 @@ function confirmStartNextRound() {
     calculateRoutes();
 }
 
+function clearStartedRound() {
+    localStorage.removeItem(getRoundStorageKey());
+    startedRound = null;
+}
+
 function drawCustomerMarkers() {
     initRoute()
     allRoutes.forEach(route => {
@@ -213,6 +218,10 @@ async function calculateRoutes() {
     }
 
     let startCoords = [parseFloat(position_longitude), parseFloat(position_latitude)]
+    const scheduledRoutes = activeRoutes
+        .filter(route => route.time !== null && route.time !== undefined && String(route.time).trim() !== '')
+        .sort((a, b) => String(a.time).localeCompare(String(b.time)));
+    nextTarget = scheduledRoutes[0] || null;
 
     if (activeRoutes.length > 0) {
         const coordsString = [
@@ -228,20 +237,19 @@ async function calculateRoutes() {
         if (tableData.distances && tableData.distances.length > 0) {
             const distancesFromStart = tableData.distances[0]; 
             
-            let minIndex = 1;
-            let minVal = distancesFromStart[1];
-
             // วนลูปเก็บระยะทางเข้าสู่ลูกค้าแต่ละคน และหาจุดที่ใกล้ที่สุด
             for (let i = 1; i < activeRoutes.length + 1; i++) {
                 activeRoutes[i - 1].distanceFromMe = distancesFromStart[i];
-
-                if (distancesFromStart[i] < minVal) {
-                    minVal = distancesFromStart[i];
-                    minIndex = i;
-                }
             }
 
-            nextTarget = activeRoutes[minIndex - 1];
+            if (scheduledRoutes.length === 0) {
+                nextTarget = activeRoutes.reduce((nearest, route) => {
+                    if (!nearest || route.distanceFromMe < nearest.distanceFromMe) {
+                        return route;
+                    }
+                    return nearest;
+                }, null);
+            }
         }
     }
 
@@ -277,10 +285,24 @@ async function calculateRoutes() {
 
 function updateRouteTable() {
     let sortedRoute = [...allRoutes].sort((a, b) => {
-        if (a.status === 1 && b.status !== 1) return 1;
-        if (b.status === 1 && a.status !== 1) return -1;
-        if (nextTarget && a.id === nextTarget.id) return -1;
-        if (nextTarget && b.id === nextTarget.id) return 1;
+        const aCompleted = a.status == 1;
+        const bCompleted = b.status == 1;
+        if (aCompleted && !bCompleted) return 1;
+        if (bCompleted && !aCompleted) return -1;
+        if (aCompleted && bCompleted) return 0;
+
+        const aHasTime = a.time !== null && a.time !== undefined && a.time !== '';
+        const bHasTime = b.time !== null && b.time !== undefined && b.time !== '';
+        if (aHasTime && !bHasTime) return -1;
+        if (bHasTime && !aHasTime) return 1;
+
+        if (aHasTime && bHasTime) {
+            return String(a.time).localeCompare(String(b.time));
+        }
+
+        const aDistance = Number.isFinite(a.distanceFromMe) ? a.distanceFromMe : Infinity;
+        const bDistance = Number.isFinite(b.distanceFromMe) ? b.distanceFromMe : Infinity;
+        if (aDistance !== bDistance) return aDistance - bDistance;
         return 0;
     });
 
@@ -318,7 +340,6 @@ function updateRouteTable() {
         } else {
             // แปลงระยะทางจากเมตรเป็นกิโลเมตร (ถ้ามีค่า)
             let distText = "";
-            let time = `<span class="badge bg-secendary">${route.time}</span>`
             if (route.distanceFromMe !== null && route.distanceFromMe !== undefined) {
                 let km = (route.distanceFromMe / 1000).toFixed(1);
                 distText = ` <span class="text-muted" style="font-size: 0.85em;">(~${km} กม.)</span>`;
@@ -358,6 +379,7 @@ function updateRouteTable() {
     });
 
     if(allRoutes.every(route => route.status == 1)) {
+        clearStartedRound();
         statusBarBody.innerHTML = ""
         if(!allRoutes[0].arrival_at_warehouse) {
             statusBarBody.innerHTML += `

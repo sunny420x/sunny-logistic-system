@@ -54,7 +54,7 @@
                   <label for="round" class="form-label">กำหนดรอบส่งของของวัน:</label>
                   <div class="input-group">
                     <span class="input-group-text">รอบที่</span>
-                    <input type="number" class="form-control" min="1" name="round">
+                    <input type="number" class="form-control" min="1" name="round" value="1">
                     <span class="input-group-text">ของวัน</span>
                   </div>
                 </div>
@@ -89,9 +89,9 @@
                     <label for="date">วันที่: </label>
                     <input type="date" name="date" class="form-control" value="<%=moment().format('YYYY-MM-DD')%>" required>
                 </div>
-                <div class="form-group mb-3">                
-                    <label for="time">เวลา: </label>
-                    <input type="time" name="time_start" class="form-control" value="<%=moment().format('HH:mm:ss')%>" step="1" required>
+                <div class="form-group mb-3">
+                    <input type="checkbox" id="alreadyBooked" onchange="toggleTimeField()"> นัดลูกค้าไว้แล้ว
+                    <input type="hidden" name="time_start" class="form-control" value="" step="1" required>
                 </div>
                 <div class="form-group mb-3">                
                     <label for="billing_id">หมายเลขบิล: </label>
@@ -192,6 +192,14 @@
     function driverChangeHandler(driver_id) {
       const date = document.getElementsByName('date')[0].value;
       initRouteRound(driver_id, date)
+    }
+
+    function toggleTimeField() {
+      if(document.getElementById('alreadyBooked').checked) {
+        document.getElementsByName('time_start')[0].setAttribute('type', 'time')
+      } else {
+        document.getElementsByName('time_start')[0].setAttribute('type', 'hidden')
+      }
     }
   </script>
 </body>
