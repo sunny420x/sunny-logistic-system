@@ -61,6 +61,10 @@ function isPointNearStops(point, stops, maxDistanceMeters = 500) {
 }
 
 async function drawAssignedRouteFromZone(routes) {
+    const urlParams = new URLSearchParams(window.location.search);
+    if(!urlParams.get('date')) {
+        return;
+    }
     const assignedRoutes = routes.filter(route => route.driver_id != null);
     if (assignedRoutes.length === 0) return;
 
@@ -74,48 +78,55 @@ async function drawAssignedRouteFromZone(routes) {
         return;
     }
 
-    const routePoints = assignedRoutes
-        .map(route => {
-            const location = route.temporary_location || route.location;
-            if (!location) return null;
+    const routesByDriver = assignedRoutes.reduce((groups, route) => {
+        const driverId = String(route.driver_id);
+        if (!groups.has(driverId)) groups.set(driverId, []);
+        groups.get(driverId).push(route);
+        return groups;
+    }, new Map());
 
-            const [lon, lat] = location.split(',').map(value => Number(value.trim()));
-            return Number.isNaN(lon) || Number.isNaN(lat) ? null : [lon, lat];
-        })
-        .filter(Boolean);
+    vectorSource.getFeatures()
+        .filter(feature => String(feature.getId()).startsWith('current-zone-route-'))
+        .forEach(feature => vectorSource.removeFeature(feature));
 
-    if (routePoints.length === 0) return;
+    await Promise.all([...routesByDriver].map(async ([driverId, driverRoutes]) => {
+        const routePoints = driverRoutes
+            .map(route => {
+                const location = route.temporary_location || route.location;
+                if (!location) return null;
 
-    const routeFeatureId = 'current-zone-routes';
-    const existingRoute = vectorSource.getFeatureById(routeFeatureId);
-    if (existingRoute) {
-        vectorSource.removeFeature(existingRoute);
-    }
+                const [lon, lat] = location.split(',').map(value => Number(value.trim()));
+                return Number.isNaN(lon) || Number.isNaN(lat) ? null : [lon, lat];
+            })
+            .filter(Boolean);
 
-    try {
-        const routeCoords = [zoneLocation, ...routePoints]
-            .map(([lon, lat]) => `${lon},${lat}`)
-            .join(';');
-        const routeResponse = await fetch(
-            `https://router.project-osrm.org/route/v1/driving/${routeCoords}?overview=full&geometries=geojson`
-        );
-        const routeData = await routeResponse.json();
+        if (routePoints.length === 0) return;
 
-        if (!routeResponse.ok || !routeData.routes?.length) return;
+        try {
+            const routeCoords = [zoneLocation, ...routePoints]
+                .map(([lon, lat]) => `${lon},${lat}`)
+                .join(';');
+            const routeResponse = await fetch(
+                `https://router.project-osrm.org/route/v1/driving/${routeCoords}?overview=full&geometries=geojson`
+            );
+            const routeData = await routeResponse.json();
 
-        const transformedRouteCoords = routeData.routes[0].geometry.coordinates
-            .map(coordinate => ol.proj.fromLonLat(coordinate));
-        const routeLine = new ol.Feature({
-            geometry: new ol.geom.LineString(transformedRouteCoords)
-        });
-        routeLine.setId(routeFeatureId);
-        routeLine.setStyle(new ol.style.Style({
-            stroke: new ol.style.Stroke({ color: routes[routes.length - 1].color, width: 4 })
-        }));
-        vectorSource.addFeature(routeLine);
-    } catch (error) {
-        console.warn('ไม่สามารถดึงเส้นทาง OSRM จากจุดเริ่มต้นได้', error);
-    }
+            if (!routeResponse.ok || !routeData.routes?.length) return;
+
+            const transformedRouteCoords = routeData.routes[0].geometry.coordinates
+                .map(coordinate => ol.proj.fromLonLat(coordinate));
+            const routeLine = new ol.Feature({
+                geometry: new ol.geom.LineString(transformedRouteCoords)
+            });
+            routeLine.setId(`current-zone-route-${driverId}`);
+            routeLine.setStyle(new ol.style.Style({
+                stroke: new ol.style.Stroke({ color: driverRoutes[0].color || '#2E8B57', width: 4 })
+            }));
+            vectorSource.addFeature(routeLine);
+        } catch (error) {
+            console.warn(`ไม่สามารถดึงเส้นทาง OSRM ของคนขับ ${driverId} จากจุดเริ่มต้นได้`, error);
+        }
+    }));
 }
 
 async function updateMap(options) {
