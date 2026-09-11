@@ -9,7 +9,7 @@ const path  = require('path')
 const { getCustomers } = require('../models/customers')
 const { getMyRoutes, getRoutes } = require('../models/routes')
 const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation, 
-    saveArrivalImageFile, ongoingDrivers, arrivalAtWarehouse, calculateTruckStats } = require('../models/tracking')
+    saveArrivalImageFile, ongoingDrivers, arrivalAtWarehouse, calculateTruckStats, getCurrentRound } = require('../models/tracking')
 const { loginUser, initUserToken } = require('../models/users')
 const { getCurrentZone } = require('../models/settings')
 
@@ -106,6 +106,21 @@ app.get('/api/getCurrentZone', async(req,res) => {
     if(!auth.user) res.redirect('/logout')
 
     const data = await getCurrentZone()
+    res.json(data)
+})
+
+app.post('/api/getCurrentRound', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+
+    const driver_id = req.body.driver_id
+    const date = req.body.date
+
+    const data = await getCurrentRound(driver_id, date)
     res.json(data)
 })
 

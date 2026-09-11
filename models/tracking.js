@@ -290,6 +290,23 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     return R * c;
 }
 
+function getCurrentRound(driver_id, date) {
+    return new Promise((resolve) => {
+        db.query(`SELECT IFNULL(round, 0) as round FROM transition_records WHERE driver_id = ? AND date = ? ORDER BY id DESC LIMIT 1`, [driver_id, date], (err,results) => {
+            if(err) {
+                resolve({
+                    status: "error",
+                    message: err.message
+                })
+            }
+            resolve({
+                status: "success",
+                data: results[0] ?? { round: 0 }
+            })
+        })
+    })
+}
+
 module.exports = {
     finishDelivery,
     saveLocation,
@@ -300,4 +317,5 @@ module.exports = {
     saveArrivalImageFile,
     arrivalAtWarehouse,
     calculateTruckStats,
+    getCurrentRound,
 }

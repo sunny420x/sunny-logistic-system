@@ -6,6 +6,7 @@ let driver_id = null;
 let routes = null
 let allRoutes = null;
 let nextTarget = null;
+let startedRound = null;
 
 let customerMarkersInitialized = false;
 
@@ -81,6 +82,7 @@ async function updateDriverMap() {
         }
 
         initRoute();
+        initializeStartedRound();
 
         if (!customerMarkersInitialized) {
             customerMarkersInitialized = true;
@@ -109,6 +111,9 @@ function initRoute() {
             customerName: route.customer_name,
             time: route.time,
             status: route.status,
+            round: Number.isFinite(Number(route.round)) && Number(route.round) > 0
+                ? Number(route.round)
+                : null,
             location_note: route.location_note,
             driver_note: route.driver_note,
             arrival_at_warehouse: route.arrival_at_warehouse,
@@ -116,6 +121,42 @@ function initRoute() {
             distanceFromMe: null // เพิ่มตัวแปรเก็บระยะทาง
         };
     });
+}
+
+function getRoundStorageKey() {
+    const routeDate = routes?.[0]?.date || new Date().toISOString().slice(0, 10);
+    const driverKey = routes?.[0]?.driver_id || driver_id || 'unknown';
+    return `driver-started-round-${driverKey}-${routeDate}`;
+}
+
+function initializeStartedRound() {
+    const storedRound = Number(localStorage.getItem(getRoundStorageKey()));
+    if (Number.isFinite(storedRound) && storedRound > 0) {
+        startedRound = storedRound;
+        return;
+    }
+
+    const rounds = allRoutes
+        .map(route => route.round)
+        .filter(round => Number.isFinite(round));
+    startedRound = rounds.length > 0 ? Math.min(...rounds) : null;
+    if (startedRound !== null) {
+        localStorage.setItem(getRoundStorageKey(), String(startedRound));
+    }
+}
+
+function confirmStartNextRound() {
+    const nextRound = allRoutes
+        .filter(route => route.status != 1 && Number.isFinite(route.round) && route.round > startedRound)
+        .reduce((minimum, route) => Math.min(minimum, route.round), Infinity);
+
+    if (!Number.isFinite(nextRound)) return;
+
+    startedRound = nextRound;
+    localStorage.setItem(getRoundStorageKey(), String(startedRound));
+    nextTarget = null;
+    updateRouteTable();
+    calculateRoutes();
 }
 
 function drawCustomerMarkers() {
@@ -157,13 +198,26 @@ function drawCustomerMarkers() {
 
 async function calculateRoutes() {
     const pendingRoutes = allRoutes.filter(c => c.status != 1);
+    const activeRoutes = startedRound === null
+        ? pendingRoutes
+        : pendingRoutes.filter(route => route.round === startedRound);
+
+    let routeFeature = vectorSource.getFeatureById('current-route');
+    if (activeRoutes.length === 0) {
+        nextTarget = null;
+        if (routeFeature) {
+            vectorSource.removeFeature(routeFeature);
+        }
+        updateRouteTable();
+        return;
+    }
 
     let startCoords = [parseFloat(position_longitude), parseFloat(position_latitude)]
 
-    if (pendingRoutes.length > 0) {
+    if (activeRoutes.length > 0) {
         const coordsString = [
             `${startCoords[0]},${startCoords[1]}`,
-            ...pendingRoutes.map(c => `${c.coords[0]},${c.coords[1]}`)
+            ...activeRoutes.map(c => `${c.coords[0]},${c.coords[1]}`)
         ].join(';');
 
         // เพิ่ม &annotations=distance เพื่อดึงระยะทางหน่วยเป็น "เมตร"
@@ -178,8 +232,8 @@ async function calculateRoutes() {
             let minVal = distancesFromStart[1];
 
             // วนลูปเก็บระยะทางเข้าสู่ลูกค้าแต่ละคน และหาจุดที่ใกล้ที่สุด
-            for (let i = 1; i < pendingRoutes.length + 1; i++) {
-                pendingRoutes[i - 1].distanceFromMe = distancesFromStart[i];
+            for (let i = 1; i < activeRoutes.length + 1; i++) {
+                activeRoutes[i - 1].distanceFromMe = distancesFromStart[i];
 
                 if (distancesFromStart[i] < minVal) {
                     minVal = distancesFromStart[i];
@@ -187,7 +241,7 @@ async function calculateRoutes() {
                 }
             }
 
-            nextTarget = pendingRoutes[minIndex - 1];
+            nextTarget = activeRoutes[minIndex - 1];
         }
     }
 
@@ -200,7 +254,6 @@ async function calculateRoutes() {
             const singleRouteCoords = routeData.routes[0].geometry.coordinates;
             const transformedRouteCoords = singleRouteCoords.map(coord => ol.proj.fromLonLat(coord));
 
-            let routeFeature = vectorSource.getFeatureById('current-route');
             if (!routeFeature) {
                 routeFeature = new ol.Feature({
                     geometry: new ol.geom.LineString(transformedRouteCoords)
@@ -233,11 +286,32 @@ function updateRouteTable() {
 
     const statusBarBody = document.getElementById("statusBarBody");
     if (statusBarBody) statusBarBody.innerHTML = "";
+
+    const nextRound = allRoutes
+        .filter(route => route.status != 1 && Number.isFinite(route.round) && route.round > startedRound)
+        .reduce((minimum, route) => Math.min(minimum, route.round), Infinity);
+    const currentRoundCompleted = allRoutes
+        .filter(route => route.round === startedRound)
+        .every(route => route.status == 1);
+
+    if (Number.isFinite(nextRound) && currentRoundCompleted) {
+        statusBarBody.innerHTML = `
+        <tr>
+            <td colspan="3" class="text-center">
+                <div class="text-success mb-2">รอบที่ ${startedRound} เสร็จเรียบร้อยแล้ว</div>
+                <button class="btn btn-primary btn-sm w-100" onclick="confirmStartNextRound()">เริ่มรอบที่ ${nextRound}</button>
+            </td>
+        </tr>`;
+        return;
+    }
     
     sortedRoute.forEach(route => {
         if (route.status == 1) {
             statusBarBody.innerHTML += `
             <tr style="opacity: 0.4;">
+                <td>
+                ${route.round}
+                </td>
                 <td>${route.customerId} ${route.customerName}</td>
                 <td>✅ ส่งแล้ว</td>
             </tr>`;
@@ -257,7 +331,10 @@ function updateRouteTable() {
             statusBarBody.innerHTML += `
             <tr>
                 <td>
-                ${route.customerId} ${route.customerName}${distText}${badge} <span class="badge bg-secondary fw-normal">${route.time}</span>
+                ${route.round}
+                </td>
+                <td>
+                ${route.customerId} ${route.customerName}<br>${distText}${badge} <span class="badge bg-secondary fw-normal">${route.time}</span>
                 </td>
                 <td>
                     <a href="https://map.google.co.th/?q=${route.coords[1]},${route.coords[0]}" class="btn btn-light" target="_blank">📍 แผนที่</a>
@@ -285,13 +362,13 @@ function updateRouteTable() {
         if(!allRoutes[0].arrival_at_warehouse) {
             statusBarBody.innerHTML += `
             <tr>
-                <td class="text-success text-center">🎉 ส่งงานทั้งหมดเรียบร้อยแล้ว</td>
-                <td><button class="btn btn-primary" onclick="arrivalAtWarehouse([${allRoutes.map(route => route.id)}])">✅ ฉันกลับมาถึงโกดังสินค้าแล้ว</td>
+                <td class="text-success text-center" colspan="2">🎉 ส่งงานทั้งหมดเรียบร้อยแล้ว</td>
+                <td><button class="btn btn-primary" onclick="arrivalAtWarehouse([${allRoutes.map(route => route.id)}])">✅ กลับมาถึงโกดังสินค้าแล้ว</td>
             </tr>`;
         } else {
             statusBarBody.innerHTML += `
             <tr>
-                <td colspan="2" class="text-success text-center">🎉 ส่งงานทั้งหมดเรียบร้อยแล้ว</td>
+                <td colspan="3" class="text-success text-center">🎉 ส่งงานทั้งหมดเรียบร้อยแล้ว</td>
             </tr>`;
         }
         return;

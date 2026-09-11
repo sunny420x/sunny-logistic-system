@@ -3,7 +3,7 @@ const db = require('../database');
 function getRoutes(date = null, search = null, status = null) {
     return new Promise((resolve, reject) => {
         let query = `SELECT r.id, r.date, r.time, c.customer_name, c.customer_id, c.location, r.status, t.license_plate, u.full_name as driver_full_name, r.driver_id, 
-        t.id as truck_id, r.weight, r.finish_at, r.arrivalImage, cg.color, c.group_id, r.location_note, r.driver_note, r.temporary_location, r.billing_id 
+        t.id as truck_id, r.weight, r.finish_at, r.arrivalImage, cg.color, c.group_id, r.location_note, r.driver_note, r.temporary_location, r.billing_id, r.round 
         FROM transition_records as r 
         JOIN customers as c ON c.id = r.customer_id 
         JOIN customer_groups as cg ON c.group_id = cg.id 
@@ -47,7 +47,7 @@ function getRoutes(date = null, search = null, status = null) {
 function getMyRoutes(driver_id) {
     return new Promise(resolve => {
         db.query(`SELECT r.id, r.date, r.time, c.customer_name, c.customer_id, c.id as customer_row_id, c.location, r.status, t.license_plate, u.full_name as driver_full_name, 
-        r.driver_id, t.id as truck_id, r.weight, r.finish_at, r.arrivalImage,  r.location_note, r.driver_note, r.temporary_location, r.arrival_at_warehouse 
+        r.driver_id, t.id as truck_id, r.weight, r.finish_at, r.arrivalImage,  r.location_note, r.driver_note, r.temporary_location, r.arrival_at_warehouse, r.round 
         FROM transition_records as r 
         JOIN customers as c ON c.id = r.customer_id 
         LEFT JOIN trucks as t ON t.id = r.truck_id
@@ -62,7 +62,7 @@ function getMyRoutes(driver_id) {
 function getRouteById(id) {
     return new Promise(resolve => {
         db.query(`SELECT r.id, r.date, r.time, c.customer_name, c.customer_id, c.id as customer_row_id, c.location, t.license_plate, t.id as truck_id, r.driver_id, 
-            u.full_name as driver_full_name, r.weight, r.finish_at, r.arrivalImage, r.status, r.location_note, r.driver_note, r.temporary_location, r.arrival_at_warehouse, r.billing_id 
+            u.full_name as driver_full_name, r.weight, r.finish_at, r.arrivalImage, r.status, r.location_note, r.driver_note, r.temporary_location, r.arrival_at_warehouse, r.billing_id, r.round 
             FROM transition_records as r JOIN customers as c ON c.id = r.customer_id 
             LEFT JOIN trucks as t ON t.id = r.truck_id 
             LEFT JOIN users as u ON u.id = r.driver_id WHERE r.id = ?`, [id], (err, result) => {
@@ -82,11 +82,12 @@ function addRoute(
     weight,
     location_note,
     driver_note,
-    temporary_location 
+    temporary_location,
+    round
 ) {
     return new Promise(resolve => {
-        db.query("INSERT INTO transition_records(customer_id, billing_id, truck_id, driver_id, date, time, weight, location_note, driver_note, temporary_location) VALUES(?,?,?,?,?,?,?,?,?,?)", 
-            [customer_id, billing_id, truck_id, driver_id, date, time, weight, location_note, driver_note, temporary_location], (err) => {
+        db.query("INSERT INTO transition_records(customer_id, billing_id, truck_id, driver_id, date, time, weight, location_note, driver_note, temporary_location, round) VALUES(?,?,?,?,?,?,?,?,?,?,?)", 
+            [customer_id, billing_id, truck_id, driver_id, date, time, weight, location_note, driver_note, temporary_location, round], (err) => {
             if(err) console.error(err);
             resolve()
         })
@@ -106,14 +107,15 @@ function editRoute(
     driver_note,
     temporary_location,
     status,
-    arrival_at_warehouse
+    arrival_at_warehouse,
+    round
 ) {
     return new Promise(resolve => {
         db.query(`UPDATE transition_records SET 
             customer_id = ?, billing_id= ?, truck_id = ?, driver_id = ?, date = ?, time = ?, weight = ?, 
             location_note = ?, driver_note = ?, temporary_location = ?, status = ?, 
-            arrival_at_warehouse = ? WHERE id = ?`, 
-            [customer_id, billing_id, truck_id, driver_id, date, time, weight, location_note, driver_note, temporary_location, status, arrival_at_warehouse, id], (err) => {
+            arrival_at_warehouse = ?, round = ? WHERE id = ?`, 
+            [customer_id, billing_id, truck_id, driver_id, date, time, weight, location_note, driver_note, temporary_location, status, arrival_at_warehouse, round, id], (err) => {
             if(err) console.error(err);
             resolve()
         })

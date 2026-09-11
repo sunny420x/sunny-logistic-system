@@ -51,52 +51,18 @@
               <h2 class="fw-bold mb-3">เพิ่มคิวส่งของ</h2>
               <form action="" method="post">
                 <div class="form-group mb-3">
+                  <label for="round" class="form-label">กำหนดรอบส่งของของวัน:</label>
+                  <div class="input-group">
+                    <span class="input-group-text">รอบที่</span>
+                    <input type="number" class="form-control" min="1" name="round">
+                    <span class="input-group-text">ของวัน</span>
+                  </div>
+                </div>
+                <div class="form-group mb-3">
                   <label for="customerSelect" class="form-label">เลือกลูกค้า:</label>
                   <select id="customerSelect" name="customer_id" class="form-select" required>
                   </select>
                 </div>
-                <script>
-                  function loadCustomers() {
-                    fetch('/api/getCustomers')
-                      .then(res => {
-                        if (res.status === 401) {
-                          window.location.href = '/login';
-                          return;
-                        }
-                        if (!res.ok) throw new Error('Failed to fetch customers');
-                        return res.json();
-                      })
-                      .then(customers => {
-                        const selectEl = $('#customerSelect');
-
-                        // 1. แปลงข้อมูลให้อยู่ในรูปแบบที่ Select2 ต้องการ { id, text }
-                        const data = customers.map(c => ({
-                          id: c.id,
-                          text: c.customer_name
-                        }));
-
-                        // 3. Initialize Select2
-                        selectEl.select2({
-                          theme: 'bootstrap-5',
-                          data: data,
-                          allowClear: true,
-                          width: '100%'
-                        });
-                      })
-                      .catch(err => console.error('Error fetching customers:', err));
-                  }
-
-                  document.addEventListener('DOMContentLoaded', () => {
-                    loadCustomers();
-
-                    $('#customerSelect').on('select2:select', function (e) {
-                      const selectedValue = e.params.data.id;
-                      if (typeof selectMark === 'function') {
-                        selectMark(selectedValue, false);
-                      }
-                    });
-                  });
-                </script>
                 <div class="form-group mb-3">
                     <label for="customer_id">รถที่ใช้ส่งสินค้า: </label>
                     <select name="truck_id" class="form-select">
@@ -108,7 +74,7 @@
                 </div>
                 <div class="form-group mb-3">
                     <label for="driver_id">พนักงานปฏิบัติการ (คนขับรถ): </label>
-                    <select name="driver_id" class="form-select">
+                    <select name="driver_id" class="form-select" onchange="driverChangeHandler(this.value)">
                       <option value="">ยังไม่กำหนดตอนนี้</option>
                       <% drivers.forEach(driver => { %>
                         <option value="<%=driver.id%>"><%=driver.full_name%></option>
@@ -149,8 +115,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Container -->
     </main>
   </div>
 
@@ -160,6 +124,75 @@
   <script>
     initializeMap();
     updateMap('customers');
+
+    function loadCustomers() {
+      fetch('/api/getCustomers')
+        .then(res => {
+          if (res.status === 401) {
+            window.location.href = '/login';
+            return;
+          }
+          if (!res.ok) throw new Error('Failed to fetch customers');
+          return res.json();
+        })
+        .then(customers => {
+          const selectEl = $('#customerSelect');
+
+          // 1. แปลงข้อมูลให้อยู่ในรูปแบบที่ Select2 ต้องการ { id, text }
+          const data = customers.map(c => ({
+            id: c.id,
+            text: c.customer_name
+          }));
+
+          // 3. Initialize Select2
+          selectEl.select2({
+            theme: 'bootstrap-5',
+            data: data,
+            allowClear: true,
+            width: '100%'
+          });
+        })
+        .catch(err => console.error('Error fetching customers:', err));
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadCustomers();
+
+      $('#customerSelect').on('select2:select', function (e) {
+        const selectedValue = e.params.data.id;
+        if (typeof selectMark === 'function') {
+          selectMark(selectedValue, false);
+        }
+      });
+    });
+
+    function initRouteRound(driver_id, date) {      
+      fetch('/api/getCurrentRound', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          driver_id, date
+        }) 
+      }).then(res => {
+          if (res.status === 401) {
+            window.location.href = '/login';
+            return;
+          }
+          if (!res.ok) throw new Error('Failed to fetch current round');
+          return res.json();
+        })
+        .then(data => {
+          document.getElementsByName('round')[0].value = parseInt(data.data.round) + 1;
+        })
+        .catch(err => console.error('Error fetching current round:', err));
+    }
+
+    function driverChangeHandler(driver_id) {
+      const date = document.getElementsByName('date')[0].value;
+      initRouteRound(driver_id, date)
+    }
   </script>
 </body>
 </html>

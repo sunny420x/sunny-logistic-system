@@ -103,8 +103,9 @@ app.post('/admin/routes/add', async(req,res) => {
     const location_note = req.body.location_note
     const driver_note = req.body.driver_note
     const temporary_location = req.body.temporary_location
+    const round = req.body.round
 
-    addRoute(customer_id, billing_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location).then(() => {
+    addRoute(customer_id, billing_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, round).then(() => {
         res.cookie('alert', 'success')
         res.redirect('/admin/routes')
     })
@@ -158,6 +159,7 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
     const driver_note = req.body.driver_note
     const temporary_location = req.body.temporary_location
     const status = req.body.status
+    const round = req.body.round
 
     const arrival_at_warehouse_date = req.body.arrival_at_warehouse_date ?? null
     const arrival_at_warehouse_time = req.body.arrival_at_warehouse_time ?? null
@@ -167,7 +169,7 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
         arrival_at_warehouse = `${arrival_at_warehouse_date} ${arrival_at_warehouse_time}`
     }
 
-    editRoute(id, customer_id, billing_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, status, arrival_at_warehouse).then(() => {
+    editRoute(id, customer_id, billing_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, status, arrival_at_warehouse, round).then(() => {
         res.cookie('alert', 'success')
         res.redirect('/admin/routes/edit/'+id)
     })
