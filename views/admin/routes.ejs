@@ -233,10 +233,14 @@
       document.getElementById('filterBtn').click()
     })
 
-    initializeMap()
-    initializePOI()
-    updateMap('route')
-    drawStartingPoint()
+    async function initialize() {
+      await initializeMap()
+      initializePOI()
+      await updateMap('route')
+      await drawStartingPoint()
+    }
+
+    initialize()
 
     function clearFilters() {
       window.location.href='/admin/routes'
