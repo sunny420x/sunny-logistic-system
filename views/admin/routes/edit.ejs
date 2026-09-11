@@ -66,7 +66,7 @@
                   <label for="round" class="form-label">กำหนดรอบส่งของของวัน:</label>
                   <div class="input-group">
                     <span class="input-group-text">รอบที่</span>
-                    <input type="number" class="form-control" min="1" name="round" value="<%=route.round%>">
+                    <input type="number" class="form-control" min="1" name="round" value="<%=route.round%>" <% if(route.status == 1) { %>readonly<%}%>>
                     <span class="input-group-text">ของวัน</span>
                   </div>
                 </div>
