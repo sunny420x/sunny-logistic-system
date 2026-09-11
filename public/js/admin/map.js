@@ -110,7 +110,7 @@ async function drawAssignedRouteFromZone(routes) {
         });
         routeLine.setId(routeFeatureId);
         routeLine.setStyle(new ol.style.Style({
-            stroke: new ol.style.Stroke({ color: routes[0].color, width: 4 })
+            stroke: new ol.style.Stroke({ color: routes[routes.length - 1].color, width: 4 })
         }));
         vectorSource.addFeature(routeLine);
     } catch (error) {

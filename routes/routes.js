@@ -94,6 +94,7 @@ app.post('/admin/routes/add', async(req,res) => {
     if(!auth.user.permission.split(',').includes('routes')) res.end("Permission denial") //Check Permission
    
     const customer_id = req.body.customer_id
+    const billing_id = req.body.billing_id
     const truck_id = req.body.truck_id || null
     const driver_id = req.body.driver_id || null
     const date = req.body.date
@@ -103,7 +104,7 @@ app.post('/admin/routes/add', async(req,res) => {
     const driver_note = req.body.driver_note
     const temporary_location = req.body.temporary_location
 
-    addRoute(customer_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location).then(() => {
+    addRoute(customer_id, billing_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location).then(() => {
         res.cookie('alert', 'success')
         res.redirect('/admin/routes')
     })
@@ -147,6 +148,7 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
    
     const id = req.params.id
     const customer_id = req.body.customer_id
+    const billing_id = req.body.billing_id
     const truck_id = req.body.truck_id || null
     const driver_id = req.body.driver_id || null
     const date = req.body.date
@@ -165,7 +167,7 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
         arrival_at_warehouse = `${arrival_at_warehouse_date} ${arrival_at_warehouse_time}`
     }
 
-    editRoute(id, customer_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, status, arrival_at_warehouse).then(() => {
+    editRoute(id, customer_id, billing_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, status, arrival_at_warehouse).then(() => {
         res.cookie('alert', 'success')
         res.redirect('/admin/routes/edit/'+id)
     })

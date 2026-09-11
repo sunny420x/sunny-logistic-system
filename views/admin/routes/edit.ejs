@@ -186,6 +186,15 @@
                   </div>
                 </div>
                 <div class="form-group mb-3">                
+                    <label for="billing_id">หมายเลขบิล: </label>
+                    <% if(route.status == 0) { %>
+                    <input type="text" name="billing_id" class="form-control" value="<%=route.billing_id%>">
+                    <% } else { %>
+                      <input type="hidden" name="billing_id" class="form-control"  value="<%=route.billing_id%>" required>
+                      <br><strong><%=route.billing_id ?? "-" %></strong>
+                    <% } %>
+                </div>
+                <div class="form-group mb-3">                
                     <label for="weight">น้ำหนักบรรทุก: </label>
                      <% if(route.status == 0) { %>
                     <input type="number" name="weight" class="form-control" value="<%=route.weight ?? 0%>" <% if(route.status == 1) { %>readonly<%}%> required>
