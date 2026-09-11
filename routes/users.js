@@ -2,6 +2,7 @@ const express = require('express');
 const app = express.Router();
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
+const moment = require('moment');
 
 const { getUsers, registerUser, getUserTypes, getUserById, editUser, initUserToken, getUserTypeById, editUserType, addUserType } = require('../models/users')
 const { getSettings } = require('../models/settings')
@@ -27,6 +28,7 @@ app.get('/admin/users', async(req,res) => {
         users: users,
         auth: auth,
         settings: await getSettings(),
+        moment: moment,
         page: 'users'
     })
 })
@@ -45,6 +47,7 @@ app.get('/admin/users/add', async(req,res) => {
         page: 'users',
         auth: auth,
         settings: await getSettings(),
+        moment: moment,
         user_types: user_types
     })
 })
@@ -88,6 +91,7 @@ app.get('/admin/users/edit/:id', async(req,res) => {
         auth: auth,
         user_types: user_types,
         settings: await getSettings(),
+        moment: moment,
         page: 'users'
     })
 })
@@ -138,6 +142,7 @@ app.get('/admin/user_types', async(req,res) => {
         user_types: user_types,
         auth: auth,
         settings: await getSettings(),
+        moment: moment,
         page: 'user_types'
     })
 })
@@ -153,6 +158,7 @@ app.get('/admin/user_types/add', async(req,res) => {
    
     res.render('admin/user_types/add', {
         page: 'user_types',
+        moment: moment,
         auth: auth,
         settings: await getSettings(),
     })
@@ -194,6 +200,7 @@ app.get('/admin/user_types/edit/:id', async(req,res) => {
         auth: auth,
         user_types: user_types,
         settings: await getSettings(),
+        moment: moment,
         page: 'user_types'
     })
 })

@@ -1,6 +1,7 @@
 const express = require('express');
 const app = express.Router();
 const cookieParser = require('cookie-parser');
+const moment = require('moment');
 
 const { getCustomers, getCustomerById, addCustomers, editCustomer, getCustomerGroups, addCustomerGroup, editCustomerGroup, getCustomerGroupById, deleteCustomerById, deleteCustomerGroupById } = require('../models/customers')
 const { initUserToken} = require('../models/users')
@@ -32,6 +33,7 @@ app.get('/admin/customers', async(req,res) => {
         group_id:group_id,
         auth: auth,
         page: 'customers',
+        moment: moment,
         settings: await getSettings(),
     })
 })
@@ -51,6 +53,7 @@ app.get('/admin/customers/add', async(req,res) => {
         auth: auth,
         customer_groups: customer_groups,
         settings: await getSettings(),
+        moment: moment,
         page: 'customers'
     })
 })
@@ -99,6 +102,7 @@ app.get('/admin/customers/edit/:id', async(req,res) => {
         customer_groups: customer_groups,
         auth: auth,
         settings: await getSettings(),
+        moment: moment,
         page: 'customers'
     })
 })
@@ -146,6 +150,7 @@ app.get('/admin/customer_groups', async(req,res) => {
         customer_groups: customer_groups,
         auth: auth,
         page: 'customer_groups',
+        moment: moment,
         settings: await getSettings(),
     })
 })
@@ -162,7 +167,8 @@ app.get('/admin/customer_groups/add', async(req,res) => {
     res.render('admin/customer_groups/add', {
         auth: auth,
         settings: await getSettings(),
-        page: 'customer_groupsrs'
+        moment: moment,
+        page: 'customer_group'
     })
 })
 app.post('/admin/customer_groups/add', async(req,res) => {
@@ -200,6 +206,7 @@ app.get('/admin/customer_groups/edit/:id', async(req,res) => {
         customer_group: customer_group,
         auth: auth,
         settings: await getSettings(),
+        moment: moment,
         page: 'customer_groups'
     })
 })

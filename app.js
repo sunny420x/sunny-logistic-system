@@ -137,6 +137,7 @@ app.get('/admin/help', async(req,res) => {
     res.render('admin/help', {
         auth: auth,
         page: 'help',
+        moment: moment,
         settings: await getSettings(),
     })
 })
@@ -154,6 +155,7 @@ app.get('/admin/settings', async(req,res) => {
     res.render('admin/settings', {
         auth: auth,
         settings: await getSettings(),
+        moment: moment,
         page: 'settings'
     })
 })

@@ -1,7 +1,6 @@
 const express = require('express');
 const app = express.Router();
 const moment = require('moment');
-const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 
 const { 
@@ -34,6 +33,7 @@ app.get('/admin/trucks', async(req,res) => {
         trucks: trucks,
         auth: auth,
         settings: await getSettings(),
+        moment: moment,
         page: 'trucks'
     })
 })
@@ -50,6 +50,7 @@ app.get('/admin/trucks/add', async(req,res) => {
     res.render('admin/trucks/add', {
         auth: auth,
         settings: await getSettings(),
+        moment: moment,
         page: 'trucks'
     })
 })
@@ -89,6 +90,7 @@ app.get('/admin/trucks/edit/:id', async(req,res) => {
         truck: truck[0],
         auth: auth,
         settings: await getSettings(),
+        moment: moment,
         page: 'trucks'
     })
 })
