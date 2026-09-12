@@ -22,12 +22,14 @@ const apiRoute = require('./routes/api')
 const customersRoute = require('./routes/customers')
 const transitionRoute = require('./routes/routes')
 const trucksRoute = require('./routes/trucks')
+const logRoute = require('./routes/logs')
 
 app.use('/', usersRoute)
 app.use('/', apiRoute)
 app.use('/', customersRoute)
 app.use('/', transitionRoute)
 app.use('/', trucksRoute)
+app.use('/', logRoute)
 
 // Express Settings
 require('dotenv').config()

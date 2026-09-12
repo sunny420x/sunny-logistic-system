@@ -2,6 +2,7 @@ const express = require('express');
 const app = express.Router();
 const cookieParser = require('cookie-parser');
 const moment = require('moment');
+const { addLog } = require('../models/logs')
 
 const { getCustomers, getCustomerById, addCustomers, editCustomer, getCustomerGroups, addCustomerGroup, editCustomerGroup, getCustomerGroupById, deleteCustomerById, deleteCustomerGroupById } = require('../models/customers')
 const { initUserToken} = require('../models/users')
@@ -83,6 +84,7 @@ app.post('/admin/customers/add', async(req,res) => {
 
     addCustomers(customer_name, customer_id, address, location, group_id, phone_number, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
+        addLog('add', `Customer added by user_id: ${auth.user.id}`)
         res.redirect('/admin/customers')
     })
 })
@@ -133,6 +135,7 @@ app.post('/admin/customers/edit/:id', async(req,res) => {
 
     editCustomer(id, customer_name, customer_id, address, location, group_id, phone_number).then(() => {
         res.cookie('alert', 'success')
+        addLog('edit', `Customer edited ${id} by user_id: ${auth.user.id}`)
         res.redirect('/admin/customers/edit/'+id)
     })
 })
@@ -192,6 +195,7 @@ app.post('/admin/customer_groups/add', async(req,res) => {
 
     addCustomerGroup(name, color, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
+        addLog('added', `Customer Group added by user_id: ${auth.user.id}`)
         res.redirect('/admin/customer_groups')
     })
 })
@@ -232,6 +236,7 @@ app.post('/admin/customer_groups/edit/:id', async(req,res) => {
 
     editCustomerGroup(id, name, color).then(() => {
         res.cookie('alert', 'success')
+        addLog('edit', `Customer Group edited ${id} by user_id: ${auth.user.id}`)
         res.redirect('/admin/customer_groups/edit/'+id)
     })
 })
@@ -250,6 +255,7 @@ app.get('/admin/customers/delete/:id', async(req,res) => {
 
     deleteCustomerById(id).then(() => {
         res.cookie('alert', 'delete_success')
+        addLog('delete', `Customer deleted ${id} by user_id: ${auth.user.id}`)
         res.redirect('/admin/customers')
     })
 })
@@ -268,6 +274,7 @@ app.get('/admin/customer_groups/delete/:id', async(req,res) => {
 
     deleteCustomerGroupById(id).then(() => {
         res.cookie('alert', 'delete_success')
+        addLog('delete', `Customer Group deleted ${id} by user_id: ${auth.user.id}`)
         res.redirect('/admin/customer_groups')
     })
 })

@@ -3,6 +3,7 @@ const app = express.Router();
 const crypto = require('crypto');
 const cookieParser = require('cookie-parser');
 const moment = require('moment');
+const { addLog } = require('../models/logs')
 
 const { getUsers, registerUser, getUserTypes, getUserById, editUser, initUserToken, getUserTypeById, editUserType, addUserType } = require('../models/users')
 const { getSettings } = require('../models/settings')
@@ -73,6 +74,7 @@ app.post('/admin/users/add', async(req,res) => {
 
     registerUser(username, password_hash, full_name, type_id, phone_number, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
+        addLog('add', `User added`)
         res.redirect('/admin/users')
     })
 })
@@ -119,6 +121,7 @@ app.post('/admin/users/edit/:id', async(req,res) => {
         const password_hash = crypto.createHash('sha256').update(password).digest('hex');
         editUser(id, username, full_name, type_id, phone_number, password_hash).then(() => {
             res.cookie('alert', 'success')
+            addLog('edit', `User edited id ${id}`)
             res.redirect('/admin/users/edit/'+id)
         })
     } else {
@@ -185,6 +188,7 @@ app.post('/admin/user_types/add', async(req,res) => {
 
     addUserType(user_type, permission, color, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
+        addLog('add', `User types added`)
         res.redirect('/admin/user_types')
     })
 })
@@ -227,6 +231,7 @@ app.post('/admin/user_types/edit/:id', async(req,res) => {
 
     editUserType(id, user_type, permission, color).then(() => {
         res.cookie('alert', 'success')
+        addLog('add', `User types edited ${id}`)
         res.redirect('/admin/user_types/edit/'+id)
     })
 })

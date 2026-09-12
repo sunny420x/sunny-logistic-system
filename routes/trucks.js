@@ -2,6 +2,7 @@ const express = require('express');
 const app = express.Router();
 const moment = require('moment');
 const cookieParser = require('cookie-parser');
+const { addLog } = require('../models/logs')
 
 const { 
     getTrucks, getTruckById, addTruck, editTruck, deleteTruckById, getMaintenanceByTruckId, getLicensePlateByTruckId, 
@@ -74,6 +75,7 @@ app.post('/admin/trucks/add', async(req,res) => {
 
     addTruck(license_plate, brand, model, cost_per_km, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
+        addLog('add', `Truck added by user_id: ${auth.user.id}`)
         res.redirect('/admin/trucks')
     })
 })
@@ -115,6 +117,7 @@ app.post('/admin/trucks/edit/:id', async(req,res) => {
 
     editTruck(id, license_plate, brand, model, cost_per_km).then(() => {
         res.cookie('alert', 'success')
+        addLog('edit', `Truck edited ${id} by user_id: ${auth.user.id}`)
         res.redirect('/admin/trucks/edit/'+id)
     })
 })
@@ -155,6 +158,7 @@ app.get('/admin/trucks/delete/:id', async(req,res) => {
 
     deleteTruckById(id).then(() => {
         res.cookie('alert', 'delete_success')
+        addLog('delete', `Truck deleted ${id} by user_id: ${auth.user.id}`)
         res.redirect('/admin/trucks')
     })
 })
@@ -252,6 +256,7 @@ app.post('/admin/maintenances/add', async(req,res) => {
 
     addMaintenance(truck_id, user_id, maintenance_type, note, created_at).then(() => {
         res.cookie('alert', 'success')
+        addLog('add', `Truck Maintenance added by user_id: ${auth.user.id}`)
         res.redirect('/admin/trucks/maintenances/'+truck_id)
     })
 })
@@ -298,6 +303,7 @@ app.post('/admin/maintenances/edit/:id', async(req,res) => {
 
     saveMaintenance(id, truck_id, maintenance_type, note, updated_at).then(() => {
         res.cookie('alert', 'success')
+        addLog('edit', `Truck Maintenance edited ${id} by user_id: ${auth.user.id}`)
         res.redirect('/admin/maintenances/edit/'+truck_id)
     })
 })
@@ -316,6 +322,7 @@ app.get('/admin/maintenances/delete/:id', async(req,res) => {
 
     deleteMaintenance(id).then(() => {
         res.cookie('alert', 'delete_success')
+        addLog('delete', `Truck Maintenance deleted ${id} by user_id: ${auth.user.id}`)
         res.redirect('/admin/trucks/maintenances/')
     })
 })
@@ -378,6 +385,7 @@ app.post('/admin/maintenances/types/add', async(req,res) => {
 
     addMaintenanceType(name, round, created_at).then(() => {
         res.cookie('alert', 'success')
+        addLog('add', `Truck Maintenance Type added by user_id: ${auth.user.id}`)
         res.redirect('/admin/maintenances/types')
     })
 })
@@ -420,6 +428,7 @@ app.post('/admin/maintenances/types/edit/:id', async(req,res) => {
 
     saveMaintenanceType(id, name, round).then(() => {
         res.cookie('alert', 'success')
+        addLog('edited', `Truck Maintenance Type edited ${id} by user_id: ${auth.user.id}`)
         res.redirect('/admin/maintenances/types/edit/'+id)
     })
 })
@@ -438,6 +447,7 @@ app.get('/admin/maintenances/types/delete/:id', async(req,res) => {
 
     deleteMaintenanceType(id).then(() => {
         res.cookie('alert', 'delete_success')
+        addLog('delete', `Truck Maintenance Type deleted ${id} by user_id: ${auth.user.id}`)
         res.redirect('/admin/maintenances/types')
     })
 })

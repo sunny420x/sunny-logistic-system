@@ -51,6 +51,8 @@
                 </select>
             </div>
 
+            <p>เพิ่มโดย: <%=user.created_by_user ?? "-" %> เมื่อ: <%=user.created_at ?? "-" %></p>
+
             <button type="submit" class="btn btn-primary w-100"><i class="bi bi-floppy me-2"></i>บันทึกการเปลี่ยนแปลง</button>
           </form>
         </div>

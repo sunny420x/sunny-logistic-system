@@ -62,10 +62,12 @@ function getMyRoutes(driver_id) {
 function getRouteById(id) {
     return new Promise(resolve => {
         db.query(`SELECT r.id, r.date, r.time, c.customer_name, c.customer_id, c.id as customer_row_id, c.location, t.license_plate, t.id as truck_id, r.driver_id, 
-            u.full_name as driver_full_name, r.weight, r.finish_at, r.arrivalImage, r.status, r.location_note, r.driver_note, r.temporary_location, r.arrival_at_warehouse, r.billing_id, r.round 
+            u.full_name as driver_full_name, r.weight, r.finish_at, r.arrivalImage, r.status, r.location_note, r.driver_note, r.temporary_location, r.arrival_at_warehouse, r.billing_id, r.round, uc.full_name as created_by_user
             FROM transition_records as r JOIN customers as c ON c.id = r.customer_id 
             LEFT JOIN trucks as t ON t.id = r.truck_id 
-            LEFT JOIN users as u ON u.id = r.driver_id WHERE r.id = ?`, [id], (err, result) => {
+            LEFT JOIN users as u ON u.id = r.driver_id 
+            LEFT JOIN users as uc ON uc.id = r.created_by
+            WHERE r.id = ?`, [id], (err, result) => {
             if(err) console.error(err);
             resolve(result)
         })

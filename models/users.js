@@ -2,7 +2,7 @@ const db = require('../database');
 
 function getUserTypes() {
     return new Promise(resolve => {
-        db.query("SELECT * FROM user_types ORDEr BY id ASC", (err, results) => {
+        db.query("SELECT ut.*, u.full_name as created_by_user FROM user_types as ut LEFT JOIN users as u ON u.id = ut.created_by ORDER BY ut.id ASC", (err, results) => {
             if(err) console.error(err);
             resolve(results)
         })
@@ -11,7 +11,7 @@ function getUserTypes() {
 
 function getUserTypeById(id) {
     return new Promise(resolve => {
-        db.query("SELECT * FROM user_types WHERE id = ?", [id], (err, results) => {
+        db.query("SELECT ut.*, u.full_name as created_by_user FROM user_types as ut LEFT JOIN users as u On u.id = ut.created_by WHERE ut.id = ?", [id], (err, results) => {
             if(err) console.error(err);
             resolve(results[0])
         })
@@ -43,7 +43,11 @@ function getDrivers() {
 
 function getUserById(id) {
     return new Promise(resolve => {
-        db.query("SELECT u.username, u.full_name, ut.name as user_type, u.phone_number, u.type_id FROM users as u JOIN user_types as ut ON ut.id = u.type_id WHERE u.id = ?", [id], (err, user) => {
+        db.query(`SELECT u.username, u.full_name, ut.name as user_type, u.phone_number, u.type_id, uc.full_name as created_by_user 
+            FROM users as u 
+            JOIN user_types as ut ON ut.id = u.type_id 
+            LEFT JOIN users as uc ON uc.id = u.created_by 
+            WHERE u.id = ?`, [id], (err, user) => {
             if(err) console.error(err);
             resolve(user[0])
         })

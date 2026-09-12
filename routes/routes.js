@@ -4,6 +4,7 @@ const moment = require('moment');
 const cookieParser = require('cookie-parser');
 
 const { getRoutes, getRouteById, addRoute, editRoute, deleteRouteById } = require('../models/routes')
+const { addLog } = require('../models/logs')
 const { getCustomers } = require('../models/customers')
 const { getTrucks } = require('../models/trucks')
 const { getDrivers, initUserToken } = require('../models/users')
@@ -110,6 +111,7 @@ app.post('/admin/routes/add', async(req,res) => {
 
     addRoute(customer_id, billing_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, round, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
+        addLog('add', `Route added by user_id: ${auth.user.id}`)
         res.redirect('/admin/routes/?date='+moment().format('YYYY-MM-DD'))
     })
 })
@@ -174,6 +176,7 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
 
     editRoute(id, customer_id, billing_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, status, arrival_at_warehouse, round).then(() => {
         res.cookie('alert', 'success')
+        addLog('edit', `Route ${id} edited by user_id: ${auth.user.id}`)
         res.redirect('/admin/routes/edit/'+id)
     })
 })
@@ -191,6 +194,7 @@ app.get('/admin/routes/delete/:id', async(req,res) => {
 
     deleteRouteById(id).then(() => {
         res.cookie('alert', 'delete_success')
+        addLog('delete', `Route ${id} deleted by user_id: ${auth.user.id}`)
         res.redirect('/admin/routes/?date='+moment().format('YYYY-MM-DD'))
     })
 })

@@ -2,7 +2,10 @@ const db = require('../database');
 
 function getCustomers(search = null, group_id = null) {
     return new Promise(resolve => {
-        let query = "SELECT c.*, cg.name as customer_group, c.group_id, c.address, cg.color FROM customers as c JOIN customer_groups as cg ON cg.id = c.group_id "
+        let query = `SELECT c.*, cg.name as customer_group, c.group_id, c.address, cg.color, u.full_name as created_by_user 
+        FROM customers as c 
+        JOIN customer_groups as cg ON cg.id = c.group_id
+        LEFT JOIN users as u ON u.id = c.created_by `
         if(search != null && group_id == null) {
             query += "WHERE c.customer_name LIKE ? OR c.customer_id LIKE ? OR c.location LIKE ? ORDER BY c.id DESC";
             db.query(query, [ `%${search}%`, `%${search}%`, `%${search}%` ], (err, results) => {
@@ -36,7 +39,7 @@ function getCustomers(search = null, group_id = null) {
 
 function getCustomerGroups() {
     return new Promise(resolve => {
-        db.query("SELECT * FROM customer_groups ORDER BY id ASC", (err, results) => {
+        db.query("SELECT cg.*, u.full_name as created_by_user FROM customer_groups as cg LEFT JOIN users as u ON u.id = cg.created_by ORDER BY cg.id ASC", (err, results) => {
             if(err) console.error(err);
             resolve(results)
         })
@@ -45,7 +48,7 @@ function getCustomerGroups() {
 
 function getCustomerGroupById(id) {
     return new Promise(resolve => {
-        db.query("SELECT * FROM customer_groups WHERE id = ?", [id], (err, result) => {
+        db.query("SELECT cg.*, u.full_name as created_by_user FROM customer_groups as cg LEFT JOIN users as u ON u.id = cg.created_by WHERE cg.id = ?", [id], (err, result) => {
             if(err) console.error(err);
             resolve(result[0])
         })
@@ -54,7 +57,7 @@ function getCustomerGroupById(id) {
 
 function getCustomerById(id) {
     return new Promise(resolve => {
-        db.query("SELECT * FROM customers WHERE id = ?", [id], (err, result) => {
+        db.query("SELECT c.*, u.full_name as created_by_user FROM customers as c LEFT JOIN users as u ON u.id = c.created_by WHERE c.id = ?", [id], (err, result) => {
             if(err) console.error(err);
             resolve(result)
         })

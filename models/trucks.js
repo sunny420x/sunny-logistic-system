@@ -2,7 +2,10 @@ const db = require('../database');
 
 function getTrucks(search = null) {
     return new Promise(resolve => {
-        let query = "SELECT t.id, t.license_plate, t.brand, t.model, t.cost_per_km FROM trucks as t LEFT JOIN location_records l ON t.id = l.truck_id ";
+        let query = `SELECT t.id, t.license_plate, t.brand, t.model, t.cost_per_km, u.full_name as created_by_user 
+        FROM trucks as t 
+        LEFT JOIN location_records l ON t.id = l.truck_id
+        LEFT JOIN users as u ON u.id = t.created_by `;
         if(search != null) {
             query += "WHERE t.license_plate LIKE ? ";
         }
@@ -17,7 +20,7 @@ function getTrucks(search = null) {
 
 function getTruckById(id) {
     return new Promise(resolve => {
-        db.query("SELECT * FROM trucks WHERE id = ?", [id], (err, result) => {
+        db.query("SELECT t.*, u.full_name as created_by_user FROM trucks as t LEFT JOIN users as u ON u.id = t.created_by WHERE t.id = ?", [id], (err, result) => {
             if(err) console.error(err);
             resolve(result)
         })

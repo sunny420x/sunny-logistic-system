@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>แก้ไขข้อมูลประเภทผู้ใช้งาน | <%=settings.company_name%></title>
+  <%-include('../includes/head')%>
+</head>
+<body>
+  <%-include('../includes/topbar')%>
+
+  <!-- Desktop Sidebar -->
+  <%-include('../includes/desktop-sidebar')%>
+
+  <!-- Mobile Sidebar -->
+  <%-include('../includes/mobile-sidebar')%>
+
+  <div class="main-wrapper">
+
+
+    <main class="container-fluid p-3 p-lg-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+          <h2 class="fw-bold mb-3">Log #<%=log.id%> action=<%=log.action%></h2>
+          <p>เพิ่มโดย: <%=log.created_by_user ?? "-" %> เมื่อ: <%=log.created_at ?? "-" %></p>
+          <div class="d-flex">
+              <pre><%-log.details%></pre>
+          </div>
+        </div>
+      </div>
+
+      <!-- Container -->
+    </main>
+  </div>
+
+  <%-include('../includes/footer')%>
+</body>
+</html>
