@@ -67,11 +67,13 @@ function addCustomers(
     address,
     location,
     group_id,
-    phone_number
+    phone_number,
+    created_at,
+    created_by
 ) {
     return new Promise(resolve => {
-        db.query("INSERT INTO customers(customer_name, customer_id, location, address, group_id, phone_number) VALUES(?,?,?,?,?,?)", 
-            [customer_name, customer_id, location, address, group_id, phone_number], (err) => {
+        db.query("INSERT INTO customers(customer_name, customer_id, location, address, group_id, phone_number, created_at, created_by) VALUES(?,?,?,?,?,?,?,?)", 
+            [customer_name, customer_id, location, address, group_id, phone_number, created_at, created_by], (err) => {
             if(err) console.error(err);
             resolve()
         })
@@ -98,11 +100,13 @@ function editCustomer(
 
 function addCustomerGroup(
     name,
-    color
+    color,
+    created_at,
+    created_by
 ) {
     return new Promise(resolve => {
-        db.query("INSERT INTO customer_groups(name, color) VALUES(?,?)", 
-            [name, color], (err) => {
+        db.query("INSERT INTO customer_groups(name, color, created_at, created_by) VALUES(?,?,?,?)", 
+            [name, color, created_at, created_by], (err) => {
             if(err) console.error(err);
             resolve()
         })

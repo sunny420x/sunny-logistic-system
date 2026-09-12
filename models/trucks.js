@@ -28,11 +28,13 @@ function addTruck(
     license_plate,
     brand,
     model,
-    cost_per_km
+    cost_per_km,
+    created_at,
+    created_by
 ) {
     return new Promise(resolve => {
-        db.query("INSERT INTO trucks(license_plate, brand, model, cost_per_km) VALUES(?,?,?,?)", 
-            [license_plate, brand, model, cost_per_km], (err) => {
+        db.query("INSERT INTO trucks(license_plate, brand, model, cost_per_km, created_at, created_by) VALUES(?,?,?,?,?,?)", 
+            [license_plate, brand, model, cost_per_km, created_at, created_by], (err) => {
             if(err) console.error(err);
             resolve()
         })

@@ -83,11 +83,14 @@ function addRoute(
     location_note,
     driver_note,
     temporary_location,
-    round
+    round,
+    created_at,
+    created_by
 ) {
     return new Promise(resolve => {
-        db.query("INSERT INTO transition_records(customer_id, billing_id, truck_id, driver_id, date, time, weight, location_note, driver_note, temporary_location, round) VALUES(?,?,?,?,?,?,?,?,?,?,?)", 
-            [customer_id, billing_id, truck_id, driver_id, date, time, weight, location_note, driver_note, temporary_location, round], (err) => {
+        db.query(`INSERT INTO transition_records(customer_id, billing_id, truck_id, driver_id, date, time, weight, location_note, driver_note, temporary_location, round, created_at, created_by) 
+            VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)`, 
+            [customer_id, billing_id, truck_id, driver_id, date, time, weight, location_note, driver_note, temporary_location, round, created_at, created_by], (err) => {
             if(err) console.error(err);
             resolve()
         })

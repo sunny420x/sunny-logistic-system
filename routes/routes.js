@@ -105,7 +105,10 @@ app.post('/admin/routes/add', async(req,res) => {
     const temporary_location = req.body.temporary_location
     const round = req.body.round
 
-    addRoute(customer_id, billing_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, round).then(() => {
+    const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
+    const created_by = auth.user.id
+
+    addRoute(customer_id, billing_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, round, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
         res.redirect('/admin/routes/?date='+moment().format('YYYY-MM-DD'))
     })

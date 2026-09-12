@@ -68,7 +68,10 @@ app.post('/admin/users/add', async(req,res) => {
     const phone_number = req.body.phone_number
     const full_name = req.body.full_name
 
-    registerUser(username, password_hash, full_name, type_id, phone_number).then(() => {
+    const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
+    const created_by = auth.user.id
+
+    registerUser(username, password_hash, full_name, type_id, phone_number, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
         res.redirect('/admin/users')
     })
@@ -177,7 +180,10 @@ app.post('/admin/user_types/add', async(req,res) => {
     const permission = req.body.permission
     const color = req.body.color
 
-    addUserType(user_type, permission, color).then(() => {
+    const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
+    const created_by = auth.user.id
+
+    addUserType(user_type, permission, color, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
         res.redirect('/admin/user_types')
     })

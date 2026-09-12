@@ -50,9 +50,10 @@ function getUserById(id) {
     })
 }
 
-function registerUser(username, password, full_name, type_id, phone_number) {
+function registerUser(username, password, full_name, type_id, phone_number, created_at, created_by) {
     return new Promise(resolve => {
-        db.query("INSERT INTO users(username, password, full_name, type_id, phone_number) VALUES(?,?,?,?,?)", [username, password, full_name, type_id, phone_number], (err) => {
+        db.query("INSERT INTO users(username, password, full_name, type_id, phone_number, created_at, created_by) VALUES(?,?,?,?,?,?,?)", 
+        [username, password, full_name, type_id, phone_number, created_at, created_by], (err) => {
             if(err) console.error(err);
             resolve()
         })
@@ -76,9 +77,9 @@ function editUser(id, username, full_name, type_id, phone_number, password = nul
     })
 }
 
-function addUserType(user_type, permission, color) {
+function addUserType(user_type, permission, color, created_at, created_by) {
     return new Promise(resolve => {
-        db.query("INSERT INTO user_types(name, permission, color) VALUES(?,?,?)", [user_type, permission, color], (err) => {
+        db.query("INSERT INTO user_types(name, permission, color, created_at, created_by) VALUES(?,?,?,?,?)", [user_type, permission, color, created_at, created_by], (err) => {
             if(err) console.error(err);
             resolve()
         })

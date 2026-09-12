@@ -74,11 +74,14 @@ app.post('/admin/customers/add', async(req,res) => {
     const group_id = req.body.group_id
     const phone_number = req.body.phone_number
 
+    const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
+    const created_by = auth.user.id
+
     if(location.split(",").length != 2) {
         res.end("พิกัดที่อยู่ลูกค้าไม่ถูกต้อง")
     }
 
-    addCustomers(customer_name, customer_id, address, location, group_id, phone_number).then(() => {
+    addCustomers(customer_name, customer_id, address, location, group_id, phone_number, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
         res.redirect('/admin/customers')
     })
@@ -184,7 +187,10 @@ app.post('/admin/customer_groups/add', async(req,res) => {
     const name = req.body.name
     const color = req.body.color
 
-    addCustomerGroup(name, color).then(() => {
+    const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
+    const created_by = auth.user.id
+
+    addCustomerGroup(name, color, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
         res.redirect('/admin/customer_groups')
     })

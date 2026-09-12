@@ -69,7 +69,10 @@ app.post('/admin/trucks/add', async(req,res) => {
     const model = req.body.model
     const cost_per_km = req.body.cost_per_km ?? 0
 
-    addTruck(license_plate, brand, model, cost_per_km).then(() => {
+    const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
+    const created_by = auth.user.id
+
+    addTruck(license_plate, brand, model, cost_per_km, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
         res.redirect('/admin/trucks')
     })
