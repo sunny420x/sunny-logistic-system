@@ -81,6 +81,15 @@
                 }
             }
         }
+
+        button.setCenter {
+            width: 50px;
+            height: 50px;
+            position: relative;
+            top: calc(-100vh + 190px);
+            right: -87%;
+            border: 0;
+        }
     </style>
 </head>
 <body>
@@ -156,11 +165,19 @@
                         }
                     }
                 }
-                </script>
 
+                function setCenter() {
+                    const centerLonLat = [parseFloat(position_longitude), parseFloat(position_latitude)];
+                    map.getView().animate({
+                        center: ol.proj.fromLonLat(centerLonLat),
+                        duration: 1000
+                    });
+                }
+                </script>
             </div>
         </div>
         <div id="map"></div>
+        <button class="setCenter" onclick="setCenter()"><i class="fa-solid fa-arrow-up"></i></button>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/ol@v10.10.0/dist/ol.js"></script>
