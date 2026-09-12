@@ -110,7 +110,8 @@
                     return;
                 }
 
-                const chunkSize = 100;
+                const chunkSize = 50;
+                const matchedRouteCoordinates = [];
 
                 for (let start = 0; start < coordinates.length - 1; start += chunkSize - 1) {
                     const chunk = coordinates.slice(start, start + chunkSize);
@@ -134,12 +135,18 @@
                             return;
                         }
 
-                        routeSource.addFeature(new ol.Feature({
-                            geometry: new ol.geom.LineString(
-                                geometryCoordinates.map(coordinate => ol.proj.fromLonLat(coordinate))
-                            )
-                        }));
+                        matchedRouteCoordinates.push(
+                            ...geometryCoordinates.slice(start === 0 ? 0 : 1)
+                        );
                     });
+                }
+
+                if (matchedRouteCoordinates.length > 1) {
+                    routeSource.addFeature(new ol.Feature({
+                        geometry: new ol.geom.LineString(
+                            matchedRouteCoordinates.map(coordinate => ol.proj.fromLonLat(coordinate))
+                        )
+                    }));
                 }
             }
 
