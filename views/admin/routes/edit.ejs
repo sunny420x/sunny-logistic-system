@@ -226,7 +226,7 @@
                     <textarea name="location_note" maxlength="200" placeholder="เช่น ตำแหน่งของจุดรับของเพิ่มเติม เลขที่อาคาร เลขที่บ้าน" <% if(route.status == 1) { %>readonly<%}%> class="form-control" style="height: 100px;"><%=route.location_note%></textarea>
                 </div>
                 <% if(route.status == 0 || route.finish_at == null) { %>
-                <input type="submit" value="บันทึกการเปลี่ยนแปลง" class="btn btn-primary w-100 mt-2">
+                <button type="submit" class="btn btn-primary w-100 mt-2"><i class="bi bi-floppy me-2"></i>บันทึกการเปลี่ยนแปลง</button>
                 <% } %>
               </div>
             </div>

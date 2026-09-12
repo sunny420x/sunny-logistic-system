@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>ตั้งค่าบัญชี | <%=settings.company_name%></title>
+  <%-include('includes/head')%>
+</head>
+<body>
+  <%-include('includes/topbar')%>
+
+  <!-- Desktop Sidebar -->
+  <%-include('includes/desktop-sidebar')%>
+
+  <!-- Mobile Sidebar -->
+  <%-include('includes/mobile-sidebar')%>
+
+  <div class="main-wrapper">
+
+    <main class="container-fluid p-3 p-lg-4">
+      <h2 class="fw-bold mb-3">ตั้งค่าบัญชี</h2>
+      <form action="" method="post">
+        <div class="table-responsive">
+          <table class="table">
+            <tbody>
+              <tr>
+                <td>ชื่อบัญชี</td>
+                <td><input type="text" name="username" class="form-control" value="<%=auth.user.username%>"></td>
+              </tr>
+              <tr>
+                <td>ชื่อนามสกุล</td>
+                <td><input type="text" name="full_name" class="form-control" value="<%=auth.user.full_name%>"></td>
+              </tr>
+              <tr>
+                <td>เบอร์โทรศัพท์</td>
+                <td><input type="text" name="phone_number" class="form-control" value="<%=auth.user.phone_number%>"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-floppy me-2"></i>บันทึกการเปลี่ยนแปลง</button>
+      </form>
+      <div class="d-flex justify-content-end mt-2">
+        <button onclick="window.location.href='/admin/account/settings/updatePassword'" class="btn btn-outline-secondary w-100"><i class="bi bi-unlock me-2"></i>เปลี่ยนรหัสผ่าน</button>
+      </div>
+    </main>
+  </div>
+
+  <%-include('includes/footer')%>
+</body>
+</html>

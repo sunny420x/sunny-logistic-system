@@ -139,6 +139,38 @@ function initUserToken(token = null) {
     })
 }
 
+function saveAccountSettings(id, username, full_name, phone_number) {
+    return new Promise(resolve => {
+        db.query("UPDATE users SET username = ?, full_name = ?, phone_number = ? WHERE id = ?", [username, full_name, phone_number, id], (err) => {
+            if(err) console.error(err);
+            resolve()
+        }) 
+    })
+}
+
+function changeAccountPassword(id, currentPassword, newPassword) {
+    return new Promise(resolve => {
+        db.query("SELECT password FROM users WHERE id = ? AND password = ?", [id, currentPassword], (err, checkCurrentPasswordResult) => {
+            if(err) console.error(err);
+            if(checkCurrentPasswordResult.length == 1) {
+                db.query("UPDATE users SET password = ? WHERE id = ?", [newPassword, id], (err) => {
+                    if(err) console.error(err);
+                    resolve({
+                        status: 'success',
+                        message: 'เปลี่ยนรหัสผ่านเสร็จสมบูรณ์',
+                    })
+                }) 
+            } else {
+                resolve({
+                    status: 'error',
+                    message: 'รหัสผ่านเดิมไม่ถูกต้อง',
+                })
+            }
+        })
+    })
+}
+
+
 module.exports = {
     getUserTypes,
     getUsers,
@@ -152,4 +184,6 @@ module.exports = {
     getUserTypeById,
     editUserType,
     addUserType,
+    saveAccountSettings,
+    changeAccountPassword,
 }

@@ -3,14 +3,15 @@ const app = express();
 const path = require('path');
 const moment = require('moment-timezone');
 const cookieParser = require('cookie-parser');
+const crypto = require('crypto');
 
 // Models
 const { getCustomers, getCustomerGroups } = require('./models/customers')
 const { getDashboardAllPackages, getDashboardCustomers, getDashboardDelivered, getDashboardUsers } = require('./models/dashboard')
 const { getMaintenanceAlerts } = require('./models/trucks')
 const { ongoingDrivers } = require('./models/tracking')
-const { getSettings, saveSettings } = require('./models/settings')
-const { initUserToken} = require('./models/users')
+const { getSettings } = require('./models/settings')
+const { initUserToken, saveSettings, changeAccountPassword } = require('./models/users')
 
 app.set('trust proxy', 1)
 moment.tz.setDefault(process.env.TIMEZONE);
@@ -177,6 +178,75 @@ app.post('/admin/settings', async(req,res) => {
 
     saveSettings(company_name, company_logo, company_banner, zone).then(() => {
         res.redirect('/admin/settings')
+    })
+})
+
+app.get('/admin/account/settings', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+   
+    res.render('admin/account_settings', {
+        auth: auth,
+        settings: await getSettings(),
+        moment: moment,
+        page: 'account_settings'
+    })
+})
+
+app.post('/admin/account/settings', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+
+    const username = req.body.username
+    const full_name = req.body.full_name
+    const phone_number = req.body.phone_number
+
+    saveAccountSettings(auth.user.id, username, full_name, phone_number).then(() => {
+        res.redirect('/admin/settings')
+    })
+})
+
+app.get('/admin/account/settings/updatePassword', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+   
+    res.render('admin/account_update_password', {
+        auth: auth,
+        settings: await getSettings(),
+        moment: moment,
+        page: 'account_settings'
+    })
+})
+
+app.post('/admin/account/settings/updatePassword', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+
+    const currentPassword = crypto.createHash('sha256').update(req.body.currentPassword).digest('hex');
+    const newPassword = crypto.createHash('sha256').update(req.body.newPassword).digest('hex');
+
+    changeAccountPassword(auth.user.id, currentPassword, newPassword).then((result) => {
+        if(result.status == "success") {
+            res.redirect('/logout')
+        } else {
+            res.redirect('/admin/account/settings/updatePassword?alert=currentPasswordNotMatch')
+        }
     })
 })
 
