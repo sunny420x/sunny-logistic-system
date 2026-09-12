@@ -105,21 +105,46 @@
                 });
             }
 
-            function drawConnectedRoute(coordinates) {
+            async function drawOsrmMatchedRoute(coordinates) {
                 if (coordinates.length < 2) {
                     return;
                 }
 
-                routeSource.addFeature(new ol.Feature({
-                    geometry: new ol.geom.LineString(
-                        coordinates.map(coordinate => ol.proj.fromLonLat(coordinate))
-                    )
-                }));
+                const chunkSize = 100;
+
+                for (let start = 0; start < coordinates.length - 1; start += chunkSize - 1) {
+                    const chunk = coordinates.slice(start, start + chunkSize);
+                    const coordinatesString = chunk
+                        .map(([longitude, latitude]) => `${longitude},${latitude}`)
+                        .join(';');
+                    const matchUrl = `https://router.project-osrm.org/match/v1/driving/${coordinatesString}?overview=full&geometries=geojson&gaps=ignore`;
+                    const response = await fetch(matchUrl);
+                    if (!response.ok) {
+                        throw new Error(`OSRM ตอบกลับด้วยสถานะ ${response.status}`);
+                    }
+
+                    const matchData = await response.json();
+                    if (matchData.code !== 'Ok' || !matchData.matchings?.length) {
+                        throw new Error('OSRM ไม่สามารถจับพิกัดเข้ากับถนนได้');
+                    }
+
+                    matchData.matchings.forEach(matching => {
+                        const geometryCoordinates = matching.geometry?.coordinates;
+                        if (!geometryCoordinates?.length) {
+                            return;
+                        }
+
+                        routeSource.addFeature(new ol.Feature({
+                            geometry: new ol.geom.LineString(
+                                geometryCoordinates.map(coordinate => ol.proj.fromLonLat(coordinate))
+                            )
+                        }));
+                    });
+                }
             }
 
             function drawCustomerMarkers(locations) {
                 const drawnCustomers = new Set();
-
                 locations.forEach(truck => {
                     const customerKey = truck.customer_row_id ?? `${truck.customer_name}|${truck.location}`;
                     if (drawnCustomers.has(customerKey) || !truck.location) {
@@ -204,7 +229,11 @@
                     });
 
                     for (const routeCoordinates of Object.values(routeCoordinatesByDate)) {
-                        drawConnectedRoute(routeCoordinates);
+                        try {
+                            await drawOsrmMatchedRoute(routeCoordinates);
+                        } catch (error) {
+                            console.error('ไม่สามารถจับเส้นทางด้วย OSRM Match:', error);
+                        }
                     }
                     renderTruckStats(data);
                 } catch (error) {
