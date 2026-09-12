@@ -17,7 +17,4 @@
     <% if(auth.user.permission.split(',').includes('users')) { %>
     <a class="nav-link <% if(locals.page == 'users') { %>active<%}%>" href="/admin/users"><i class="bi bi-people"></i> ผู้ใช้งานระบบ</a>
     <% } %>
-    <% if(auth.user.permission.split(',').includes('users')) { %>
-    <a class="nav-link <% if(locals.page == 'user_types') { %>active<%}%>" href="/admin/user_types"><i class="bi bi-people"></i> ประเภทผู้ใช้งาน</a>
-    <% } %>
 </nav>
