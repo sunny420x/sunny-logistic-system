@@ -259,10 +259,6 @@
 
             updateTruckLocations();
 
-            setInterval(() => {
-                updateTruckLocations();
-            }, 60000);
-
             function renderTruckStats(data) {
                 const tbody = document.getElementById('truckStatsTable');
                 if (!data || data.status !== 'success') {
