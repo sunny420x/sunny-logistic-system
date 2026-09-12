@@ -105,39 +105,14 @@
                 });
             }
 
-            async function drawOsrmRoute(coordinates) {
+            function drawConnectedRoute(coordinates) {
                 if (coordinates.length < 2) {
                     return;
                 }
 
-                const osrmCoordinates = [];
-                const chunkSize = 50;
-
-                for (let start = 0; start < coordinates.length - 1; start += chunkSize - 1) {
-                    const chunk = coordinates.slice(start, start + chunkSize);
-                    const coordsString = chunk
-                        .map(([longitude, latitude]) => `${longitude},${latitude}`)
-                        .join(';');
-                    const routeUrl = `https://router.project-osrm.org/route/v1/driving/${coordsString}?overview=full&geometries=geojson`;
-                    const response = await fetch(routeUrl);
-                    if (!response.ok) {
-                        throw new Error(`OSRM ตอบกลับด้วยสถานะ ${response.status}`);
-                    }
-
-                    const routeData = await response.json();
-                    if (routeData.code !== 'Ok' || !routeData.routes?.[0]?.geometry?.coordinates) {
-                        throw new Error('OSRM ไม่พบเส้นทางบนถนนสำหรับพิกัดชุดนี้');
-                    }
-
-                    const geometryCoordinates = routeData.routes[0].geometry.coordinates;
-                    osrmCoordinates.push(
-                        ...geometryCoordinates.slice(start === 0 ? 0 : 1)
-                    );
-                }
-
                 routeSource.addFeature(new ol.Feature({
                     geometry: new ol.geom.LineString(
-                        osrmCoordinates.map(coordinate => ol.proj.fromLonLat(coordinate))
+                        coordinates.map(coordinate => ol.proj.fromLonLat(coordinate))
                     )
                 }));
             }
@@ -229,13 +204,7 @@
                     });
 
                     for (const routeCoordinates of Object.values(routeCoordinatesByDate)) {
-                        if (routeCoordinates.length > 1) {
-                            try {
-                                await drawOsrmRoute(routeCoordinates);
-                            } catch (error) {
-                                console.error('ไม่สามารถสร้างเส้นทางด้วย OSRM:', error);
-                            }
-                        }
+                        drawConnectedRoute(routeCoordinates);
                     }
                     renderTruckStats(data);
                 } catch (error) {
