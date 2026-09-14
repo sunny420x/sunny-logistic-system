@@ -20,8 +20,12 @@ app.get('/admin/logs', async(req,res) => {
     if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('logs')) res.end("Permission denial") //Check Permission
+
+    const limit = 100;
+    const action = req.query.action || null
+    const date = req.query.date || null
    
-    const logs = await showLogs(50) ?? [];
+    const logs = await showLogs(limit, action, date) ?? [];
 
     res.render('admin/logs', {
         logs: logs,

@@ -11,10 +11,27 @@ function addLog(action = "unknown", details) {
     })
 }
 
-function showLogs(limit = null) {
+function showLogs(limit = null, action = null, date = null) {
     return new Promise(resolve => {
         let params = []
-        let query = `SELECT * FROM logs ORDER BY id DESC `
+        let query = `SELECT * FROM logs `
+
+        if(action) {
+            query += `WHERE action = ? `
+            params.push(action)
+
+            if(date) {
+                query += `AND DATE(created_at) = ? `
+                params.push(date)
+            }
+        } else {
+            if(date) {
+                query += `WHERE DATE(created_at) = ? `
+                params.push(date)
+            }
+        }
+
+        query += `ORDER BY id DESC `
 
         if(limit) {
             query += `LIMIT ?`
