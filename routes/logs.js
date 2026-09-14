@@ -3,7 +3,7 @@ const app = express.Router();
 const moment = require('moment');
 const cookieParser = require('cookie-parser');
 
-const { addLog, showLogs, getLogById, clearLogs } = require('../models/logs')
+const { addLog, showLogs, getLogById, clearLogs, deleteLogById } = require('../models/logs')
 const { initUserToken } = require('../models/users')
 const { getSettings } = require('../models/settings')
 
@@ -54,7 +54,24 @@ app.get('/admin/logs/:id', async(req,res) => {
     })
 })
 
-app.get('/clearLogs', async(req,res) => {
+app.get('/admin/logs/delete/:id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('settings')) res.end("Permission denial") //Check Permission
+   
+    const id = req.params.id
+    
+    deleteLogById(id).then(() => {
+        res.redirect('/admin/logs')
+    })
+})
+
+app.get('/admin/clearLogs', async(req,res) => {
     if(!req.cookies.auth) {
         res.redirect('/login')
         return

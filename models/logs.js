@@ -49,9 +49,19 @@ function clearLogs(limit = null) {
             params.push(limit)
         }
 
-        db.query(query, params, (err, results) => {
+        db.query(query, params, (err) => {
             if(err) console.error(err);
-            resolve(results)
+            resolve()
+        })
+    })
+}
+
+function deleteLogById(id = null) {
+    if(!id) return;
+    return new Promise(resolve => {
+        db.query("DELETE FROM logs WHERE id = ?", [id], (err) => {
+            if(err) console.error(err);
+            resolve()
         })
     })
 }
@@ -60,5 +70,6 @@ module.exports = {
     addLog, 
     showLogs, 
     getLogById,
-    clearLogs
+    clearLogs,
+    deleteLogById
 }
