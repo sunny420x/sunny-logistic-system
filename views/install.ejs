@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ติดตั้งระบบ Sunny Logistic System</title>
+    <link rel="icon" type="image/png" href="/icons/favicon.png">
+    <link rel="stylesheet" href="/css/install.css">
+</head>
+
+<body>
+    <div class="install-wrapper">
+        <!-- Header -->
+        <div class="install-header">
+            <div class="logo">
+                <img src="/icons/favicon.png" alt="System Logo" width="100">
+            </div>
+            <h1>ติดตั้งระบบ Transportation Management System</h1>
+            <p>
+            ระบบของเราจำเป็นต้องกมีการติดตั้งโครงสร้างของฐานข้อมูลก่อน โดยหากท่านตรวจสอบข้อมูลข้างต้นนี้จาก .env แล้ว<br>ท่านสามารถคลิก "ดำเนินการ" ได้ทันที เพื่อเริ่มติดตั้งระบบ
+            </p>
+        </div>
+
+        <!-- Steps -->
+        <div class="steps">
+            <div class="step">
+                <div class="step-number">1</div>
+                <span>Database</span>
+            </div>
+
+            <div class="step-line"></div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <span>Administrator</span>
+            </div>
+
+            <div class="step-line"></div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <span>Complete</span>
+            </div>
+        </div>
+
+        <!-- Main Card -->
+        <div class="install-card" id="installation-content">
+        </div>
+    </div>
+    <script>
+    let isAllInstalled = "<%=tables.allInstalled%>" === "true"
+    let step = 1
+    let step_content = [
+        `<div class="card-header">
+            <h2>รายละเอียดไฟล์ .env ของท่าน</h2>
+            <p>
+                โปรดตรวจสอบว่าทุกอย่างถูกต้องก่อนจะเริ่มดำเนินการติดตั้ง
+            </p>
+        </div>
+        <div class="card-body">
+            <p><strong>Database Host</strong>: <%=database.host%></p>
+            <br>
+            <p><strong>Database Username</strong>: <%=database.username%></p>
+            <br>
+            <p><strong>Database Password</strong>: <%=database.password%></p>
+            <br>
+            <% for (const [key, value] of Object.entries(tables)) { %>
+            <div class="requirement"> 
+                <div class="requirement-info"> 
+                <div class="requirement-icon"> <%=key[0]%> </div> 
+                <div> 
+                <div class="requirement-name"> <%=key%> </div> 
+                </div> 
+                </div> 
+                <div class="status <%=value ? "success" : "error" %>"> 
+                    <span class="status-dot"></span> <%=value ? "ติดตั้งแล้ว" : "ยังไม่ได้ติดตั้ง" %> 
+                </div> 
+            </div>
+            <% } %>
+        </div>
+        <div class="card-footer">
+            <div class="footer-note">
+            เพื่อป้องกันความผิดพลากในการติดตั้ง โปรดตรวจสอบว่าทุกอย่างถูกต้องก่อนดำเนินการ
+            </div>
+
+            <div class="button-group">
+                <button class="btn-primary" onclick="installDatabase()">
+                    ดำเนินการ
+                </button>
+            </div>
+        </div>`,
+        `<div class="card-header">
+            <h2>ผู้ใช้งานเริ่มต้น</h2>
+            <p>
+                โปรดใช้รายละเอียดข้างต้นนี้ในการเข้าสู่ระบบผู้ดูแลเริ่มต้น
+            </p>
+        </div>
+        <div class="card-body">
+            <h3>เข้าสู่ระบบด้วยผู้ใช้งานเริ่มต้น</h3>
+            <br>
+            <p>
+            Username: <strong>administrator</strong><br>Password: <strong>administrator</strong>
+            </p>
+        </div>
+        <!-- Footer -->
+        <div class="card-footer">
+            <div class="button-group">
+                <button class="btn-primary" onclick="complateInstallation()">
+                    ดำเนินการ
+                </button>
+            </div>
+        </div>`,
+        `<div class="card-header">
+            <h2>การติดตั้งเสร็จสมบูรณ์</h2>
+            <p>
+                ท่านสามารถใช้งานระบบ Sunny Logistic System ได้ทันที
+            </p>
+        </div>
+        <!-- Footer -->
+        <div class="card-footer">
+            <div class="button-group">
+                <button class="btn-primary" onclick="window.location.href='/admin'">
+                    เริ่มต้นใช้งานเลย
+                </button>
+            </div>
+        </div>`
+    ]
+
+    function installDatabase() {
+        fetch(`/installation/database`)
+        .then(res => {
+            if (!res.ok) {
+                throw new Error(`เซิร์ฟเวอร์ตอบกลับด้วยสถานะ: ${res.status}`);
+            }
+            return res.json();
+        })
+        .then(data => {
+            console.log(data)
+            if (data.status == 'success') {
+                step = 2
+                initStep()
+                Swal.fire({
+                    icon: 'success',
+                    title: "ติดตั้ง Table เสร็จสมบูรณ์",
+                })
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: "ติดตั้งล้มเหลว",
+                    text: data.error.sqlMessage
+                })
+            }
+        })
+        .catch(error => {
+            console.error("❌ เกิดข้อผิดพลาดในการ Fetch ข้อมูล:", error);
+        });
+    }
+
+    function complateInstallation() {
+        step = 3
+        initStep()
+    }
+
+    function initStep() {
+        document.getElementById('installation-content').innerHTML = step_content[step - 1]
+        const steps = document.getElementsByClassName('steps')[0]
+        if(steps) {
+            steps.getElementsByClassName('step')[step - 1].classList.add('active')
+        }
+    }
+
+    if(isAllInstalled) {
+        step = 3
+        initStep()
+    }
+
+    initStep()
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+</html>

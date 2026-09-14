@@ -4,7 +4,10 @@ function getSettings() {
     return new Promise(resolve => {
         db.query("SELECT * FROM settings", (err, settings) => {
             if(err) console.error(err);
-            resolve(settings[0])
+            resolve(settings[0] ?? {
+                company_name: "Sunny Logistic",
+                company_logo: "/icons/favicon.png"
+            })
         }) 
     })
 }
