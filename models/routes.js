@@ -32,7 +32,7 @@ function getRoutes(date = null, search = null, status = null) {
             query += " WHERE " + conditions.join(" AND ");
         }
 
-        query += " ORDER BY r.date DESC";
+        query += " ORDER BY r.driver_id DESC";
 
         db.query(query, params, (err, results) => {
             if (err) {
