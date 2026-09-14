@@ -159,7 +159,7 @@
                 </div>
                 <div class="form-group mb-3">                
                     <label for="temporary_location">ตำแหน่งชั่วคราว (กรณีส่งนอกพิกัดเดิมของลูกค้า): </label>
-                    <input type="text" name="temporary_location" maxlength="100" class="form-control" value="<%=route.temporary_location%>" <% if(route.status == 1) { %>readonly<%}%> onblur="validateTempLocation()">
+                    <input type="text" name="temporary_location" maxlength="100" class="form-control" value="<%=route.temporary_location%>" <% if(route.status == 1) { %>readonly<%}%> onblur="validateLocation('temporary_location')">
                 </div>
                 <div class="form-group mb-3">                
                     <label for="location">วันที่: </label>
@@ -269,7 +269,7 @@
   <%if(!!route.temporary_location) {%>
   <script>
     setTimeout(() => {
-      validateTempLocation()
+      validateLocation('temporary_location')
     }, 1000)
   </script>
   <%}%>

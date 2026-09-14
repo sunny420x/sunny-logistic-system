@@ -739,27 +739,16 @@ async function getPointOfInterest(orderedStops) {
 }
 
 //สำหรับประเทศไทยค่า Longtitude จะมากกว่า Latitude เสมอ
-function validateLocation() {
-    const locationInput = document.querySelector('input[name="location"]')
+function validateLocation(elementName) {
+    const locationInput = document.querySelector(`input[name="${elementName}"]`)
     const locationValue = locationInput.value.trim().replace(" ", '')
     if(locationValue.split(',').length != 2) {
-        return
-    } else {
-        if (locationValue.split(',')[0] < locationValue.split(',')[1]) {
-            if(locationValue.split(',')[0] != "" && locationValue.split(',')[1] != "") {
-            locationInput.value = `${locationValue.split(',')[1]},${locationValue.split(',')[0]}`
-            }
-            setMarkOnMap(locationValue.split(',')[1], locationValue.split(',')[0])
-        } else {
-            setMarkOnMap(locationValue.split(',')[0], locationValue.split(',')[1])
-        }
-    }
-}
-
-function validateTempLocation() {
-    const locationInput = document.querySelector('input[name="temporary_location"]')
-    const locationValue = locationInput.value.trim().replace(" ", '')
-    if(locationValue.split(',').length != 2) {
+        Swal.fire({
+            icon: "error",
+            title: "พิกัดลูกค้าต้องเป็น Lon,Lat เท่านั้น",
+            text: "พิกัดไม่สามารถเป็นลิงค์หรือตัวอักษรธรรมดาได้ พิกัดควรอยู่ในรูปแบบ เช่น 98.9947,18.7629" 
+        })
+        locationInput.value = ""
         return
     } else {
         if (locationValue.split(',')[0] < locationValue.split(',')[1]) {
