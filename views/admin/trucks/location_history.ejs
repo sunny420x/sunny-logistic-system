@@ -106,52 +106,68 @@
             }
 
             async function drawOsrmMatchedRoute(coordinates) {
+                // กรองเฉพาะพิกัดที่ถูกต้อง และตัดพิกัดซ้ำกันแบบติดๆ กันออก
                 const validCoordinates = coordinates.filter(([longitude, latitude]) => (
                     Number.isFinite(longitude) && Number.isFinite(latitude) &&
                     longitude >= -180 && longitude <= 180 &&
-                    latitude >= -90 && latitude <= 90
-                ));
+                    latitude >= -90 && latitude <= 90 &&
+                    !(longitude === 0 && latitude === 0)
+                )).filter((coord, idx, arr) => {
+                    if (idx === 0) return true;
+                    const [prevLon, prevLat] = arr[idx - 1];
+                    return Math.abs(coord[0] - prevLon) > 0.00001 || Math.abs(coord[1] - prevLat) > 0.00001;
+                });
 
                 if (validCoordinates.length < 2) {
                     return;
                 }
 
                 const chunkSize = 10;
-                const matchedRouteCoordinates = [];
+                const finalRouteCoordinates = [];
 
                 for (let start = 0; start < validCoordinates.length - 1; start += chunkSize - 1) {
                     const chunk = validCoordinates.slice(start, start + chunkSize);
+                    if (chunk.length < 2) continue;
+
+                    let matched = false;
                     const coordinatesString = chunk
                         .map(([longitude, latitude]) => `${longitude.toFixed(6)},${latitude.toFixed(6)}`)
                         .join(';');
                     const matchUrl = `https://router.project-osrm.org/match/v1/driving/${coordinatesString}?overview=full&geometries=geojson&gaps=ignore`;
-                    const response = await fetch(matchUrl);
-                    if (!response.ok) {
-                        const errorDetails = await response.text();
-                        throw new Error(`OSRM ตอบกลับด้วยสถานะ ${response.status}: ${errorDetails}`);
-                    }
 
-                    const matchData = await response.json();
-                    if (matchData.code !== 'Ok' || !matchData.matchings?.length) {
-                        throw new Error('OSRM ไม่สามารถจับพิกัดเข้ากับถนนได้');
-                    }
-
-                    matchData.matchings.forEach(matching => {
-                        const geometryCoordinates = matching.geometry?.coordinates;
-                        if (!geometryCoordinates?.length) {
-                            return;
+                    try {
+                        const response = await fetch(matchUrl);
+                        if (response.ok) {
+                            const matchData = await response.json();
+                            if (matchData.code === 'Ok' && matchData.matchings?.length > 0) {
+                                matchData.matchings.forEach(matching => {
+                                    const geometryCoordinates = matching.geometry?.coordinates;
+                                    if (geometryCoordinates?.length > 0) {
+                                        const startIndex = finalRouteCoordinates.length > 0 ? 1 : 0;
+                                        finalRouteCoordinates.push(...geometryCoordinates.slice(startIndex));
+                                        matched = true;
+                                    }
+                                });
+                            }
                         }
+                    } catch (err) {
+                        // หากมี Error ไม่ต้องขัดขวางการทำงาน ให้ไปใช้ Fallback
+                    }
 
-                        matchedRouteCoordinates.push(
-                            ...geometryCoordinates.slice(start === 0 ? 0 : 1)
-                        );
-                    });
+                    // หาก OSRM ไม่สามารถ Match ได้ (เช่น ตอบกลับ 400 NoSegment หรือพิกัดอยู่นอกถนน) ให้ใช้พิกัดจริงลากเส้นตรงเป็น Fallback
+                    if (!matched) {
+                        chunk.forEach((coord, idx) => {
+                            if (finalRouteCoordinates.length === 0 || idx > 0) {
+                                finalRouteCoordinates.push(coord);
+                            }
+                        });
+                    }
                 }
 
-                if (matchedRouteCoordinates.length > 1) {
+                if (finalRouteCoordinates.length > 1) {
                     routeSource.addFeature(new ol.Feature({
                         geometry: new ol.geom.LineString(
-                            matchedRouteCoordinates.map(coordinate => ol.proj.fromLonLat(coordinate))
+                            finalRouteCoordinates.map(coordinate => ol.proj.fromLonLat(coordinate))
                         )
                     }));
                 }
@@ -243,12 +259,15 @@
                     });
 
                     for (const routeCoordinates of Object.values(routeCoordinatesByDate)) {
-                        try {
-                            await drawOsrmMatchedRoute(routeCoordinates);
-                        } catch (error) {
-                            console.error('ไม่สามารถจับเส้นทางด้วย OSRM Match:', error);
-                        }
+                        await drawOsrmMatchedRoute(routeCoordinates);
                     }
+
+                    // ซูมแผนที่ให้ครอบคลุมพิกัดทั้งหมด
+                    if (vectorSource.getFeatures().length > 0) {
+                        const extent = vectorSource.getExtent();
+                        map.getView().fit(extent, { padding: [50, 50, 50, 50], maxZoom: 15, duration: 500 });
+                    }
+
                     renderTruckStats(data);
                 } catch (error) {
                     console.error("เกิดข้อผิดพลาดในการอัปเดตพิกัด:", error);
