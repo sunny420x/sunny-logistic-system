@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express.Router();
 
-const { checkDatabaseExistance, checkTableExistance, installDatabase } = require('../models/installation')
+const { checkDatabaseExistance, checkTableAndColumnsExistance, installDatabase, expectedSchema } = require('../models/installation');
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
@@ -11,19 +11,10 @@ require('dotenv').config()
 app.get('/installation', async(req,res) => {
     const isDatabaseExist = await checkDatabaseExistance(process.env.DB_NAME)
     if(isDatabaseExist) {
-        const tableStatus = {
-            users: await checkTableExistance(process.env.DB_NAME, 'users'),
-            customers: await checkTableExistance(process.env.DB_NAME, 'customers'),
-            customer_groups: await checkTableExistance(process.env.DB_NAME, 'customer_groups'),
-            location_records: await checkTableExistance(process.env.DB_NAME, 'location_records'),
-            logs: await checkTableExistance(process.env.DB_NAME, 'logs'),
-            maintenance_type: await checkTableExistance(process.env.DB_NAME, 'maintenance_type'),
-            settings: await checkTableExistance(process.env.DB_NAME, 'settings'),
-            transition_records: await checkTableExistance(process.env.DB_NAME, 'transition_records'),
-            truck_maintenance: await checkTableExistance(process.env.DB_NAME, 'truck_maintenance'),
-            trucks: await checkTableExistance(process.env.DB_NAME, 'trucks'),
-            user_types: await checkTableExistance(process.env.DB_NAME, 'user_types'),
-        };
+        const tableStatus = {};
+        for (const tableName of Object.keys(expectedSchema)) {
+            tableStatus[tableName] = await checkTableAndColumnsExistance(process.env.DB_NAME, tableName);
+        }
 
         const allInstalled = Object.values(tableStatus).every(status => status === true);
         
