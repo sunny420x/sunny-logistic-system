@@ -54,4 +54,22 @@ app.get('/admin/logs/:id', async(req,res) => {
     })
 })
 
+app.get('/clearLogs', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('settings')) res.end("Permission denial") //Check Permission
+   
+    const limit = req.query.limit ?? 0
+
+    clearLogs(limit).then(() => {
+        addLog("delete", `ข้อมูลประวัติการใช้งานเก่าจำนวน ${limit} รายการ ถูกลบออกจากระบบ โดย #${auth.user.id} - ${auth.user.username}`)
+        res.redirect('/admin/logs')
+    })
+})
+
 module.exports = app;

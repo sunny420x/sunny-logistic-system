@@ -19,6 +19,25 @@
       <div class="d-lg-flex gap-2">
         <h2 class="fw-bold mb-3">ประวัติการใช้งานระบบ</h2>
       </div>
+      <div class="d-flex mb-3 gap-2">
+        <label for="clearLogAmount" style="padding: 8px 5px 8px 0;">ลบประวัติการใช้งานที่เก่ากว่า</label><input type="number" id="clearLogAmount" class="form-control" style="width: 200px;" value="20">
+        <button class="btn btn-outline-danger" onclick="
+        Swal.fire({
+          title: 'คุณแน่ใจหรือไม่?',
+          text: 'คุณกำลังจะลบข้อมูลประวัติการใช้งานเก่า จำนวน '+document.getElementById('clearLogAmount').value+' รายการออกจากระบบ',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#3085d6',
+          cancelButtonColor: '#d33',
+          confirmButtonText: 'ใช่, ลบเลย!',
+          cancelButtonText: 'ยกเลิก'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.href='/clearLogs?limit='+document.getElementById('clearLogAmount').value
+          }
+        })
+      "><i class="bi bi-trash me-2"></i>ลบประวัติการใช้งาน</button>
+      </div>
       <div class="table-responsive">
         <table class="table">
           <thead>
