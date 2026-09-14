@@ -19,7 +19,7 @@ app.get('/admin/logs', async(req,res) => {
     const auth = await initUserToken(req.cookies.auth)
     if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
-    if(!auth.user.permission.split(',').includes('settings')) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('logs')) res.end("Permission denial") //Check Permission
    
     const logs = await showLogs(50) ?? [];
 
@@ -40,7 +40,7 @@ app.get('/admin/logs/:id', async(req,res) => {
     const auth = await initUserToken(req.cookies.auth)
     if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
-    if(!auth.user.permission.split(',').includes('settings')) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('logs')) res.end("Permission denial") //Check Permission
    
     const id = req.params.id
     const log = await getLogById(id) ?? [];
@@ -62,7 +62,7 @@ app.get('/admin/logs/delete/:id', async(req,res) => {
     const auth = await initUserToken(req.cookies.auth)
     if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
-    if(!auth.user.permission.split(',').includes('settings')) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('logs')) res.end("Permission denial") //Check Permission
    
     const id = req.params.id
     
@@ -79,7 +79,7 @@ app.get('/admin/clearLogs', async(req,res) => {
     const auth = await initUserToken(req.cookies.auth)
     if(!auth.user) res.redirect('/logout')
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
-    if(!auth.user.permission.split(',').includes('settings')) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('logs')) res.end("Permission denial") //Check Permission
    
     const limit = req.query.limit ?? 0
 
