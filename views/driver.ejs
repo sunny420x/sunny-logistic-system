@@ -44,6 +44,24 @@
             }
         }
 
+        button.setCenter {
+            width: 25px;
+            height: 25px;
+            position: absolute;
+            right: calc(60% - 35px);
+            top: 60px;
+            z-index: 2;
+            border: 0;
+            padding: 8px;
+            background: #fff;
+            display: flex;
+
+            i {
+                font-size: 10px;
+                color: #555;
+            }
+        }
+
         @media screen and (max-width: 1200px) {
             .mapContainer {
                 display: block;
@@ -80,16 +98,21 @@
                     margin-bottom: 5px;
                 }
             }
+            button.setCenter {
+                width: 32px;
+                height: 32px;
+                position: relative;
+                top: calc(-100vh + 270px);
+                left: 10px;
+                border: 1px solid #fff;
+                background: #fff;
+
+                i {
+                    color: #555;
+                }
+            }
         }
 
-        button.setCenter {
-            width: 50px;
-            height: 50px;
-            position: relative;
-            top: calc(-100vh + 190px);
-            right: -87%;
-            border: 0;
-        }
     </style>
 </head>
 <body>
