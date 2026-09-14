@@ -291,6 +291,11 @@ function updateRouteTable() {
         if (bCompleted && !aCompleted) return -1;
         if (aCompleted && bCompleted) return 0;
 
+        const aIsNext = nextTarget && a.id === nextTarget.id;
+        const bIsNext = nextTarget && b.id === nextTarget.id;
+        if (aIsNext && !bIsNext) return -1;
+        if (bIsNext && !aIsNext) return 1;
+
         const aHasTime = a.time !== null && a.time !== undefined && a.time !== '';
         const bHasTime = b.time !== null && b.time !== undefined && b.time !== '';
         if (aHasTime && !bHasTime) return -1;
