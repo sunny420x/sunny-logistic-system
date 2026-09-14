@@ -11,14 +11,14 @@
   <style>
     #map {
       width: 100%;
-      height: 87vh;
+      height: 82vh;
       z-index: 1;
       border-radius: 20px;
       overflow: hidden;
     }
     .route-info {
       width: 700px;
-      max-height: 87vh;
+      max-height: 82vh;
       overflow: auto;
     }
     @media screen and (max-width: 1024px) {
@@ -47,7 +47,7 @@
         <div>
           <div class="d-lg-flex d-block">
             <div id="map"></div>
-            <div class="route-info p-4 py-lg-0">
+            <div class="route-info p-4">
               <%if(route.status) { %>
                 สถานะ: <span class="badge bg-success fw-normal mb-3">ส่งแล้ว</span>
               <% } else { %>
@@ -75,7 +75,6 @@
                   <% if(route.status == 0) { %>
                     <!-- ใส่ ID ให้ select เพื่อเรียกใช้ Select2 -->
                     <select id="customerSelect" name="customer_id" class="form-select" onchange="selectMark(this.value)" required>
-                      <option value="">-- เลือกลูกค้า --</option>
                       <% customers.forEach(customer => { %>
                         <option value="<%= customer.id %>" <%= route.customer_row_id == customer.id ? 'selected' : '' %>>
                           <%= customer.customer_name %>
@@ -111,7 +110,7 @@
                         selectEl.select2({
                           theme: 'bootstrap-5',
                           data: data,
-                          allowClear: true,
+                          allowClear: false,
                           width: '100%'
                         });
                       })
