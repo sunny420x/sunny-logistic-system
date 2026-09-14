@@ -167,9 +167,51 @@
                 }
 
                 function setCenter() {
-                    const centerLonLat = [parseFloat(position_longitude), parseFloat(position_latitude)];
-                    map.getView().animate({
-                        center: ol.proj.fromLonLat(centerLonLat),
+                    const currentLonLat = [parseFloat(position_longitude), parseFloat(position_latitude)];
+                    const currentCoordinate = ol.proj.fromLonLat(currentLonLat);
+                    const view = map.getView();
+                    const routeFeature = vectorSource?.getFeatureById('current-route');
+                    const routeCoordinates = routeFeature?.getGeometry()?.getCoordinates() || [];
+
+                    if (routeCoordinates.length < 2) {
+                        view.animate({ center: currentCoordinate, rotation: 0, duration: 1000 });
+                        return;
+                    }
+
+                    const currentRouteIndex = routeCoordinates.reduce((closestIndex, coordinate, index) => {
+                        const closestDistance = Math.hypot(
+                            routeCoordinates[closestIndex][0] - currentCoordinate[0],
+                            routeCoordinates[closestIndex][1] - currentCoordinate[1]
+                        );
+                        const distance = Math.hypot(
+                            coordinate[0] - currentCoordinate[0],
+                            coordinate[1] - currentCoordinate[1]
+                        );
+                        return distance < closestDistance ? index : closestIndex;
+                    }, 0);
+                    const nextCoordinate = routeCoordinates[Math.min(currentRouteIndex + 1, routeCoordinates.length - 1)];
+                    const currentLonLatOnRoute = ol.proj.toLonLat(currentCoordinate);
+                    const nextLonLat = ol.proj.toLonLat(nextCoordinate);
+                    const bearing = Math.atan2(
+                        Math.sin((nextLonLat[0] - currentLonLatOnRoute[0]) * Math.PI / 180) * Math.cos(nextLonLat[1] * Math.PI / 180),
+                        Math.cos(currentLonLatOnRoute[1] * Math.PI / 180) * Math.sin(nextLonLat[1] * Math.PI / 180) -
+                        Math.sin(currentLonLatOnRoute[1] * Math.PI / 180) * Math.cos(nextLonLat[1] * Math.PI / 180) *
+                        Math.cos((nextLonLat[0] - currentLonLatOnRoute[0]) * Math.PI / 180)
+                    );
+                    const distanceToNext = Math.hypot(
+                        nextCoordinate[0] - currentCoordinate[0],
+                        nextCoordinate[1] - currentCoordinate[1]
+                    );
+                    const lookAheadDistance = Math.min(80, distanceToNext / 2);
+                    const lookAheadRatio = distanceToNext > 0 ? lookAheadDistance / distanceToNext : 0;
+                    const lookAheadCoordinate = [
+                        currentCoordinate[0] + (nextCoordinate[0] - currentCoordinate[0]) * lookAheadRatio,
+                        currentCoordinate[1] + (nextCoordinate[1] - currentCoordinate[1]) * lookAheadRatio
+                    ];
+
+                    view.animate({
+                        center: lookAheadCoordinate,
+                        rotation: -bearing,
                         duration: 1000
                     });
                 }
