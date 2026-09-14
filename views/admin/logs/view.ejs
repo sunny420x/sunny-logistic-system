@@ -20,7 +20,7 @@
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
           <h2 class="fw-bold mb-3">Log #<%=log.id%> action=<%=log.action%></h2>
-          <p>เพิ่มโดย: <%=log.created_by_user ?? "-" %> เมื่อ: <%=log.created_at ?? "-" %></p>
+          <p>เมื่อ: <%if(log.created_at) {%><%=moment(log.created_at).format("DD/MM/YYYY HH:mm:ss") %><%} else {%>-<%}%></p>
           <div class="d-flex">
               <pre><%-log.details%></pre>
           </div>

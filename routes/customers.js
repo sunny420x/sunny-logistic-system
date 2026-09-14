@@ -84,7 +84,7 @@ app.post('/admin/customers/add', async(req,res) => {
 
     addCustomers(customer_name, customer_id, address, location, group_id, phone_number, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
-        addLog('add', `Customer added by user_id: ${auth.user.id}`)
+        addLog('add', `ลูกค้า ${customer_name} ถูกเพิ่มโดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/customers')
     })
 })
@@ -135,7 +135,7 @@ app.post('/admin/customers/edit/:id', async(req,res) => {
 
     editCustomer(id, customer_name, customer_id, address, location, group_id, phone_number).then(() => {
         res.cookie('alert', 'success')
-        addLog('edit', `Customer edited ${id} by user_id: ${auth.user.id}`)
+        addLog('edit', `ลูกค้ารหัส #${id} - ${customer_name} ถูกแก้ไขโดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/customers/edit/'+id)
     })
 })
@@ -195,7 +195,7 @@ app.post('/admin/customer_groups/add', async(req,res) => {
 
     addCustomerGroup(name, color, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
-        addLog('added', `Customer Group added by user_id: ${auth.user.id}`)
+        addLog('added', `กลุ่มลูกค้า '${name}' ถูกเพิ่มเข้าสู่ระบบ โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/customer_groups')
     })
 })
@@ -236,7 +236,7 @@ app.post('/admin/customer_groups/edit/:id', async(req,res) => {
 
     editCustomerGroup(id, name, color).then(() => {
         res.cookie('alert', 'success')
-        addLog('edit', `Customer Group edited ${id} by user_id: ${auth.user.id}`)
+        addLog('edit', `กลุ่มลูกค้า หมายเลข #${id} - ${name} ถูกแก้ไขโดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/customer_groups/edit/'+id)
     })
 })
@@ -255,7 +255,7 @@ app.get('/admin/customers/delete/:id', async(req,res) => {
 
     deleteCustomerById(id).then(() => {
         res.cookie('alert', 'delete_success')
-        addLog('delete', `Customer deleted ${id} by user_id: ${auth.user.id}`)
+        addLog('delete', `ลูกค้าหมายเลข #${id} ถูกลบออกจากระบบ โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/customers')
     })
 })
@@ -274,7 +274,7 @@ app.get('/admin/customer_groups/delete/:id', async(req,res) => {
 
     deleteCustomerGroupById(id).then(() => {
         res.cookie('alert', 'delete_success')
-        addLog('delete', `Customer Group deleted ${id} by user_id: ${auth.user.id}`)
+        addLog('delete', `กลุ่มลูกค้า หมายเลข #${id} ถูกลบออกจากระบบ โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/customer_groups')
     })
 })

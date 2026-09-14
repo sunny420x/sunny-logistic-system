@@ -74,7 +74,7 @@ app.post('/admin/users/add', async(req,res) => {
 
     registerUser(username, password_hash, full_name, type_id, phone_number, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
-        addLog('add', `User added`)
+        addLog('add', `ผู้ใช้ '${username}' ชื่อเต็ม '${full_name}' ถูกเพิ่มเข้าสู่ระบบ โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/users')
     })
 })
@@ -121,7 +121,7 @@ app.post('/admin/users/edit/:id', async(req,res) => {
         const password_hash = crypto.createHash('sha256').update(password).digest('hex');
         editUser(id, username, full_name, type_id, phone_number, password_hash).then(() => {
             res.cookie('alert', 'success')
-            addLog('edit', `User edited id ${id}`)
+            addLog('edit', `ผู้ใช้ #${id} - ${username} ถูกแก้ไข โดย #${auth.user.id} - ${auth.user.username}`)
             res.redirect('/admin/users/edit/'+id)
         })
     } else {
@@ -188,7 +188,7 @@ app.post('/admin/user_types/add', async(req,res) => {
 
     addUserType(user_type, permission, color, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
-        addLog('add', `User types added`)
+        addLog('add', `ประเภทผู้ใช้ใหม่ '${user_type}' สิทธิ์ ${permission} ถูกเพิ่มเข้าสู่ระบบ โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/user_types')
     })
 })
@@ -231,7 +231,7 @@ app.post('/admin/user_types/edit/:id', async(req,res) => {
 
     editUserType(id, user_type, permission, color).then(() => {
         res.cookie('alert', 'success')
-        addLog('add', `User types edited ${id}`)
+        addLog('add', `ประเภทผู้ใช้หมายเลข #${id} - ${user_type} ถูกแก้ไข โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/user_types/edit/'+id)
     })
 })

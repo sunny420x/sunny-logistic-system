@@ -111,7 +111,7 @@ app.post('/admin/routes/add', async(req,res) => {
 
     addRoute(customer_id, billing_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, round, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
-        addLog('add', `Route added by user_id: ${auth.user.id}`)
+        addLog('add', `คิวส่งของใหม่สำหรับลูกค้าหมายเลข #${customer_id} รหัสบิล ${billing_id} ถูกเพิ่มเข้าสู่ระบบ โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/routes/?date='+moment().format('YYYY-MM-DD'))
     })
 })
@@ -176,7 +176,7 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
 
     editRoute(id, customer_id, billing_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, status, arrival_at_warehouse, round).then(() => {
         res.cookie('alert', 'success')
-        addLog('edit', `Route ${id} edited by user_id: ${auth.user.id}`)
+        addLog('edit', `คิวส่งสินค้าหมายเลข #${id} ถูกแก้ไข โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/routes/edit/'+id)
     })
 })
@@ -194,7 +194,7 @@ app.get('/admin/routes/delete/:id', async(req,res) => {
 
     deleteRouteById(id).then(() => {
         res.cookie('alert', 'delete_success')
-        addLog('delete', `Route ${id} deleted by user_id: ${auth.user.id}`)
+        addLog('delete', `คิวส่งสินค้าหมายเลข #${id} ถูกลบออกจากระบบ โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/routes/?date='+moment().format('YYYY-MM-DD'))
     })
 })

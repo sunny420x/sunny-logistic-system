@@ -12,6 +12,7 @@ const { getMaintenanceAlerts } = require('./models/trucks')
 const { ongoingDrivers } = require('./models/tracking')
 const { getSettings } = require('./models/settings')
 const { initUserToken, saveSettings, changeAccountPassword } = require('./models/users')
+const { addLog } = require('./models/logs')
 
 app.set('trust proxy', 1)
 
@@ -64,8 +65,10 @@ app.get('/login', async(req,res) => {
         if(auth.status == "success") {
             if(auth.user.type_id == "2") {
                 res.redirect('/driver/myRoute')
+                addLog('login', `#${auth.user.id} - ${auth.user.username} ได้เข้าสู่ระบบในฐานะ พนักงานขับรถ`)
             } else {
                 res.redirect('/admin')
+                addLog('login', `#${auth.user.id} - ${auth.user.username} ได้เข้าสู่ระบบ`)
             }
         }
     } else {
