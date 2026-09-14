@@ -23,6 +23,7 @@
         <table class="table">
           <thead>
             <th style="width: 40px;">#</th>
+            <th style="width: 40px;">เมื่อ</th>
             <th style="width: 100px;">Action</th>
             <th style="width: 200px;">Details</th>
             <th style="width: 200px;">จัดการ</th>
@@ -31,6 +32,7 @@
             <% logs.forEach(row => { %>
             <tr>
               <td><%=row.id%></td>
+              <td><%if(row.created_at) {%><%=moment(row.created_at).format("DD/MM/YYYY HH:mm:ss") %><%} else {%>-<%}%></td>
               <td><%=row.action%></td>
               <td><%=row.details%></td>
               <td>
