@@ -1,8 +1,10 @@
 const db = require('../database');
+const moment = require('moment')
 
 function addLog(action = "unknown", details) {
     return new Promise(resolve => {
-        db.query("INSERT INTO logs(action, details) VALUES(?,?)", [action, details], (err) => {
+        const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
+        db.query("INSERT INTO logs(action, details, created_at) VALUES(?,?,?)", [action, details, created_at], (err) => {
             if(err) console.error(err);
             resolve()
         })

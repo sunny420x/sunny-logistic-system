@@ -27,7 +27,8 @@ CREATE TABLE IF NOT EXISTS `location_records` (
 CREATE TABLE IF NOT EXISTS `logs` (
   `id` int(11) NOT NULL PRIMARY KEY,
   `action` varchar(50) DEFAULT NULL,
-  `details` varchar(300) DEFAULT NULL
+  `details` varchar(300) DEFAULT NULL,
+  `created_at` datetime DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 CREATE TABLE IF NOT EXISTS `maintenance_type` (
   `id` int(11) NOT NULL PRIMARY KEY,
