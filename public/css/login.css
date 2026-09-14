@@ -256,6 +256,22 @@ body {
     text-decoration: underline;
 }
 
+.download-text {
+    font-size: 14px;
+    text-align: center;
+    color: #727d90;
+}
+
+.download-text a {
+    font-weight: 700;
+    color: #007fc5;
+    text-decoration: none;
+}
+
+.download-text a:hover {
+    text-decoration: underline;
+}
+
 .copyright {
     margin-top: 35px;
     font-size: 12px;
