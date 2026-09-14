@@ -16,7 +16,6 @@
             <% if(auth.user.permission.split(',').includes('logs')) { %>
             <a class="nav-link <% if(locals.page == 'logs') { %>active<%}%>" href="/admin/logs"><i class="bi bi-file-earmark-text"></i> ประวัติการใช้งานระบบ</a>
             <% } %>
-            <a class="nav-link <% if(locals.page == 'help') { %>active<%}%>" href="/admin/help"><i class="bi bi-question-circle"></i> ช่วยเหลือ</a>
         </nav>
     </div>
 
