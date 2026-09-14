@@ -1,7 +1,7 @@
 const express = require('express');
 const app = express();
 const path = require('path');
-const moment = require('moment-timezone');
+const moment = require('moment');
 const cookieParser = require('cookie-parser');
 const crypto = require('crypto');
 
@@ -14,7 +14,6 @@ const { getSettings } = require('./models/settings')
 const { initUserToken, saveSettings, changeAccountPassword } = require('./models/users')
 
 app.set('trust proxy', 1)
-moment.tz.setDefault(process.env.TIMEZONE);
 
 //Routes
 const usersRoute = require('./routes/users')

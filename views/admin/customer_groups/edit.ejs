@@ -30,7 +30,8 @@
                 <input type="color" class="form-control form-control-color w-100" id="color" name="color" value="<%=customer_group.color%>" title="เลือกสี">
             </div>
 
-            <p>เพิ่มโดย: <%=customer_group.created_by_user ?? "-" %> เมื่อ: <%=customer_group.created_at ?? "-" %></p>
+            <p><strong>เพิ่มโดย:</strong> <%=customer_group.created_by_user ?? "-" %><br>
+            <strong>เมื่อ:</strong> <% if(customer_group.created_at) { %><%=moment(customer_group.created_at).format("DD/MM/YYYY HH:mm:ss") %><%} else {%>-<%} %></p>
 
             <button type="submit" class="btn btn-primary w-100"><i class="bi bi-floppy me-2"></i>บันทึกการเปลี่ยนแปลง</button>
           </form>

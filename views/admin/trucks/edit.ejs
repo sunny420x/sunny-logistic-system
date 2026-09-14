@@ -38,7 +38,8 @@
                 <input type="number" name="cost_per_km" class="form-control" value="<%=truck.cost_per_km%>" required>
             </div>
 
-              <p>เพิ่มโดย: <%=truck.created_by_user ?? "-" %> เมื่อ: <%=truck.created_at ?? "-" %></p>
+            <p><strong>เพิ่มโดย:</strong> <%=truck.created_by_user ?? "-" %><br>
+            <strong>เมื่อ:</strong> <% if(truck.created_at) { %><%=moment(truck.created_at).format("DD/MM/YYYY HH:mm:ss") %><%} else {%>-<%} %></p>
 
             <button type="submit" class="btn btn-primary w-100"><i class="bi bi-floppy me-2"></i>บันทึกการเปลี่ยนแปลง</button>
           </form>

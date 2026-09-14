@@ -51,7 +51,8 @@
                 </select>
             </div>
 
-            <p>เพิ่มโดย: <%=user.created_by_user ?? "-" %> เมื่อ: <%=user.created_at ?? "-" %></p>
+            <p><strong>เพิ่มโดย:</strong> <%=user.created_by_user ?? "-" %><br>
+            <strong>เมื่อ:</strong> <% if(user.created_at) { %><%=moment(user.created_at).format("DD/MM/YYYY HH:mm:ss") %><%} else {%>-<%} %></p>
 
             <button type="submit" class="btn btn-primary w-100"><i class="bi bi-floppy me-2"></i>บันทึกการเปลี่ยนแปลง</button>
           </form>

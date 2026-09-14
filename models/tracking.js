@@ -1,6 +1,5 @@
 const db = require('../database')
-const moment = require('moment-timezone')
-moment.tz.setDefault(process.env.TIMEZONE);
+const moment = require('moment')
 
 function finishDelivery(id, finish_at) {
     return new Promise(resolve => {

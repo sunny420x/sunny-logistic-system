@@ -43,7 +43,7 @@ function getDrivers() {
 
 function getUserById(id) {
     return new Promise(resolve => {
-        db.query(`SELECT u.username, u.full_name, ut.name as user_type, u.phone_number, u.type_id, uc.full_name as created_by_user 
+        db.query(`SELECT u.username, u.full_name, ut.name as user_type, u.phone_number, u.type_id, uc.full_name as created_by_user, u.created_at 
             FROM users as u 
             JOIN user_types as ut ON ut.id = u.type_id 
             LEFT JOIN users as uc ON uc.id = u.created_by 

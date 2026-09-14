@@ -82,7 +82,8 @@
                 <input type="text" name="phone_number" class="form-control" value="<%=customer.phone_number%>" oninput="validatePhoneNumber()" placeholder="เบอร์โทรศัพท์">
             </div>
 
-            <p>เพิ่มโดย: <%=customer.created_by_user ?? "-" %> เมื่อ: <%=customer.created_at ?? "-" %></p>
+            <p><strong>เพิ่มโดย:</strong> <%=customer.created_by_user ?? "-" %><br>
+            <strong>เมื่อ:</strong> <% if(customer.created_at) { %><%=moment(customer.created_at).format("DD/MM/YYYY HH:mm:ss") %><%} else {%>-<%} %></p>
 
             <button type="submit" class="btn btn-primary w-100 mb-2"><i class="bi bi-floppy me-2"></i>บันทึกการเปลี่ยนแปลง</button>
           </form>
