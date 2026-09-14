@@ -19,10 +19,10 @@
     <main class="container-fluid p-3 p-lg-4">
       <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
-          <h2 class="fw-bold mb-3">Log #<%=log.id%> action=<%=log.action%></h2>
+          <h2 class="fw-bold mb-3">ประวัติการใช้งาน หมายเลข #<%=log.id%> action=<%=log.action%></h2>
           <p>เมื่อ: <%if(log.created_at) {%><%=moment(log.created_at).format("DD/MM/YYYY HH:mm:ss") %><%} else {%>-<%}%></p>
           <div class="d-flex">
-              <pre><%-log.details%></pre>
+              <p><%-log.details%></p>
           </div>
         </div>
       </div>
