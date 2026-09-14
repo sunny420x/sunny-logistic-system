@@ -40,21 +40,30 @@ function getLogById(id = null) {
 }
 
 function clearLogs(limit = null) {
-    return new Promise(resolve => {
-        let params = []
-        let query = `DELETE FROM logs ORDER BY id ASC `
+  return new Promise((resolve, reject) => {
+    let params = []
+    let query = `DELETE FROM logs `
+    
+    if(limit) {
+      const limitNum = parseInt(limit, 10);
+      if (isNaN(limitNum) || limitNum <= 0) {
+        return reject(new Error("Invalid limit value"));
+      }
+      
+      query += `ORDER BY id ASC LIMIT ?`
+      params.push(limitNum)
+    }
 
-        if(limit) {
-            query += `LIMIT ?`
-            params.push(limit)
-        }
-
-        db.query(query, params, (err) => {
-            if(err) console.error(err);
-            resolve()
-        })
+    db.query(query, params, (err, result) => {
+      if(err) {
+        console.error(err);
+        return reject(err);
+      }
+      resolve(result)
     })
+  })
 }
+
 
 function deleteLogById(id = null) {
     if(!id) return;
