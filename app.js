@@ -249,6 +249,7 @@ app.post('/admin/account/settings/updatePassword', async(req,res) => {
 
     changeAccountPassword(auth.user.id, currentPassword, newPassword).then((result) => {
         if(result.status == "success") {
+            addLog('edit', `#${auth.user.id} - ${auth.user.username} ได้เปลี่ยนรหัสผ่านบัญชีของตนเอง`)
             res.redirect('/logout')
         } else {
             res.redirect('/admin/account/settings/updatePassword?alert=currentPasswordNotMatch')
