@@ -209,6 +209,7 @@
             }
 
             async function updateTruckLocations() {
+                let data;
                 try {
                     const response = await fetch("/api/driver/getTruckLocation/<%=truck_id%>/<%=date%>");
 
@@ -216,17 +217,36 @@
                         throw new Error("ดึงข้อมูลจากหลังบ้านไม่สำเร็จ");
                     }
 
-                    const data = await response.json();
+                    data = await response.json();
+                } catch (error) {
+                    console.error("เกิดข้อผิดพลาดในการดึงข้อมูล:", error);
+                    document.getElementById('truckStatsTable').innerHTML = `
+                        <tr>
+                            <td colspan="8" class="text-danger">
+                                ไม่สามารถโหลดข้อมูลได้
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
 
+                // แยก try/catch การวาดแผนที่ออกจากตารางสถิติ
+                // เพื่อไม่ให้ Error จากการวาดแผนที่ (เช่น OSRM ล่ม) บล็อกการแสดงผลตาราง
+                try {
                     // เคลียร์เฉพาะ Marker เก่าออกจาก VectorSource (ไม่กระทบตัวแผนที่)
                     vectorSource.clear();
                     routeSource.clear();
                     const routeCoordinatesByDate = {};
 
-                    drawCustomerMarkers(data.locations);
+                    // เรียงตามเวลาให้แน่ใจว่าเส้นทางถูกโยงตามลำดับเวลาจริง
+                    const sortedLocations = [...data.locations].sort((a, b) =>
+                        new Date(a.created_at) - new Date(b.created_at)
+                    );
+
+                    drawCustomerMarkers(sortedLocations);
 
                     // วนลูปสร้าง Marker ใหม่
-                    data.locations.forEach(truck => {
+                    sortedLocations.forEach(truck => {
                         const latitude = parseFloat(truck.position_latitude);
                         const longitude = parseFloat(truck.position_longitude);
                         if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
@@ -267,10 +287,21 @@
                         const extent = vectorSource.getExtent();
                         map.getView().fit(extent, { padding: [50, 50, 50, 50], maxZoom: 15, duration: 500 });
                     }
+                } catch (error) {
+                    console.error("เกิดข้อผิดพลาดในการวาดแผนที่:", error);
+                }
 
+                try {
                     renderTruckStats(data);
                 } catch (error) {
-                    console.error("เกิดข้อผิดพลาดในการอัปเดตพิกัด:", error);
+                    console.error("เกิดข้อผิดพลาดในการแสดงผลตาราง:", error);
+                    document.getElementById('truckStatsTable').innerHTML = `
+                        <tr>
+                            <td colspan="8" class="text-danger">
+                                เกิดข้อผิดพลาดในการแสดงผลตาราง
+                            </td>
+                        </tr>
+                    `;
                 }
             }
 
