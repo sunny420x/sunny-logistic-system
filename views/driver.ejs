@@ -249,6 +249,40 @@
             transform: translateY(0);
         }
 
+        button.followToggle {
+            position: absolute;
+            bottom: 24px;
+            right: 78px;
+            z-index: 20;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        button.followToggle:hover {
+            background: #f8fafc;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(15, 23, 42, 0.16);
+            color: var(--primary-color);
+        }
+
+        button.followToggle.active {
+            background: var(--primary-color);
+            border-color: var(--primary-color);
+            color: #ffffff;
+        }
+
+
         /* Responsive Breakpoints */
         @media screen and (max-width: 991.98px) {
             .mapContainer {
@@ -289,6 +323,13 @@
             button.setCenter {
                 bottom: 16px;
                 right: 16px;
+                width: 40px;
+                height: 40px;
+                font-size: 1rem;
+            }
+
+            button.followToggle {
+                bottom: 16px;
                 width: 40px;
                 height: 40px;
                 font-size: 1rem;
@@ -435,12 +476,29 @@
                             duration: 1000
                         });
                     }
+
+                    let followModeInterval = null;
+
+                    function toggleFollowMode() {
+                        const followBtn = document.getElementById('followToggleBtn');
+                        if (followModeInterval) {
+                            clearInterval(followModeInterval);
+                            followModeInterval = null;
+                            followBtn.classList.remove('active');
+                            return;
+                        }
+
+                        setCenter();
+                        followModeInterval = setInterval(setCenter, 10000);
+                        followBtn.classList.add('active');
+                    }
                     </script>
                 </div>
             </div>
 
             <div id="mapWrapper">
                 <div id="map"></div>
+                <button class="followToggle" id="followToggleBtn" onclick="toggleFollowMode()" title="โหมดติดตามอัตโนมัติ"><i class="fa-solid fa-location-crosshairs"></i></button>
                 <button class="setCenter" onclick="setCenter()" title="จัดกึ่งกลางตำแหน่ง"><i class="fa-solid fa-arrow-up"></i></button>
             </div>
         </div>
