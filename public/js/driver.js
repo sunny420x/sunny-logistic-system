@@ -317,11 +317,23 @@ function updateRouteTable() {
     const nextRound = allRoutes
         .filter(route => route.status != 1 && Number.isFinite(route.round) && route.round > startedRound)
         .reduce((minimum, route) => Math.min(minimum, route.round), Infinity);
-    const currentRoundCompleted = allRoutes
-        .filter(route => route.round === startedRound)
-        .every(route => route.status == 1);
+    const currentRoundRoutes = allRoutes.filter(route => route.round === startedRound);
+    const currentRoundCompleted = currentRoundRoutes.every(route => route.status == 1);
+    const currentRoundArrivedAtWarehouse = currentRoundRoutes.every(route => route.arrival_at_warehouse);
 
     if (Number.isFinite(nextRound) && currentRoundCompleted) {
+        // ต้องกลับมาโกดังก่อน ถึงจะเริ่มรอบถัดไปได้
+        if (!currentRoundArrivedAtWarehouse) {
+            statusBarBody.innerHTML = `
+            <tr>
+                <td colspan="3" class="text-center">
+                    <div class="text-success mb-2">รอบที่ ${startedRound} เสร็จเรียบร้อยแล้ว</div>
+                    <button class="btn btn-primary btn-sm w-100" onclick="arrivalAtWarehouse([${currentRoundRoutes.map(route => route.id)}])">✅ กลับมาถึงโกดังสินค้าแล้ว</button>
+                </td>
+            </tr>`;
+            return;
+        }
+
         statusBarBody.innerHTML = `
         <tr>
             <td colspan="3" class="text-center">
