@@ -344,9 +344,22 @@ app.get('/admin/calculate_round_month/report/:driver_id', async(req,res) => {
         return groups;
     }, {});
 
+    // สรุปจำนวนรอบและค่ารอบรวมของแต่ละวัน
+    const dailyTotals = Object.fromEntries(
+        Object.entries(rowsByDate).map(([dateKey, dailyRows]) => {
+            const dailyRoundCount = new Set(dailyRows.map(row => row.round).filter(round => round !== null)).size;
+            return [dateKey, {
+                round_count: dailyRoundCount,
+                round_cost: dailyRoundCount * dailyRows[0].round_cost,
+                license_plate: dailyRows[0].license_plate
+            }];
+        })
+    );
+
     res.render('admin/calculate_round_report_month', {
         driver: rows[0],
         rowsByDate: rowsByDate,
+        dailyTotals: dailyTotals,
         round_count: round_count,
         month: month,
         auth: auth,

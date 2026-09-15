@@ -90,7 +90,12 @@
                     <table class="table table-bordered mb-0">
                         <thead>
                             <tr>
-                                <th colspan="5" class="date-group-title"><%=moment(date).format('DD/MM/YYYY')%></th>
+                                <th colspan="5" class="date-group-title">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <span><%=moment(date).format('DD/MM/YYYY')%> <span class="text-muted fw-normal">(ทะเบียนรถ <%=dailyTotals[date].license_plate%>)</span></span>
+                                        <span><%=dailyTotals[date].round_count%> รอบ รวม <%=dailyTotals[date].round_cost%> บาท</span>
+                                    </div>
+                                </th>
                             </tr>
                             <tr class="table-light">
                                 <th>รอบ</th>
