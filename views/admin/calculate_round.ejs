@@ -59,10 +59,16 @@
                 </tr>
             </thead>
             <tbody>
-                <% drivers_round.forEach(row => { %>
+                <% 
+                current_full_name = '';    
+                drivers_round.forEach(row => { %>
                     <tr>
                         <td><%=moment(row.date).format('DD/MM/YYYY')%></td>
-                        <td><%=row.full_name%></td>
+                        <td>
+                        <% if(current_full_name !== row.full_name) { %>
+                        <%=row.full_name%>
+                        <% current_full_name = row.full_name; } %>
+                        </td>
                         <td><%=row.round_count%> รอบ</td>
                         <td><%=row.round_cost%> บาท/รอบ</td>
                         <td><%= parseInt(row.round_count) * parseInt(row.round_cost) %> บาท</td>
@@ -70,7 +76,8 @@
                             <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/calculate_round/report/<%=row.driver_id%>?date=<%=moment(row.date).format('YYYY-MM-DD')%>'"><i class="bi bi-file-earmark-text"></i> ออกรายงาน</button>
                         </td>
                     </tr>
-                <% }) %>
+                <% 
+                }) %>
             </tbody>
         </table>
     </main>
