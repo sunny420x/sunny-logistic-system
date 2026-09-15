@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>รายงานค่ารอบ | <%=settings.company_name%></title>
+  <%-include('includes/head')%>
+  <style>
+    .report-page {
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .report-summary td, .report-summary th {
+        font-size: 1rem;
+    }
+
+    @media print {
+        .no-print {
+            display: none !important;
+        }
+
+        body {
+            background: #ffffff !important;
+        }
+
+        .main-wrapper, .report-page {
+            width: 100% !important;
+            max-width: 100% !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print">
+    <%-include('includes/topbar')%>
+    <%-include('includes/desktop-sidebar')%>
+    <%-include('includes/mobile-sidebar')%>
+  </div>
+
+  <div class="main-wrapper">
+    <main class="container-fluid p-3 p-lg-4">
+        <div class="report-page">
+            <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+                <h2 class="fw-bold mb-0">รายงานค่ารอบพนักงานขับรถ</h2>
+                <button class="btn btn-primary" onclick="window.print()"><i class="bi bi-printer"></i> พิมพ์รายงาน</button>
+            </div>
+
+            <div class="text-center mb-4">
+                <h4 class="fw-bold mb-1"><%=settings.company_name%></h4>
+                <div class="text-muted">รายงานค่ารอบพนักงานขับรถ ประจำวันที่ <%=moment(date).format('DD/MM/YYYY')%></div>
+            </div>
+
+            <table class="table table-bordered mb-4">
+                <tbody>
+                    <tr>
+                        <th style="width: 200px;">พนักงานขับรถ</th>
+                        <td><%=driver.full_name%></td>
+                    </tr>
+                    <tr>
+                        <th>วันที่</th>
+                        <td><%=moment(date).format('DD/MM/YYYY')%></td>
+                    </tr>
+                    <tr>
+                        <th>จำนวนรอบ</th>
+                        <td><%=round_count%> รอบ</td>
+                    </tr>
+                    <tr>
+                        <th>ค่ารอบ</th>
+                        <td><%=driver.round_cost%> บาท/รอบ</td>
+                    </tr>
+                    <tr>
+                        <th>ค่ารอบรวม</th>
+                        <td class="fw-bold"><%=round_count * driver.round_cost%> บาท</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="table table-bordered">
+                <thead class="table-light">
+                    <tr>
+                        <th>รอบ</th>
+                        <th>รหัสลูกค้า</th>
+                        <th>ชื่อลูกค้า</th>
+                        <th>เวลานัดหมาย</th>
+                        <th>สถานะ</th>
+                        <th>เวลาส่งเสร็จ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% rows.forEach(row => { %>
+                        <tr>
+                            <td><%=row.round ?? '-'%></td>
+                            <td><%=row.customer_id%></td>
+                            <td><%=row.customer_name%></td>
+                            <td><%=row.time ?? '-'%></td>
+                            <td><%=row.status == 1 ? '✅ ส่งแล้ว' : 'ยังไม่ส่ง'%></td>
+                            <td><%=row.finish_at ? moment(row.finish_at).format('DD/MM/YYYY HH:mm') : '-'%></td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </main>
+  </div>
+  <div class="no-print">
+    <%-include('includes/footer')%>
+  </div>
+</body>
+</html>

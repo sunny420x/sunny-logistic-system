@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>คิดค่ารอบ | <%=settings.company_name%></title>
+  <%-include('includes/head')%>
+  <style>
+    #map {
+      width: 100%;
+      height: 70vh;
+      z-index: 1;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <%-include('includes/topbar')%>
+
+  <!-- Desktop Sidebar -->
+  <%-include('includes/desktop-sidebar')%>
+
+  <!-- Mobile Sidebar -->
+  <%-include('includes/mobile-sidebar')%>
+
+  <div class="main-wrapper">
+    <main class="container-fluid p-3 p-lg-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div class="d-flex">
+                <h2 class="fw-bold mb-3">คิดเงินค่ารอบให้พนักงานขับรถ</h2>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/admin/calculate_round_month" class="btn btn-outline-secondary"><i class="bi bi-calendar-month"></i> ดูรายเดือน</a>
+                <form action="" method="get" class="d-flex gap-2">
+                    <div class="d-flex gap-2">
+                        <input type="date" class="form-control" name="date" id="dateSearch" value="">
+                        <button class="btn btn-outline-primary" style="width: 200px;"><i class="bi bi-filter"></i> กรองวันที่</button>
+                    </div>
+                </form>
+                <button class="btn btn-secondary" id="clearFilterBtn" onclick="window.location.href='/admin/calculate_round'"><i class="bi bi-x"></i> ล้างตัวกรอง</button>
+            </div>
+            <script>
+                document.getElementById('dateSearch').value = getSearchQuery() ?? ''
+
+                function getSearchQuery() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    return urlParams.get('date');
+                }
+            </script>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>พนักงานขับรถ</th>
+                    <th>จำนวนรอบ</th>
+                    <th>ค่ารอบ</th>
+                    <th>ค่ารอบรวม</th>
+                    <th>จัดการ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% drivers_round.forEach(row => { %>
+                    <tr>
+                        <td><%=moment(row.date).format('DD/MM/YYYY')%></td>
+                        <td><%=row.full_name%></td>
+                        <td><%=row.round_count%> รอบ</td>
+                        <td><%=row.round_cost%> บาท/รอบ</td>
+                        <td><%= parseInt(row.round_count) * parseInt(row.round_cost) %> บาท</td>
+                        <td>
+                            <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/calculate_round/report/<%=row.driver_id%>?date=<%=moment(row.date).format('YYYY-MM-DD')%>'"><i class="bi bi-file-earmark-text"></i> ออกรายงาน</button>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
+  </div>
+  <%-include('../includes/footer')%>
+</body>
+</html>

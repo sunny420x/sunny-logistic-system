@@ -5,7 +5,9 @@ const cookieParser = require('cookie-parser');
 const moment = require('moment');
 const { addLog } = require('../models/logs')
 
-const { getUsers, registerUser, getUserTypes, getUserById, editUser, initUserToken, getUserTypeById, editUserType, addUserType } = require('../models/users')
+const { getUsers, registerUser, getUserTypes, getUserById, editUser, 
+    initUserToken, getUserTypeById, editUserType, addUserType, getCalculateRoundByDate, getCalculateRoundByMonth, 
+    getCalculateRoundReport, getCalculateRoundReportByMonth } = require('../models/users')
 const { getSettings } = require('../models/settings')
 
 app.use(express.json())
@@ -68,11 +70,12 @@ app.post('/admin/users/add', async(req,res) => {
     const type_id = req.body.type_id
     const phone_number = req.body.phone_number
     const full_name = req.body.full_name
+    const round_cost = req.body.round_cost
 
     const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
     const created_by = auth.user.id
 
-    registerUser(username, password_hash, full_name, type_id, phone_number, created_at, created_by).then(() => {
+    registerUser(username, password_hash, full_name, type_id, phone_number, round_cost, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
         addLog('add', `ผู้ใช้ '${username}' ชื่อเต็ม '${full_name}' ถูกเพิ่มเข้าสู่ระบบ โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/users')
@@ -116,16 +119,17 @@ app.post('/admin/users/edit/:id', async(req,res) => {
     const type_id = req.body.type_id
     const phone_number = req.body.phone_number
     const full_name = req.body.full_name
+    const round_cost = req.body.round_cost
 
     if(password) {
         const password_hash = crypto.createHash('sha256').update(password).digest('hex');
-        editUser(id, username, full_name, type_id, phone_number, password_hash).then(() => {
+        editUser(id, username, full_name, type_id, phone_number, round_cost, password_hash).then(() => {
             res.cookie('alert', 'success')
             addLog('edit', `ผู้ใช้ #${id} - ${username} ถูกแก้ไข โดย #${auth.user.id} - ${auth.user.username}`)
             res.redirect('/admin/users/edit/'+id)
         })
     } else {
-        editUser(id, username, full_name, type_id, phone_number).then(() => {
+        editUser(id, username, full_name, type_id, phone_number, round_cost, null).then(() => {
             res.cookie('alert', 'success')
             res.redirect('/admin/users/edit/'+id)
         })
@@ -233,6 +237,123 @@ app.post('/admin/user_types/edit/:id', async(req,res) => {
         res.cookie('alert', 'success')
         addLog('add', `ประเภทผู้ใช้หมายเลข #${id} - ${user_type} ถูกแก้ไข โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/user_types/edit/'+id)
+    })
+})
+
+app.get('/admin/calculate_round', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
+   
+    const date = req.query.date;
+    const drivers_round = await getCalculateRoundByDate(date)
+
+    res.render('admin/calculate_round', {
+        drivers_round: drivers_round,
+        auth: auth,
+        settings: await getSettings(),
+        moment: moment,
+        page: 'users'
+    })
+})
+
+app.get('/admin/calculate_round/report/:driver_id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
+
+    const driver_id = req.params.driver_id;
+    const date = req.query.date ?? moment().format('YYYY-MM-DD');
+    const rows = await getCalculateRoundReport(driver_id, date) ?? [];
+
+    if (rows.length === 0) {
+        res.status(404).end("ไม่พบข้อมูลรอบของพนักงานขับรถในวันที่เลือก");
+        return;
+    }
+
+    const round_count = new Set(rows.map(row => row.round).filter(round => round !== null)).size;
+
+    res.render('admin/calculate_round_report', {
+        driver: rows[0],
+        rows: rows,
+        round_count: round_count,
+        date: date,
+        auth: auth,
+        settings: await getSettings(),
+        moment: moment,
+        page: 'users'
+    })
+})
+
+app.get('/admin/calculate_round_month', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
+
+    const month = req.query.month ?? moment().format('YYYY-MM');
+    const drivers_round = await getCalculateRoundByMonth(month)
+
+    res.render('admin/calculate_round_month', {
+        drivers_round: drivers_round,
+        month: month,
+        auth: auth,
+        settings: await getSettings(),
+        moment: moment,
+        page: 'users'
+    })
+})
+
+app.get('/admin/calculate_round_month/report/:driver_id', async(req,res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
+
+    const driver_id = req.params.driver_id;
+    const month = req.query.month ?? moment().format('YYYY-MM');
+    const rows = await getCalculateRoundReportByMonth(driver_id, month) ?? [];
+
+    if (rows.length === 0) {
+        res.status(404).end("ไม่พบข้อมูลรอบของพนักงานขับรถในเดือนที่เลือก");
+        return;
+    }
+
+    const round_count = new Set(rows.map(row => `${moment(row.date).format('YYYY-MM-DD')}-${row.round}`).filter(key => !key.endsWith('-null'))).size;
+    const rowsByDate = rows.reduce((groups, row) => {
+        const dateKey = moment(row.date).format('YYYY-MM-DD');
+        if (!groups[dateKey]) groups[dateKey] = [];
+        groups[dateKey].push(row);
+        return groups;
+    }, {});
+
+    res.render('admin/calculate_round_report_month', {
+        driver: rows[0],
+        rowsByDate: rowsByDate,
+        round_count: round_count,
+        month: month,
+        auth: auth,
+        settings: await getSettings(),
+        moment: moment,
+        page: 'users'
     })
 })
 

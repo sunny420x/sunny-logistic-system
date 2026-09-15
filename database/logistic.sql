@@ -170,6 +170,7 @@ CREATE TABLE IF NOT EXISTS `users` (
   `full_name` varchar(200) DEFAULT NULL,
   `phone_number` varchar(200) DEFAULT NULL,
   `type_id` int(11) NOT NULL DEFAULT 2,
+  `round_cost` int(11) NOT NULL DEFAULT 0,
   `created_at` datetime DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
@@ -180,6 +181,7 @@ ALTER TABLE `users`
   ADD COLUMN IF NOT EXISTS `full_name` varchar(200) DEFAULT NULL,
   ADD COLUMN IF NOT EXISTS `phone_number` varchar(200) DEFAULT NULL,
   ADD COLUMN IF NOT EXISTS `type_id` int(11) NOT NULL DEFAULT 2,
+  ADD COLUMN IF NOT EXISTS `round_cost` int(11) NOT NULL DEFAULT 0,
   ADD COLUMN IF NOT EXISTS `created_at` datetime DEFAULT NULL,
   ADD COLUMN IF NOT EXISTS `created_by` int(11) DEFAULT NULL;
 

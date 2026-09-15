@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>คิดค่ารอบรายเดือน | <%=settings.company_name%></title>
+  <%-include('includes/head')%>
+</head>
+<body>
+  <%-include('includes/topbar')%>
+
+  <!-- Desktop Sidebar -->
+  <%-include('includes/desktop-sidebar')%>
+
+  <!-- Mobile Sidebar -->
+  <%-include('includes/mobile-sidebar')%>
+
+  <div class="main-wrapper">
+    <main class="container-fluid p-3 p-lg-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div class="d-flex">
+                <h2 class="fw-bold mb-3">คิดเงินค่ารอบให้พนักงานขับรถ (รายเดือน)</h2>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/admin/calculate_round" class="btn btn-outline-secondary"><i class="bi bi-calendar-day"></i> ดูรายวัน</a>
+                <form action="" method="get" class="d-flex gap-2">
+                    <div class="d-flex gap-2">
+                        <input type="month" class="form-control" name="month" id="monthSearch" value="<%=month%>">
+                        <button class="btn btn-outline-primary" style="width: 200px;"><i class="bi bi-filter"></i> กรองเดือน</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>พนักงานขับรถ</th>
+                    <th>จำนวนรอบ</th>
+                    <th>ค่ารอบ</th>
+                    <th>ค่ารอบรวม</th>
+                    <th>จัดการ</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if(drivers_round.length === 0) { %>
+                    <tr>
+                        <td colspan="5" class="text-muted text-center">ไม่มีข้อมูลรอบในเดือนที่เลือก</td>
+                    </tr>
+                <% } %>
+                <% drivers_round.forEach(row => { %>
+                    <tr>
+                        <td><%=row.full_name%></td>
+                        <td><%=row.round_count%> รอบ</td>
+                        <td><%=row.round_cost%> บาท/รอบ</td>
+                        <td><%= parseInt(row.round_count) * parseInt(row.round_cost) %> บาท</td>
+                        <td>
+                            <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/calculate_round_month/report/<%=row.driver_id%>?month=' + document.getElementById('monthSearch').value"><i class="bi bi-file-earmark-text"></i> ออกรายงาน</button>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+    </main>
+  </div>
+  <%-include('../includes/footer')%>
+</body>
+</html>

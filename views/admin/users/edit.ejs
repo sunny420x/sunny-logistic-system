@@ -51,6 +51,11 @@
                 </select>
             </div>
 
+            <div class="form-group mb-3">
+                <label for="round_cost">ค่ารอบต่อรอบ: (บาท)</label>
+                <input type="number" name="round_cost" class="form-control" value="<%=user.round_cost%>" required>
+            </div>
+
             <p><strong>เพิ่มโดย:</strong> <%=user.created_by_user ?? "-" %><br>
             <strong>เมื่อ:</strong> <% if(user.created_at) { %><%=moment(user.created_at).format("DD/MM/YYYY HH:mm:ss") %><%} else {%>-<%} %></p>
 
