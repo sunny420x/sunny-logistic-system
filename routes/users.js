@@ -6,9 +6,10 @@ const moment = require('moment');
 const { addLog } = require('../models/logs')
 
 const { getUsers, registerUser, getUserTypes, getUserById, editUser, 
-    initUserToken, getUserTypeById, editUserType, addUserType, getCalculateRoundByDate, getCalculateRoundByMonth, 
-    getCalculateRoundReport, getCalculateRoundReportByMonth } = require('../models/users')
+    initUserToken, getUserTypeById, editUserType, addUserType } = require('../models/users')
 const { getSettings } = require('../models/settings')
+const  {getCalculateRoundByDate, getCalculateRoundByMonth, 
+    getCalculateRoundReport, getCalculateRoundReportByMonth } = require('../models/trucks')
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
@@ -70,12 +71,11 @@ app.post('/admin/users/add', async(req,res) => {
     const type_id = req.body.type_id
     const phone_number = req.body.phone_number
     const full_name = req.body.full_name
-    const round_cost = req.body.round_cost
 
     const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
     const created_by = auth.user.id
 
-    registerUser(username, password_hash, full_name, type_id, phone_number, round_cost, created_at, created_by).then(() => {
+    registerUser(username, password_hash, full_name, type_id, phone_number, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
         addLog('add', `ผู้ใช้ '${username}' ชื่อเต็ม '${full_name}' ถูกเพิ่มเข้าสู่ระบบ โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/users')
@@ -119,17 +119,16 @@ app.post('/admin/users/edit/:id', async(req,res) => {
     const type_id = req.body.type_id
     const phone_number = req.body.phone_number
     const full_name = req.body.full_name
-    const round_cost = req.body.round_cost
 
     if(password) {
         const password_hash = crypto.createHash('sha256').update(password).digest('hex');
-        editUser(id, username, full_name, type_id, phone_number, round_cost, password_hash).then(() => {
+        editUser(id, username, full_name, type_id, phone_number, password_hash).then(() => {
             res.cookie('alert', 'success')
             addLog('edit', `ผู้ใช้ #${id} - ${username} ถูกแก้ไข โดย #${auth.user.id} - ${auth.user.username}`)
             res.redirect('/admin/users/edit/'+id)
         })
     } else {
-        editUser(id, username, full_name, type_id, phone_number, round_cost, null).then(() => {
+        editUser(id, username, full_name, type_id, phone_number, null).then(() => {
             res.cookie('alert', 'success')
             res.redirect('/admin/users/edit/'+id)
         })
