@@ -2,7 +2,7 @@ const db = require('../database');
 
 function getTrucks(search = null) {
     return new Promise(resolve => {
-        let query = `SELECT t.id, t.license_plate, t.brand, t.model, t.cost_per_km, t.round_cost, u.full_name as created_by_user 
+        let query = `SELECT t.id, t.license_plate, t.brand, t.model, t.cost_per_km, t.round_cost, u.full_name as created_by_user, t.round_cost
         FROM trucks as t 
         LEFT JOIN location_records l ON t.id = l.truck_id
         LEFT JOIN users as u ON u.id = t.created_by `;
@@ -229,6 +229,77 @@ function getLicensePlateByTruckId(id) {
     })
 }
 
+
+function getCalculateRoundByDate(date = null) {
+    return new Promise(resolve => {
+        let params = []
+        let query = `SELECT u.id as driver_id, u.full_name, u.username, DATE(tr.date) as date, COUNT(DISTINCT tr.round) AS round_count, t.round_cost 
+        FROM transition_records as tr 
+        JOIN users as u ON u.id = tr.driver_id 
+        JOIN trucks as t ON t.id = tr.truck_id `
+        if(date) {
+            params.push(date)
+            query += "WHERE DATE(tr.date) = ? "
+        }
+        query += " GROUP BY u.id, DATE(tr.date), t.round_cost "
+        db.query(query, params, (err, result) => {
+            if(err) console.error(err);
+            resolve(result)
+        }) 
+    })
+}
+
+function getCalculateRoundByMonth(month) {
+    return new Promise(resolve => {
+        let params = []
+        let query = `SELECT u.id as driver_id, u.full_name, u.username, DATE_FORMAT(tr.date, '%Y-%m') as month, COUNT(DISTINCT DATE(tr.date), tr.round) AS round_count, t.round_cost 
+        FROM transition_records as tr 
+        JOIN users as u ON u.id = tr.driver_id 
+        JOIN trucks as t ON t.id = tr.truck_id `
+        if(month) {
+            params.push(month)
+            query += "WHERE DATE_FORMAT(tr.date, '%Y-%m') = ? "
+        }
+        query += " GROUP BY u.id, DATE_FORMAT(tr.date, '%Y-%m'), t.round_cost "
+        db.query(query, params, (err, result) => {
+            if(err) console.error(err);
+            resolve(result)
+        }) 
+    })
+}
+
+function getCalculateRoundReport(driver_id, date) {
+    return new Promise(resolve => {
+        db.query(`SELECT u.full_name, u.username, t.round_cost, tr.round, tr.time, tr.status, tr.finish_at,
+            c.customer_name, c.customer_id
+            FROM transition_records as tr
+            JOIN users as u ON u.id = tr.driver_id
+            JOIN trucks as t ON t.id = tr.truck_id
+            JOIN customers as c ON c.id = tr.customer_id
+            WHERE tr.driver_id = ? AND DATE(tr.date) = ?
+            ORDER BY tr.round ASC, tr.time ASC`, [driver_id, date], (err, result) => {
+            if(err) console.error(err);
+            resolve(result)
+        })
+    })
+}
+
+function getCalculateRoundReportByMonth(driver_id, month) {
+    return new Promise(resolve => {
+        db.query(`SELECT u.full_name, u.username, t.round_cost, tr.date, tr.round, tr.time, tr.status, tr.finish_at,
+            c.customer_name, c.customer_id
+            FROM transition_records as tr
+            JOIN users as u ON u.id = tr.driver_id
+            JOIN trucks as t ON t.id = tr.truck_id
+            JOIN customers as c ON c.id = tr.customer_id
+            WHERE tr.driver_id = ? AND DATE_FORMAT(tr.date, '%Y-%m') = ?
+            ORDER BY tr.date ASC, tr.round ASC, tr.time ASC`, [driver_id, month], (err, result) => {
+            if(err) console.error(err);
+            resolve(result)
+        })
+    })
+}
+
 module.exports = {
     getTrucks,
     getTruckById,
@@ -247,4 +318,8 @@ module.exports = {
     deleteMaintenanceType,
     getMaintenanceAlerts,
     getLicensePlateByTruckId,
+    getCalculateRoundReport,
+    getCalculateRoundReportByMonth,
+    getCalculateRoundByDate,
+    getCalculateRoundByMonth,
 }
