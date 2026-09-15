@@ -37,6 +37,10 @@
                 <label for="cost_per_km">ค่าใช้จ่ายต่อกิโลเมตร: </label>
                 <input type="number" name="cost_per_km" class="form-control" value="<%=truck.cost_per_km%>" required>
             </div>
+            <div class="form-group mb-3">                
+                <label for="round_cost">ค่ารอบ (บาท/รอบ): </label>
+                <input type="number" name="round_cost" class="form-control" value="<%=truck.round_cost%>" required>
+            </div>
 
             <p><strong>เพิ่มโดย:</strong> <%=truck.created_by_user ?? "-" %><br>
             <strong>เมื่อ:</strong> <% if(truck.created_at) { %><%=moment(truck.created_at).format("DD/MM/YYYY HH:mm:ss") %><%} else {%>-<%} %></p>
