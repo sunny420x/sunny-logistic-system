@@ -160,28 +160,28 @@
                     <label for="temporary_location">ตำแหน่งชั่วคราว (กรณีส่งนอกพิกัดเดิมของลูกค้า): </label>
                     <input type="text" name="temporary_location" maxlength="100" class="form-control" value="<%=route.temporary_location%>" <% if(route.status == 1) { %>readonly<%}%> onblur="validateLocation('temporary_location')">
                 </div>
+                <% if(route.status == 0) { %>
                 <div class="form-group mb-3">                
                     <label for="location">วันที่: </label>
-                     <% if(route.status == 0) { %>
                     <input type="date" name="date" class="form-control" value="<%=moment(route.date).format('YYYY-MM-DD')%>" required>
-                    <% } else {%>
-                      <input type="hidden" name="date" class="form-control"  value="<%=moment(route.date).format('YYYY-MM-DD')%>" required>
-                      <br><strong><%=moment(route.date).format('DD/MM/YYYY')%></strong>
-                    <%}%>
                 </div>
+                <% } else {%>
+                  <input type="hidden" name="date" class="form-control"  value="<%=moment(route.date).format('YYYY-MM-DD')%>" required>
+                  <strong><%=moment(route.date).format('DD/MM/YYYY')%></strong>
+                <%}%>
+                <% if(route.status == 0) { %>
                 <div class="form-group mb-3">                
-                     <% if(route.status == 0) { %>
                     <input type="checkbox" id="alreadyBooked" onchange="toggleTimeField()" <%if(route.time) {%>checked<%}%>> นัดลูกค้าไว้แล้ว
                     <input type="<%if(route.time) {%>time<%} else {%>hidden<%}%>" name="time_start" class="form-control"  value="<%=route.time%>" <% if(route.status == 1) { %>readonly<%}%> step="1">
-                    <% } else {%>
-                      <input type="hidden" name="time_start" class="form-control"  value="<%=route.time%>">
-                      <br><strong><%=route.time%></strong>
-                    <%}%>
                 </div>
+                <% } else {%>
+                  <input type="hidden" name="time_start" class="form-control"  value="<%=route.time%>">
+                   นัดลูกค้าเวลา: <strong><%=route.time%></strong>
+                <%}%>
                 <% if(route.status != 0) {%>
                 <div class="form-group mb-3">                
                   <label for="finish_at">ส่งสินค้าเสร็จเมื่อ: </label>
-                  <br><strong id="finish_at"><%=moment(route.finish_at).format('DD/MM/YYYY HH:mm:ss')%></strong>
+                  <strong id="finish_at"><%=moment(route.finish_at).format('DD/MM/YYYY HH:mm:ss')%></strong>
                 </div>
                 <%}%>
                 <div class="form-group mb-3">
