@@ -48,8 +48,8 @@ window.AdminServerPagination = function ({ resource, tableBody, pagination, getF
             renderPagination(data);
             if (onRowsLoaded) onRowsLoaded(data.rows);
         } catch (error) {
-            console.error('Pagination error:', error);
-            body.innerHTML = `<tr><td colspan="${colspan}" class="text-danger text-center">${error.message}</td></tr>`;
+            console.error(`Pagination error (${resource}):`, error);
+            body.innerHTML = `<tr><td colspan="${colspan}" class="text-danger text-center">${error.message || 'ไม่สามารถโหลดข้อมูลได้'}</td></tr>`;
             renderPagination({ total: 0 });
         }
     }

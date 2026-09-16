@@ -76,8 +76,8 @@ const resourceQueries = {
         order: 'r.driver_id DESC, r.date DESC, r.round ASC, r.time ASC'
     },
     maintenance: {
-        select: `SELECT t.license_plate, u.full_name, u.id, mt.name as maintenace_name, m.note,
-            m.created_at, m.updated_at, m.id, m.truck_id, m.maintenance_type
+        select: `SELECT t.license_plate, u.full_name, u.id AS user_id, mt.name as maintenace_name, m.note,
+            m.created_at, m.updated_at, m.id AS id, m.truck_id, m.maintenance_type
             FROM truck_maintenance m JOIN maintenance_type mt ON mt.id = m.maintenance_type
             JOIN trucks t ON t.id = m.truck_id JOIN users u ON u.id = m.user_id`,
         where(filters) {
