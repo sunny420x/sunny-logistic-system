@@ -71,7 +71,7 @@
                 <option value="<%=row.id%>" <%if(row.id == group_id) {%>selected<%}%>><%=row.name%></option>
               <% }) %>
             </select>
-            <button style="width: 20%;" class="btn btn-secondary btn-sm" onclick="window.location.href='/admin/customers'"><i class="bi bi-x-circle"></i> ล้างตัวกรอง</button>
+            <button style="width: 20%;" class="btn btn-secondary btn-sm" onclick="clearFilterState(); window.location.href='/admin/customers'"><i class="bi bi-x-circle"></i> ล้างตัวกรอง</button>
           </div>
           <script>
               document.getElementById('topbarSearch').value = getSearchQuery() ?? ''

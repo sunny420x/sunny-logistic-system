@@ -36,7 +36,7 @@
                         <button class="btn btn-outline-primary" style="width: 200px;"><i class="bi bi-filter"></i> กรองวันที่</button>
                     </div>
                 </form>
-                <button class="btn btn-secondary" id="clearFilterBtn" onclick="window.location.href='/admin/calculate_round'"><i class="bi bi-x"></i> ล้างตัวกรอง</button>
+                <button class="btn btn-secondary" id="clearFilterBtn" onclick="clearFilterState(); window.location.href='/admin/calculate_round'"><i class="bi bi-x"></i> ล้างตัวกรอง</button>
             </div>
             <script>
                 document.getElementById('dateSearch').value = getSearchQuery() ?? ''
