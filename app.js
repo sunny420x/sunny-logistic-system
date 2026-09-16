@@ -11,7 +11,7 @@ const { getDashboardAllPackages, getDashboardCustomers, getDashboardDelivered, g
 const { getMaintenanceAlerts } = require('./models/trucks')
 const { ongoingDrivers } = require('./models/tracking')
 const { getSettings, saveSettings } = require('./models/settings')
-const { initUserToken, changeAccountPassword } = require('./models/users')
+const { initUserToken, changeAccountPassword, getUserTypes } = require('./models/users')
 const { addLog } = require('./models/logs')
 
 app.set('trust proxy', 1)
@@ -52,10 +52,12 @@ app.get('/', async(req, res) => {
     if(req.cookies.auth) {
         const auth = await initUserToken(req.cookies.auth)
         if(auth.status == "success") {
-            if(auth.user.type_id == "2") {
-                res.redirect('/driver/myRoute')
-            } else {
-                res.redirect('/admin')
+            if(auth.user.type_id.includes((await getUserTypes()).map(type => type.id))) {
+                if(auth.user.type_id == "2") {
+                    res.redirect('/driver/myRoute')
+                } else {
+                    res.redirect('/admin')
+                }
             }
         }
     } else {

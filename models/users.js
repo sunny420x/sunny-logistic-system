@@ -176,6 +176,15 @@ function changeAccountPassword(id, currentPassword, newPassword) {
     })
 }
 
+function getUserTypes() {
+    return new Promise(resolve => {
+        db.query("SELECT * FROM user_types", (err, results) => {
+            if(err) console.error(err);
+            resolve(results)
+        })
+    })
+}
+
 module.exports = {
     getUserTypes,
     getUsers,
