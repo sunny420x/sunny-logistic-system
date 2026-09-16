@@ -251,18 +251,15 @@ function getCalculateRoundByDate(date = null) {
     })
 }
 
-function getCalculateRoundByMonth(month) {
+function getCalculateRoundByMonth(start_date, end_date) {
     return new Promise(resolve => {
-        let params = []
-        let query = `SELECT u.id as driver_id, u.full_name, u.username, DATE_FORMAT(tr.date, '%Y-%m') as month, COUNT(DISTINCT DATE(tr.date), tr.round) AS round_count, t.round_cost 
+        const params = [start_date, end_date]
+        let query = `SELECT u.id as driver_id, u.full_name, u.username, COUNT(DISTINCT DATE(tr.date), tr.round) AS round_count, t.round_cost 
         FROM transition_records as tr 
         JOIN users as u ON u.id = tr.driver_id 
-        JOIN trucks as t ON t.id = tr.truck_id `
-        if(month) {
-            params.push(month)
-            query += "WHERE DATE_FORMAT(tr.date, '%Y-%m') = ? "
-        }
-        query += " GROUP BY u.id, DATE_FORMAT(tr.date, '%Y-%m'), t.round_cost "
+        JOIN trucks as t ON t.id = tr.truck_id
+        WHERE DATE(tr.date) BETWEEN ? AND ?
+        GROUP BY u.id, t.round_cost `
         db.query(query, params, (err, result) => {
             if(err) console.error(err);
             resolve(result)
@@ -286,7 +283,7 @@ function getCalculateRoundReport(driver_id, date) {
     })
 }
 
-function getCalculateRoundReportByMonth(driver_id, month) {
+function getCalculateRoundReportByMonth(driver_id, start_date, end_date) {
     return new Promise(resolve => {
         db.query(`SELECT u.full_name, u.username, t.round_cost, t.license_plate, tr.date, tr.round, tr.time, tr.status, tr.finish_at,
             c.customer_name, c.customer_id
@@ -294,8 +291,8 @@ function getCalculateRoundReportByMonth(driver_id, month) {
             JOIN users as u ON u.id = tr.driver_id
             JOIN trucks as t ON t.id = tr.truck_id
             JOIN customers as c ON c.id = tr.customer_id
-            WHERE tr.driver_id = ? AND DATE_FORMAT(tr.date, '%Y-%m') = ?
-            ORDER BY tr.date ASC, tr.round ASC, tr.time ASC`, [driver_id, month], (err, result) => {
+            WHERE tr.driver_id = ? AND DATE(tr.date) BETWEEN ? AND ?
+            ORDER BY tr.date ASC, tr.round ASC, tr.time ASC`, [driver_id, start_date, end_date], (err, result) => {
             if(err) console.error(err);
             resolve(result)
         })

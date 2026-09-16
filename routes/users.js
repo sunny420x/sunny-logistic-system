@@ -305,12 +305,14 @@ app.get('/admin/calculate_round_month', async(req,res) => {
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
 
-    const month = req.query.month ?? moment().format('YYYY-MM');
-    const drivers_round = await getCalculateRoundByMonth(month)
+    const start_date = req.query.start_date ?? moment().startOf('month').format('YYYY-MM-DD');
+    const end_date = req.query.end_date ?? moment().endOf('month').format('YYYY-MM-DD');
+    const drivers_round = await getCalculateRoundByMonth(start_date, end_date)
 
     res.render('admin/calculate_round_month', {
         drivers_round: drivers_round,
-        month: month,
+        start_date: start_date,
+        end_date: end_date,
         auth: auth,
         settings: await getSettings(),
         moment: moment,
@@ -329,11 +331,12 @@ app.get('/admin/calculate_round_month/report/:driver_id', async(req,res) => {
     if(!auth.user.permission.split(',').includes('users')) res.end("Permission denial") //Check Permission
 
     const driver_id = req.params.driver_id;
-    const month = req.query.month ?? moment().format('YYYY-MM');
-    const rows = await getCalculateRoundReportByMonth(driver_id, month) ?? [];
+    const start_date = req.query.start_date ?? moment().startOf('month').format('YYYY-MM-DD');
+    const end_date = req.query.end_date ?? moment().endOf('month').format('YYYY-MM-DD');
+    const rows = await getCalculateRoundReportByMonth(driver_id, start_date, end_date) ?? [];
 
     if (rows.length === 0) {
-        res.status(404).end("ไม่พบข้อมูลรอบของพนักงานขับรถในเดือนที่เลือก");
+        res.status(404).end("ไม่พบข้อมูลรอบของพนักงานขับรถในช่วงวันที่เลือก");
         return;
     }
 
@@ -362,7 +365,8 @@ app.get('/admin/calculate_round_month/report/:driver_id', async(req,res) => {
         rowsByDate: rowsByDate,
         dailyTotals: dailyTotals,
         round_count: round_count,
-        month: month,
+        start_date: start_date,
+        end_date: end_date,
         auth: auth,
         settings: await getSettings(),
         moment: moment,

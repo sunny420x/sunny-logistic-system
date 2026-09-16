@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <title>รายงานค่ารอบรายเดือน | <%=settings.company_name%></title>
+    <title>รายงานค่ารอบตามช่วงวันที่ | <%=settings.company_name%></title>
   <%-include('includes/head')%>
   <style>
     .report-page {
@@ -51,13 +51,13 @@
     <main class="container-fluid p-3 p-lg-4">
         <div class="report-page">
             <div class="d-flex justify-content-between align-items-center mb-4 no-print">
-                <h2 class="fw-bold mb-0">รายงานค่ารอบพนักงานขับรถ (รายเดือน)</h2>
+                <h2 class="fw-bold mb-0">รายงานค่ารอบพนักงานขับรถ (ตามช่วงวันที่)</h2>
                 <button class="btn btn-primary" onclick="window.print()"><i class="bi bi-printer"></i> พิมพ์รายงาน</button>
             </div>
 
             <div class="text-center mb-4">
                 <h4 class="fw-bold mb-1"><%=settings.company_name%></h4>
-                <div class="text-muted">รายงานค่ารอบพนักงานขับรถ ประจำเดือน <%=moment(month, 'YYYY-MM').format('MM/YYYY')%></div>
+                <div class="text-muted">รายงานค่ารอบพนักงานขับรถ วันที่ <%=moment(start_date).format('DD/MM/YYYY')%> ถึง <%=moment(end_date).format('DD/MM/YYYY')%></div>
             </div>
 
             <table class="table table-bordered mb-4">
@@ -67,8 +67,8 @@
                         <td><%=driver.full_name%></td>
                     </tr>
                     <tr>
-                        <th>เดือน</th>
-                        <td><%=moment(month, 'YYYY-MM').format('MM/YYYY')%></td>
+                        <th>ช่วงวันที่</th>
+                        <td><%=moment(start_date).format('DD/MM/YYYY')%> ถึง <%=moment(end_date).format('DD/MM/YYYY')%></td>
                     </tr>
                     <tr>
                         <th>จำนวนรอบ</th>

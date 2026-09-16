@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <title>คิดค่ารอบรายเดือน | <%=settings.company_name%></title>
+    <title>คิดค่ารอบประจำเดือน | <%=settings.company_name%></title>
   <%-include('includes/head')%>
 </head>
 <body>
@@ -17,16 +17,18 @@
     <main class="container-fluid p-3 p-lg-4">
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
             <div class="d-flex">
-                <h2 class="fw-bold mb-3">คิดเงินค่ารอบให้พนักงานขับรถ (รายเดือน)</h2>
+                <h2 class="fw-bold">คิดเงินค่ารอบประจำเดือน</h2>
             </div>
             <div class="d-flex gap-2">
-                <a href="/admin/calculate_round" class="btn btn-outline-secondary"><i class="bi bi-calendar-day"></i> ดูรายวัน</a>
                 <form action="" method="get" class="d-flex gap-2">
                     <div class="d-flex gap-2">
-                        <input type="month" class="form-control" name="month" id="monthSearch" value="<%=month%>">
-                        <button class="btn btn-outline-primary" style="width: 200px;"><i class="bi bi-filter"></i> กรองเดือน</button>
+                        <input type="date" class="form-control" name="start_date" id="startDateSearch" value="<%=start_date%>">
+                        <span class="align-self-center">ถึง</span>
+                        <input type="date" class="form-control" name="end_date" id="endDateSearch" value="<%=end_date%>">
+                        <button class="btn btn-outline-primary" style="width: 200px;"><i class="bi bi-filter"></i> กรอง</button>
                     </div>
                 </form>
+                <a href="/admin/calculate_round" class="btn btn-outline-secondary"><i class="bi bi-calendar-day"></i> ดูรายวัน</a>
             </div>
         </div>
         <table class="table">
@@ -42,7 +44,7 @@
             <tbody>
                 <% if(drivers_round.length === 0) { %>
                     <tr>
-                        <td colspan="5" class="text-muted text-center">ไม่มีข้อมูลรอบในเดือนที่เลือก</td>
+                            <td colspan="5" class="text-muted text-center">ไม่มีข้อมูลรอบในช่วงวันที่เลือก</td>
                     </tr>
                 <% } %>
                 <% 
@@ -59,7 +61,7 @@
                         <td><%=row.round_cost%> บาท/รอบ</td>
                         <td><%= parseInt(row.round_count) * parseInt(row.round_cost) %> บาท</td>
                         <td>
-                            <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/calculate_round_month/report/<%=row.driver_id%>?month=' + document.getElementById('monthSearch').value"><i class="bi bi-file-earmark-text"></i> ออกรายงาน</button>
+                            <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/calculate_round_month/report/<%=row.driver_id%>?start_date=' + encodeURIComponent(document.getElementById('startDateSearch').value) + '&end_date=' + encodeURIComponent(document.getElementById('endDateSearch').value)"><i class="bi bi-file-earmark-text"></i> ออกรายงาน</button>
                         </td>
                     </tr>
                 <% 
