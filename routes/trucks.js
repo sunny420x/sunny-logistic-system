@@ -70,11 +70,12 @@ app.post('/admin/trucks/add', async(req,res) => {
     const model = req.body.model
     const cost_per_km = req.body.cost_per_km ?? 0
     const round_cost = req.body.round_cost ?? 0
+    const mileage_cycle = req.body.mileage_cycle ?? 0
 
     const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
     const created_by = auth.user.id
 
-    addTruck(license_plate, brand, model, cost_per_km, round_cost, created_at, created_by).then(() => {
+    addTruck(license_plate, brand, model, cost_per_km, round_cost, mileage_cycle, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
         addLog('add', `รถส่งสินค้า หมายเลขทะเบียน ${license_plate} ถูกเพิ่มเข้ามาใหม่ โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/trucks')
@@ -116,8 +117,9 @@ app.post('/admin/trucks/edit/:id', async(req,res) => {
     const model = req.body.model
     const cost_per_km = req.body.cost_per_km ?? 0
     const round_cost = req.body.round_cost ?? 0
+    const mileage_cycle = req.body.mileage_cycle ?? 0
 
-    editTruck(id, license_plate, brand, model, cost_per_km, round_cost).then(() => {
+    editTruck(id, license_plate, brand, model, cost_per_km, round_cost, mileage_cycle).then(() => {
         res.cookie('alert', 'success')
         addLog('edit', `รถส่งสินค้าทะเบียน ${license_plate} ถูกแก้ไขแล้ว โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/trucks')

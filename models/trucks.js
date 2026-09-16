@@ -2,14 +2,14 @@ const db = require('../database');
 
 function getTrucks(search = null) {
     return new Promise(resolve => {
-        let query = `SELECT t.id, t.license_plate, t.brand, t.model, t.cost_per_km, t.round_cost, u.full_name as created_by_user, t.round_cost
+        let query = `SELECT t.id, t.license_plate, t.brand, t.model, t.cost_per_km, t.round_cost, u.full_name as created_by_user, t.round_cost, t.mileage_cycle
         FROM trucks as t 
         LEFT JOIN location_records l ON t.id = l.truck_id
         LEFT JOIN users as u ON u.id = t.created_by `;
         if(search != null) {
             query += "WHERE t.license_plate LIKE ? ";
         }
-        query += "GROUP BY t.id, t.brand, t.model, t.cost_per_km, t.round_cost ORDER BY t.id DESC";
+        query += "GROUP BY t.id, t.brand, t.model, t.cost_per_km, t.round_cost, t.mileage_cycle ORDER BY t.id DESC";
 
         db.query(query, [ `%${search}%` ], (err, results) => {
             if(err) console.error(err);
@@ -33,12 +33,13 @@ function addTruck(
     model,
     cost_per_km,
     round_cost,
+    mileage_cycle,
     created_at,
     created_by
 ) {
     return new Promise(resolve => {
-        db.query("INSERT INTO trucks(license_plate, brand, model, cost_per_km, round_cost, created_at, created_by) VALUES(?,?,?,?,?,?,?)", 
-            [license_plate, brand, model, cost_per_km, round_cost, created_at, created_by], (err) => {
+        db.query("INSERT INTO trucks(license_plate, brand, model, cost_per_km, round_cost, mileage_cycle, created_at, created_by) VALUES(?,?,?,?,?,?,?,?)", 
+            [license_plate, brand, model, cost_per_km, round_cost, mileage_cycle, created_at, created_by], (err) => {
             if(err) console.error(err);
             resolve()
         })
@@ -51,11 +52,12 @@ function editTruck(
     brand,
     model,
     cost_per_km,
-    round_cost
+    round_cost,
+    mileage_cycle
 ) {
     return new Promise(resolve => {
-        db.query("UPDATE trucks SET license_plate = ?, brand = ?, model = ?, cost_per_km = ?, round_cost = ? WHERE id = ?", 
-            [license_plate, brand, model, cost_per_km, round_cost, id], (err) => {
+        db.query("UPDATE trucks SET license_plate = ?, brand = ?, model = ?, cost_per_km = ?, round_cost = ?, mileage_cycle = ? WHERE id = ?", 
+            [license_plate, brand, model, cost_per_km, round_cost, mileage_cycle, id], (err) => {
             if(err) console.error(err);
             resolve()
         })
