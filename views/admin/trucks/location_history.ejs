@@ -210,7 +210,11 @@
             async function updateTruckLocations() {
                 let data;
                 try {
-                    const response = await fetch("/api/driver/getTruckLocation/<%=truck_id%>/<%=date%>");
+                    const selectedDate = document.getElementById('dateSearch').value;
+                    const endpoint = selectedDate
+                        ? `/api/driver/getTruckLocation/<%=truck_id%>/${encodeURIComponent(selectedDate)}`
+                        : `/api/driver/getTruckLocation/<%=truck_id%>`;
+                    const response = await fetch(endpoint);
 
                     if (!response.ok) {
                         throw new Error("ดึงข้อมูลจากหลังบ้านไม่สำเร็จ");
@@ -238,7 +242,7 @@
                     const routeCoordinatesByDate = {};
 
                     // เรียงตามเวลาให้แน่ใจว่าเส้นทางถูกโยงตามลำดับเวลาจริง
-                    const sortedLocations = [...data.locations].sort((a, b) =>
+                    const sortedLocations = [...(data.locations ?? [])].sort((a, b) =>
                         new Date(a.created_at) - new Date(b.created_at)
                     );
 
@@ -277,9 +281,9 @@
                         vectorSource.addFeature(marker);
                     });
 
-                    for (const routeCoordinates of Object.values(routeCoordinatesByDate)) {
-                        await drawOsrmMatchedRoute(routeCoordinates);
-                    }
+                    //for (const routeCoordinates of Object.values(routeCoordinatesByDate)) {
+                    //    await drawOsrmMatchedRoute(routeCoordinates);
+                    //}
 
                     // ซูมแผนที่ให้ครอบคลุมพิกัดทั้งหมด
                     if (vectorSource.getFeatures().length > 0) {
