@@ -412,3 +412,47 @@ body {
         width: 100%;
     }
 }
+
+.skeleton-row td {
+    padding-top: 0.85rem;
+    padding-bottom: 0.85rem;
+}
+
+.skeleton-line {
+    display: block;
+    height: 0.85rem;
+    width: 78%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #e2e8f0 25%, #f8fafc 50%, #e2e8f0 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.35s ease-in-out infinite;
+}
+
+.skeleton-line.short {
+    width: 42%;
+}
+
+.loading-surface {
+    position: relative;
+    min-height: 240px;
+    overflow: hidden;
+    background: linear-gradient(90deg, #eef2f7 25%, #f8fafc 50%, #eef2f7 75%);
+    background-size: 200% 100%;
+    animation: skeleton-shimmer 1.35s ease-in-out infinite;
+}
+
+.loading-surface.is-loaded {
+    animation: none;
+    background: transparent;
+}
+
+@keyframes skeleton-shimmer {
+    0% { background-position: 200% 0; }
+    100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .skeleton-line {
+        animation: none;
+    }
+}

@@ -8,6 +8,12 @@ window.adminFormatDate = function (value, includeTime = false) {
 window.AdminServerPagination = function ({ resource, tableBody, pagination, getFilters, renderRow, colspan, pageSize = 20, onRowsLoaded }) {
     let currentPage = 1;
 
+    function skeletonRows() {
+        return Array.from({ length: Math.min(6, pageSize) }, (_, index) => `<tr class="skeleton-row" aria-hidden="true">
+            ${Array.from({ length: colspan }, (_, cellIndex) => `<td><span class="skeleton-line ${((index + cellIndex) % 4 === 0) ? 'short' : ''}"></span></td>`).join('')}
+        </tr>`).join('');
+    }
+
     function renderPagination(meta) {
         const wrapper = document.getElementById(pagination);
         if (!wrapper) return;
@@ -35,7 +41,7 @@ window.AdminServerPagination = function ({ resource, tableBody, pagination, getF
         const filters = { ...(getFilters ? getFilters() : {}) };
         filters.page = page;
         filters.pageSize = pageSize;
-        body.innerHTML = `<tr><td colspan="${colspan}" class="text-muted text-center">กำลังโหลดข้อมูล...</td></tr>`;
+        body.innerHTML = skeletonRows();
         const query = new URLSearchParams(Object.entries(filters).filter(([, value]) => value !== null && value !== undefined && value !== '')).toString();
         try {
             const response = await fetch(`/api/admin/page/${resource}?${query}`);

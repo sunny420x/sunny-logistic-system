@@ -71,14 +71,14 @@
         </script>
       </div>
       <div class="row g-0 gap-0">
-        <div class="col-lg" id="map"></div>
+        <div class="col-lg loading-surface" id="map"></div>
         <div class="col-lg-4 table-responsive" id="poiListWrapper">
           <table class="table">
             <thead>
               <th colspan="2">ลูกค้า</th>
               <th>โทรศัพท์</th>
             </thead>
-            <tbody id="poiList"></tbody>
+            <tbody id="poiList"><tr class="skeleton-row" aria-hidden="true"><td><span class="skeleton-line short"></span></td><td><span class="skeleton-line"></span></td><td><span class="skeleton-line short"></span></td></tr><tr class="skeleton-row" aria-hidden="true"><td><span class="skeleton-line short"></span></td><td><span class="skeleton-line"></span></td><td><span class="skeleton-line short"></span></td></tr></tbody>
           </table>
         </div>
       </div>
@@ -98,7 +98,7 @@
             <th>จัดการ</th>
           </thead>
           <tbody id="routesTableBody">
-            <tr><td colspan="11" class="text-muted text-center">กำลังโหลดข้อมูล...</td></tr>
+            <tr class="skeleton-row" aria-hidden="true"><td colspan="11"><span class="skeleton-line"></span></td></tr>
           </tbody>
         </table>
       </div>
@@ -142,7 +142,7 @@
         document.getElementById('togglePoiText').textContent = "ซ่อน Point of Interest (POI)"
         const poiListElem = document.getElementById('poiList')
         if (poiListElem) {
-          poiListElem.innerHTML = `<tr><td colspan="3">กำลังโหลด Point of Interest...</td></tr>`
+          poiListElem.innerHTML = `<tr class="skeleton-row" aria-hidden="true"><td><span class="skeleton-line short"></span></td><td><span class="skeleton-line"></span></td><td><span class="skeleton-line short"></span></td></tr><tr class="skeleton-row" aria-hidden="true"><td><span class="skeleton-line short"></span></td><td><span class="skeleton-line"></span></td><td><span class="skeleton-line short"></span></td></tr>`
         }
       }
     }
@@ -182,6 +182,7 @@
 
     async function initialize() {
       await initializeMap()
+      document.getElementById('map').classList.add('is-loaded')
       initializePOI()
       await updateMap('route')
       await drawStartingPoint()
