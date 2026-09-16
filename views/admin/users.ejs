@@ -33,40 +33,22 @@
             <th style="width: 150px;">โทรศัพท์</th>
             <th style="width: 200px;">จัดการ</th>
           </thead>
-          <tbody>
-            <% users.forEach(row => { %>
-            <tr>
-              <td><%=row.id%></td>
-              <td><%=row.username%></td>
-              <td><%=row.full_name ?? "-"%></td>
-              <td><div class="badge bg-<%=row.user_type_color%> fw-normal"><%=row.user_type%></div></td>
-              <td><%=row.phone_number ?? "-"%></td>
-              <td>
-                <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/users/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
-                <button class="btn btn-outline-danger btn-sm" onclick="
-                Swal.fire({
-                  title: 'คุณแน่ใจหรือไม่?',
-                  text: 'คุณต้องการลบผู้ใช้งานรายนี้ออกจากระบบ',
-                  icon: 'warning',
-                  showCancelButton: true,
-                  confirmButtonColor: '#3085d6',
-                  cancelButtonColor: '#d33',
-                  confirmButtonText: 'ใช่, ลบเลย!',
-                  cancelButtonText: 'ยกเลิก'
-                }).then((result) => {
-                  if (result.isConfirmed) {
-                    window.location.href='/admin/users/delete/<%=row.id%>'
-                  }
-                })
-                "><i class="bi bi-trash3"></i> ลบ</button>
-              </td>
-            </tr>
-            <% }) %>
-          </tbody>
+          <tbody id="usersTableBody"><tr><td colspan="6" class="text-muted text-center">กำลังโหลดข้อมูล...</td></tr></tbody>
         </table>
       </div>
+      <div id="usersPagination" class="mt-3"></div>
     </main>
   </div>
+
+  <script>
+    const usersTable = AdminServerPagination({
+      resource: 'users', tableBody: 'usersTableBody', pagination: 'usersPagination', colspan: 6,
+      getFilters: () => ({ q: new URLSearchParams(window.location.search).get('q') }),
+      renderRow: row => `<tr><td>${row.id}</td><td>${row.username}</td><td>${row.full_name || '-'}</td><td><div class="badge bg-${row.user_type_color || 'secondary'} fw-normal">${row.user_type}</div></td><td>${row.phone_number || '-'}</td><td><button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/users/edit/${row.id}'"><i class="bi bi-pencil-square"></i> แก้ไข</button> <button class="btn btn-outline-danger btn-sm" onclick="deleteUser(${row.id})"><i class="bi bi-trash3"></i> ลบ</button></td></tr>`
+    });
+    usersTable.load();
+    function deleteUser(id) { Swal.fire({ title: 'คุณแน่ใจหรือไม่?', text: 'คุณต้องการลบผู้ใช้งานรายนี้ออกจากระบบ', icon: 'warning', showCancelButton: true, confirmButtonText: 'ใช่, ลบเลย!', cancelButtonText: 'ยกเลิก' }).then(result => { if (result.isConfirmed) window.location.href = `/admin/users/delete/${id}`; }); }
+  </script>
 
   <%-include('includes/footer')%>
 </body>

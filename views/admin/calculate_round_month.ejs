@@ -41,35 +41,19 @@
                     <th>จัดการ</th>
                 </tr>
             </thead>
-            <tbody>
-                <% if(drivers_round.length === 0) { %>
-                    <tr>
-                            <td colspan="5" class="text-muted text-center">ไม่มีข้อมูลรอบในช่วงวันที่เลือก</td>
-                    </tr>
-                <% } %>
-                <% 
-                current_driver_full_name = "";
-                drivers_round.forEach(row => { %>
-                    <tr>
-                        <td>
-                        <% if(current_driver_full_name !== row.full_name) { %>
-                            <%=row.full_name%>
-                        <% current_driver_full_name = row.full_name;
-                        } %>
-                        </td>
-                        <td><%=row.round_count%> รอบ</td>
-                        <td><%=parseInt(row.round_cost).toLocaleString('us')%> บาท/รอบ</td>
-                        <td><%= (parseInt(row.round_count) * parseInt(row.round_cost)).toLocaleString('us') %> บาท</td>
-                        <td>
-                            <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/calculate_round_month/report/<%=row.driver_id%>?start_date=' + encodeURIComponent(document.getElementById('startDateSearch').value) + '&end_date=' + encodeURIComponent(document.getElementById('endDateSearch').value)"><i class="bi bi-file-earmark-text"></i> ออกรายงาน</button>
-                        </td>
-                    </tr>
-                <% 
-                }) %>
-            </tbody>
+            <tbody id="calculateRoundMonthTableBody"><tr><td colspan="5" class="text-muted text-center">กำลังโหลดข้อมูล...</td></tr></tbody>
         </table>
+        <div id="calculateRoundMonthPagination" class="mt-3"></div>
     </main>
   </div>
+    <script>
+        const calculateRoundMonthTable = AdminServerPagination({
+            resource: 'calculate_round_range', tableBody: 'calculateRoundMonthTableBody', pagination: 'calculateRoundMonthPagination', colspan: 5,
+            getFilters: () => ({ start_date: document.getElementById('startDateSearch').value, end_date: document.getElementById('endDateSearch').value }),
+            renderRow: row => `<tr><td>${row.full_name || '-'}</td><td>${row.round_count} รอบ</td><td>${Number(row.round_cost).toLocaleString('en-US')} บาท/รอบ</td><td>${(Number(row.round_count) * Number(row.round_cost)).toLocaleString('en-US')} บาท</td><td><button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/calculate_round_month/report/${row.driver_id}?start_date=' + encodeURIComponent(document.getElementById('startDateSearch').value) + '&end_date=' + encodeURIComponent(document.getElementById('endDateSearch').value)"><i class="bi bi-file-earmark-text"></i> ออกรายงาน</button></td></tr>`
+        });
+        calculateRoundMonthTable.load();
+    </script>
   <%-include('../includes/footer')%>
 </body>
 </html>

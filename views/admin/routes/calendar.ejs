@@ -85,33 +85,7 @@
 
             const calendarEl = document.getElementById('routes-calendar');
 
-            const events = [
-                <% routes.forEach(row => { %>
-                {
-                id: '<%= row.id %>',
-                title: '<%= row.customer_name %>',
-
-                start: '<%= moment(row.date).format("YYYY-MM-DD") %>',
-
-                <% if (row.finish_at) { %>
-                end: '<%= moment(row.finish_at).format("YYYY-MM-DDTHH:mm:ss") %>',
-                <% } %>
-
-                extendedProps: {
-                    customerId: '<%= row.customer_id %>',
-                    customerName: '<%= row.customer_name %>',
-                    status: <%= row.status ? 'true' : 'false' %>,
-                    truckId: '<%= row.truck_id %>',
-                    licensePlate: '<%= row.license_plate %>',
-                    driverId: '<%= row.driver_id %>',
-                    driverName: '<%= row.driver_full_name %>',
-                    location: '<%= row.location %>',
-                    weight: '<%= row.weight ?? 0 %>',
-                    finishAt: '<%= row.finish_at ? moment(row.finish_at).format("DD/MM/YY HH:mm") : "-" %>'
-                }
-                },
-                <% }) %>
-            ];
+            const events = [];
 
             const calendar = new FullCalendar.Calendar(calendarEl, {
 
@@ -266,6 +240,28 @@
                 calendar.render();
 
             });
+
+            fetch(`/api/admin/getCurrentRoutes?date=${encodeURIComponent(document.getElementById('dateSearch').value)}`)
+                .then(response => response.json())
+                .then(rows => {
+                    rows.forEach(row => events.push({
+                        id: row.id,
+                        title: row.customer_name,
+                        start: moment(row.date).format('YYYY-MM-DD'),
+                        ...(row.finish_at ? { end: moment(row.finish_at).format('YYYY-MM-DDTHH:mm:ss') } : {}),
+                        extendedProps: {
+                            customerId: row.customer_id, customerName: row.customer_name,
+                            status: Boolean(row.status), truckId: row.truck_id,
+                            licensePlate: row.license_plate, driverId: row.driver_id,
+                            driverName: row.driver_full_name, location: row.location,
+                            weight: row.weight ?? 0,
+                            finishAt: row.finish_at ? moment(row.finish_at).format('DD/MM/YY HH:mm') : '-'
+                        }
+                    }));
+                    calendar.removeAllEvents();
+                    calendar.addEventSource(events);
+                })
+                .catch(error => console.error('ไม่สามารถโหลดข้อมูลปฏิทินได้', error));
     </script>
     </main>
     <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>

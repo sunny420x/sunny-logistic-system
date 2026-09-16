@@ -12,6 +12,7 @@ const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, get
     saveArrivalImageFile, ongoingDrivers, arrivalAtWarehouse, calculateTruckStats, getCurrentRound } = require('../models/tracking')
 const { loginUser, initUserToken } = require('../models/users')
 const { getCurrentZone } = require('../models/settings')
+const { getAdminPage } = require('../models/adminPagination')
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -28,6 +29,46 @@ const upload = multer({ storage: storage });
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
+
+app.get('/api/admin/page/:resource', async (req, res) => {
+    if(!req.cookies.auth) {
+        res.status(401).json({ status: 'error', message: 'กรุณาเข้าสู่ระบบ' })
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) {
+        res.status(401).json({ status: 'error', message: 'กรุณาเข้าสู่ระบบ' })
+        return
+    }
+
+    const permissionByResource = {
+        customers: 'customers', customer_groups: 'customers',
+        trucks: 'trucks', maintenance: 'trucks', maintenance_types: 'trucks',
+        repairs: 'trucks', repair_types: 'trucks', routine_checks: 'trucks',
+        routes: 'routes',
+        users: 'users', user_types: 'users', calculate_round: 'users', calculate_round_range: 'users',
+        logs: 'dashboard'
+    }
+    const requiredPermission = permissionByResource[req.params.resource]
+    if (!requiredPermission || !auth.user.permission.split(',').includes(requiredPermission)) {
+        res.status(403).json({ status: 'error', message: 'ไม่มีสิทธิ์เข้าถึงข้อมูล' })
+        return
+    }
+
+    try {
+        const filters = { ...req.query }
+        const result = await getAdminPage(
+            req.params.resource,
+            filters,
+            req.query.page,
+            req.query.pageSize
+        )
+        res.json({ status: 'success', ...result })
+    } catch (error) {
+        console.error('Admin pagination error:', error)
+        res.status(500).json({ status: 'error', message: 'ไม่สามารถโหลดข้อมูลได้' })
+    }
+})
 
 app.post('/api/login', async(req,res) => {
     const username = req.body.username ?? null

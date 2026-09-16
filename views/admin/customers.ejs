@@ -7,7 +7,7 @@
   <style>
     #map {
       width: 100%;
-      height: 77vh;
+      height: 80vh;
       z-index: 1;
       overflow: hidden;
     }
@@ -20,6 +20,7 @@
     }
     #customersWrapper {
       width: 60%;
+      padding: 10px;
     }
     @media screen and (max-width: 1024px) {
       #map {
@@ -90,21 +91,9 @@
                 <th style="width: 150px;">กลุ่มลูกค้า</th>
                 <th style="width: 200px;" class="text-center">จัดการ</th>
               </thead>
-              <tbody>
-                <% customers.forEach(row => { %>
-                <tr>
-                  <td class="text-center"><%=row.id%></td>
-                  <td class="text-center"><span class="badge bg-secondary fs-6 fw-normal"><%=row.customer_id%></span></td>
-                  <td><%=row.customer_name%></td>
-                  <td><a href="/admin/customers?group_id=<%=row.group_id%>" class="badge fw-normal" style="background: <%=row.color%>; color: white; text-decoration: none;"> <%=row.customer_group%> </a></td>
-                  <td class="text-center">
-                    <button class="btn btn-outline-success btn-sm" onclick="selectMark('<%=row.id%>', true)"><i class="bi bi-pin"></i></button>
-                    <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/customers/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i></button>
-                  </td>
-                </tr>
-                <% }) %>
-              </tbody>
+              <tbody id="customersTableBody"><tr><td colspan="5" class="text-muted text-center">กำลังโหลดข้อมูล...</td></tr></tbody>
             </table>
+            <div id="customersPagination" class="mb-3"></div>
           </div>
         </div>
       </div>
@@ -117,6 +106,22 @@
   <script>
     initializeMap();
     updateMap('customers');
+
+    const customersTable = AdminServerPagination({
+      resource: 'customers',
+      tableBody: 'customersTableBody',
+      pagination: 'customersPagination',
+      colspan: 5,
+      getFilters: () => ({ q: getSearchQuery(), group_id: new URLSearchParams(window.location.search).get('group_id') }),
+      renderRow: row => `<tr>
+        <td class="text-center">${row.id}</td>
+        <td class="text-center"><span class="badge bg-secondary fs-6 fw-normal">${row.customer_id}</span></td>
+        <td>${row.customer_name}</td>
+        <td><a href="/admin/customers?group_id=${row.group_id}" class="badge fw-normal" style="background: ${row.color || '#6c757d'}; color: white; text-decoration: none;">${row.customer_group}</a></td>
+        <td class="text-center"><button class="btn btn-outline-success btn-sm" onclick="selectMark('${row.id}', true)"><i class="bi bi-pin"></i></button> <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/customers/edit/${row.id}'"><i class="bi bi-pencil-square"></i></button></td>
+      </tr>`
+    });
+    customersTable.load();
 
     setInterval(() => {
         updateMap('customers');
