@@ -53,7 +53,7 @@ app.post('/api/login', async(req,res) => {
         res.cookie('auth', btoa(auth[0].username + ":" + password_hash), {
             path: '/',
             httpOnly: true,
-            secure: true,
+            secure: req.secure,
             sameSite: 'lax',
             maxAge: maxAge
         });
@@ -170,7 +170,10 @@ app.get('/api/getPointOfInterest/:group_id', async(req,res) => {
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(!auth.user) res.redirect('/logout')
+    if(!auth.user) {
+        res.status(401).json({ status: 'error', message: 'กรุณาเข้าสู่ระบบ' })
+        return
+    }
 
     const data = await getAllCustomersLocation(req.params.group_id)
     res.json(data)
@@ -178,11 +181,14 @@ app.get('/api/getPointOfInterest/:group_id', async(req,res) => {
 
 app.get('/api/driver/getTruckLocation/:truck_id', async(req,res) => {
     if(!req.cookies.auth) {
-        res.redirect('/login')
+        res.status(401).json({ status: 'error', message: 'กรุณาเข้าสู่ระบบ' })
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(!auth.user) res.redirect('/logout')
+    if(!auth.user) {
+        res.status(401).json({ status: 'error', message: 'กรุณาเข้าสู่ระบบ' })
+        return
+    }
 
     const truck_id = req.params.truck_id;
     const data = await getTruckLocation(null, truck_id)
@@ -203,11 +209,14 @@ app.get('/api/driver/getTruckLocation/:truck_id', async(req,res) => {
 
 app.get('/api/driver/getTruckLocation/:truck_id/:date', async(req,res) => {
     if(!req.cookies.auth) {
-        res.redirect('/login')
+        res.status(401).json({ status: 'error', message: 'กรุณาเข้าสู่ระบบ' })
         return
     }
     const auth = await initUserToken(req.cookies.auth)
-    if(!auth.user) res.redirect('/logout')
+    if(!auth.user) {
+        res.status(401).json({ status: 'error', message: 'กรุณาเข้าสู่ระบบ' })
+        return
+    }
 
     const truck_id = req.params.truck_id;
     const date = req.params.date ?? null
