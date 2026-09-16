@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>เพิ่มข้อมูลตรวจเช็ค | <%=settings.company_name%></title>
+  <%-include('../includes/head')%>
+</head>
+<body>
+  <%-include('../includes/topbar')%>
+
+  <!-- Desktop Sidebar -->
+  <%-include('../includes/desktop-sidebar')%>
+
+  <!-- Mobile Sidebar -->
+  <%-include('../includes/mobile-sidebar')%>
+
+  <div class="main-wrapper">
+
+    <main class="container-fluid p-3 p-lg-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+          <h2 class="fw-bold mb-3">เพิ่มข้อมูลตรวจเช็ค</h2>
+          <form action="" method="post" style="width: 800px;">
+            <div class="form-group mb-3">
+                <label for="truck_id">หมายเลขทะเบียนรถ: </label>
+                <select name="truck_id" id="truck_id" class="form-select">
+                    <% trucks.forEach(truck => { %>
+                    <option value="<%=truck.id%>"><%=truck.license_plate%></option>
+                    <% }) %>
+                </select>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="mileage">ระยะทางปัจจุบันของรถ (กม.): </label>
+                <input type="number" name="mileage" id="mileage" class="form-control" min="0" required>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="notes">หมายเหตุ: </label>
+                <textarea name="notes" id="notes" class="form-control" rows="3"></textarea>
+            </div>
+
+            <input type="submit" value="เพิ่มข้อมูลตรวจเช็คประจำรถ" class="btn btn-primary w-100">
+          </form>
+        </div>
+      </div>
+
+      <!-- Container -->
+    </main>
+  </div>
+
+  <%-include('../includes/footer')%>
+</body>
+</html>

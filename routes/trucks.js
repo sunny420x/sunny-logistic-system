@@ -186,7 +186,7 @@ app.get('/admin/trucks/maintenances', async(req,res) => {
         auth: auth,
         moment: moment,
         settings: await getSettings(),
-        page: 'maintenance'
+        page: 'trucks'
     })
 })
 
@@ -213,7 +213,7 @@ app.get('/admin/trucks/maintenances/:id', async(req,res) => {
         auth: auth,
         moment: moment,
         settings: await getSettings(),
-        page: 'maintenance'
+        page: 'trucks'
     })
 })
 
@@ -236,7 +236,7 @@ app.get('/admin/maintenances/add', async(req,res) => {
         trucks: await getTrucks(),
         maintenance_type: await getMaintenanceTypes(),
         settings: await getSettings(),
-        page: 'maintenance'
+        page: 'trucks'
     })
 })
 
@@ -283,7 +283,7 @@ app.get('/admin/maintenances/edit/:id', async(req,res) => {
         trucks: await getTrucks(),
         maintenance_type: await getMaintenanceTypes(),
         settings: await getSettings(),
-        page: 'maintenance'
+        page: 'trucks'
     })
 })
 
@@ -306,7 +306,7 @@ app.post('/admin/maintenances/edit/:id', async(req,res) => {
     saveMaintenance(id, truck_id, maintenance_type, note, updated_at).then(() => {
         res.cookie('alert', 'success')
         addLog('edit', `ข้อมูลการบำรุงรักษารถส่งสินค้า หมายเลข #${id} ถูกแก้ไขแล้ว โดย #${auth.user.id} - ${auth.user.username}`)
-        res.redirect('/admin/trucks/maintenances')
+        res.redirect('/admin/trucks/maintenances/'+truck_id)
     })
 })
 
@@ -325,7 +325,7 @@ app.get('/admin/maintenances/delete/:id', async(req,res) => {
     deleteMaintenance(id).then(() => {
         res.cookie('alert', 'delete_success')
         addLog('delete', `ข้อมูลการบำรุงรักษารถส่งสินค้า หมายเลข #${id} ถูกลบออกจากระบบ โดย #${auth.user.id} - ${auth.user.username}`)
-        res.redirect('/admin/trucks/maintenances/')
+        res.redirect('/admin/trucks/maintenances/'+truck_id)
     })
 })
 
@@ -344,7 +344,7 @@ app.get('/admin/maintenances/types', async(req,res) => {
         auth: auth,
         moment: moment,
         settings: await getSettings(),
-        page: 'maintenance'
+        page: 'trucks'
     })
 })
 
@@ -367,7 +367,7 @@ app.get('/admin/maintenances/types/add', async(req,res) => {
         trucks: await getTrucks(),
         maintenance_type: await getMaintenanceTypes(),
         settings: await getSettings(),
-        page: 'maintenance'
+        page: 'trucks'
     })
 })
 
@@ -410,7 +410,7 @@ app.get('/admin/maintenances/types/edit/:id', async(req,res) => {
         auth: auth,
         moment: moment,
         settings: await getSettings(),
-        page: 'maintenance'
+        page: 'trucks'
     })
 })
 

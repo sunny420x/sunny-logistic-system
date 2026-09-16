@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="th">
 <head>
-  <title>รายการบำรุงรักษารถ | <%=settings.company_name%></title>
+  <title>รายการตรวจเช็ครถประจำสัปดาห์ | <%=settings.company_name%></title>
   <%-include('includes/head')%>
   <style>
     #map {
@@ -24,11 +24,9 @@
 
   <div class="main-wrapper">
     <main class="container-fluid p-3 p-lg-4">
-    <%-include('includes/maintenance_alert')%>
-
         <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
             <div class="d-flex">
-                <h2 class="fw-bold">รายการบำรุงรักษารถ<% if(locals.license_plate) { %>: <div class="badge bg-primary"><%=locals.license_plate%></div> <% } %></h2>
+                <h2 class="fw-bold">รายการตรวจเช็ครถประจำสัปดาห์<% if(locals.license_plate) { %>: <div class="badge bg-primary"><%=locals.license_plate%></div> <% } %></h2>
             </div>
             <form action="" method="get" class="d-flex gap-2">
                 <div class="d-flex gap-2">
@@ -46,9 +44,7 @@
             </script>
         </div>
         <div class="d-flex">            
-            <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/maintenances/add?id=<%=locals.id%>'"><i class="bi bi-file-earmark-plus"></i> เพิ่มข้อมูลบำรุงรักษา</button>
-            <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/maintenances/types'"><i class="bi bi-gear"></i> จัดการประเภทการบำรุงรักษา</button>
-            <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/routine_check/<%=locals.id%>'"><i class="bi bi-check2-circle"></i> รายการตรวจเช็ครถประจำสัปดาห์</button>
+            <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/routine_check/<%=locals.truck_id%>/add'"><i class="bi bi-file-earmark-plus"></i> เพิ่มข้อมูลตรวจเช็คประจำรถ</button>
         </div>
         <div class="table-responsive">
             <table class="table">
@@ -57,25 +53,25 @@
                         <% if(!locals.license_plate) { %>
                         <th>ทะเบียนรถ</th>
                         <% } %>
-                        <th>วันที่ตรวจเช็คล่าสุด</th>
+                        <th>วันที่ตรวจเช็ค</th>
                         <th>ผู้ตรวจเช็ค</th>
-                        <th>ประเภทตรวจเช็ค</th>
+                        <th>เลขไมล์ปัจจุบัน</th>
                         <th>หมายเหตุ</th>
                         <th>จัดการ</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <% maintenance.forEach(row => { %>
+                    <% routine_checks.forEach(row => { %>
                         <tr>
                             <% if(!locals.license_plate) { %>
                             <td><%=row.license_plate%></td>
                             <% } %>
                             <td><%=moment(row.created_at).format("DD/MM/YYYY HH:mm:ss")%></td>
-                            <td><%=row.full_name%></td>
-                            <td><%=row.maintenace_name%></td>
+                            <td><%=row.created_by_user%></td>
+                            <td><%=row.current_mileage%></td>
                             <td><%=row.note || "-"%></td>
                             <td>
-                                <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/maintenances/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
+                                <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/routine_check/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
                                 <button class="btn btn-outline-danger btn-sm" onclick="
                                 Swal.fire({
                                 title: 'คุณแน่ใจหรือไม่?',
@@ -88,7 +84,7 @@
                                 cancelButtonText: 'ยกเลิก'
                                 }).then((result) => {
                                 if (result.isConfirmed) {
-                                    window.location.href='/admin/maintenances/delete/<%=row.id%>'
+                                    window.location.href='/admin/routine_check/delete/<%=row.id%>'
                                 }
                                 })
                                 "><i class="bi bi-trash3"></i> ลบ</button>
