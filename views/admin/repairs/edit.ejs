@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>การซ่อมบำรุง | <%=settings.company_name%></title>
+  <%-include('../includes/head')%>
+</head>
+<body>
+  <%-include('../includes/topbar')%>
+
+  <!-- Desktop Sidebar -->
+  <%-include('../includes/desktop-sidebar')%>
+
+  <!-- Mobile Sidebar -->
+  <%-include('../includes/mobile-sidebar')%>
+
+  <div class="main-wrapper">
+
+    <main class="container-fluid p-3 p-lg-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+          <h2 class="fw-bold mb-3">รายละเอียดข้อมูลการซ่อมบำรุง
+            <a href="/admin/repairs/report/<%=repair.id%>" class="btn btn-outline-secondary"><i class="bi bi-file-earmark-text"></i> ออกรายงาน</a>
+          </h2>
+          <form action="" method="post" style="width: 800px;">
+            <div class="form-group mb-3">
+                <label for="truck_id">หมายเลขทะเบียนรถ: </label>
+                <select name="truck_id" id="truck_id" class="form-select">
+                    <% trucks.forEach(truck => { %>
+                    <option value="<%=truck.id%>" <%= truck.id === repair.truck_id ? 'selected' : '' %>><%=truck.license_plate%></option>
+                    <% }) %>
+                </select>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="repair_type">ประเภทการซ่อมบำรุง: </label>
+                <select name="repair_type" id="repair_type" class="form-select">
+                    <% repair_types.forEach(repair_type => { %>
+                    <option value="<%=repair_type.id%>" <%= repair_type.id === repair.repair_type ? 'selected' : '' %>><%=repair_type.name%></option>
+                    <% }) %>
+                </select>
+            </div>
+
+            <input type="hidden" name="details">
+            <div class="form-group mb-3">
+                <label for="notes">หมายเหตุ: </label>
+                <textarea name="notes" id="notes" class="form-control" rows="3"><%=repair.note%></textarea>
+            </div>
+
+            <input type="submit" value="บันทึกการแก้ไขข้อมูลการซ่อมบำรุง" class="btn btn-primary w-100 d-none" id="submit-details-form">
+          </form>
+          <div class="form-group mb-3">
+              <label for="details">รายละเอียดการซ่อมบำรุง: </label>
+              <table class="table table-bordered">
+              <thead>
+                  <tr>
+                      <th>รายการ</th>
+                      <th>จำนวน</th>
+                      <th>ราคา</th>
+                  </tr>
+              </thead>
+              <tbody id="details-table">
+              </tbody>
+              </table>
+              <button type="button" class="btn btn-secondary mt-2" onclick="addDetailRow()">เพิ่มรายการ</button>
+              <button type="button" class="btn btn-danger mt-2" onclick="removeDetailRow()">ลบแถว</button>
+          </div>
+          <button type="button" class="btn btn-primary mt-2 w-100" onclick="submitDetailsForm()">ส่งรายละเอียด</button>
+          <script>
+          function submitDetailsForm() {
+              document.getElementById('submit-details-form').click();
+          }
+          </script>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+  
+  function addDetailRow() {
+      const table = document.getElementById('details-table');
+      const row = table.insertRow();
+      const cell1 = row.insertCell(0);
+      const cell2 = row.insertCell(1);
+      const cell3 = row.insertCell(2);
+      cell1.innerHTML = '<input type="text" name="detail" placeholder="รายการ" class="form-control" oninput="updateDetailsInput()">';
+      cell2.innerHTML = '<input type="text" name="amount" placeholder="จำนวน" class="form-control" oninput="updateDetailsInput()">';
+      cell3.innerHTML = '<input type="text" name="price" placeholder="ราคา" class="form-control" oninput="updateDetailsInput()">';
+  }
+  function removeDetailRow() {
+      const table = document.getElementById('details-table');
+      if (table.rows.length > 0) {
+          table.deleteRow(-1);
+          updateDetailsInput();
+      }
+  }
+
+  function updateDetailsInput() {
+    document.querySelector('input[name="details"]').value = JSON.stringify(
+      Array.from(document.querySelectorAll('#details-table tr')).map(row => {
+        const detail = row.querySelector('input[name="detail"]').value;
+        const amount = row.querySelector('input[name="amount"]').value;
+        const price = row.querySelector('input[name="price"]').value;
+        return { detail, amount, price };
+      })
+    );
+  }
+
+  function initDetails(jsonContent) {
+    const details = JSON.parse(jsonContent);
+    details.forEach(detail => {
+      addDetailRow();
+      const lastRow = document.querySelector('#details-table tr:last-child');
+      lastRow.querySelector('input[name="detail"]').value = detail.detail;
+      lastRow.querySelector('input[name="amount"]').value = detail.amount;
+      lastRow.querySelector('input[name="price"]').value = detail.price;
+    });
+    updateDetailsInput();
+  }
+
+  initDetails('<%-repair.details%>');
+  </script>
+
+  <%-include('../includes/footer')%>
+</body>
+</html>

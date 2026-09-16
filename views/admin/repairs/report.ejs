@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>รายงานการซ่อมบำรุง | <%=settings.company_name%></title>
+  <%-include('../includes/head')%>
+  <style>
+    .report-page {
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+
+      body {
+        background: #ffffff !important;
+      }
+
+      .main-wrapper,
+      .report-page {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="no-print">
+    <%-include('../includes/topbar')%>
+    <%-include('../includes/desktop-sidebar')%>
+    <%-include('../includes/mobile-sidebar')%>
+  </div>
+
+  <div class="main-wrapper">
+    <main class="container-fluid p-3 p-lg-4">
+      <div class="report-page">
+        <div class="d-flex justify-content-between align-items-center mb-4 no-print">
+          <h2 class="fw-bold mb-0">รายงานการซ่อมบำรุง</h2>
+          <button class="btn btn-primary" type="button" onclick="window.print()"><i class="bi bi-printer"></i> พิมพ์รายงาน</button>
+        </div>
+
+        <div class="text-center mb-4">
+          <h4 class="fw-bold mb-1"><%=settings.company_name%></h4>
+          <div class="text-muted">รายงานการซ่อมบำรุงรถ</div>
+        </div>
+
+        <table class="table table-bordered mb-4">
+          <tbody>
+            <tr>
+              <th style="width: 220px;">ทะเบียนรถ</th>
+              <td><%=repair.license_plate ?? '-'%></td>
+            </tr>
+            <tr>
+              <th>ประเภทการซ่อม</th>
+              <td><%=repair.repair_type_name ?? '-'%></td>
+            </tr>
+            <tr>
+              <th>วันที่แจ้งซ่อม</th>
+              <td><%=repair.created_at ? moment(repair.created_at).format('DD/MM/YYYY HH:mm:ss') : '-'%></td>
+            </tr>
+            <tr>
+              <th>ผู้แจ้งซ่อม</th>
+              <td><%=repair.created_by_user ?? '-'%></td>
+            </tr>
+            <tr>
+              <th>หมายเหตุ</th>
+              <td><%=repair.note ?? '-'%></td>
+            </tr>
+          </tbody>
+        </table>
+
+        <table class="table table-bordered">
+          <thead class="table-light">
+            <tr>
+              <th style="width: 60px;">ลำดับ</th>
+              <th>รายการ</th>
+              <th style="width: 140px;">จำนวน</th>
+              <th style="width: 180px;">ราคา/หน่วย</th>
+              <th style="width: 180px;">รวม</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% let total = 0; %>
+            <% if(details.length === 0) { %>
+              <tr>
+                <td colspan="5" class="text-center text-muted">ไม่มีรายละเอียดค่าใช้จ่าย</td>
+              </tr>
+            <% } else { %>
+              <% details.forEach((detail, index) => {
+                const amount = Number(detail.amount) || 0;
+                const price = Number(detail.price) || 0;
+                const lineTotal = amount * price;
+                total += lineTotal;
+              %>
+                <tr>
+                  <td><%=index + 1%></td>
+                  <td><%=detail.detail ?? '-'%></td>
+                  <td class="text-end"><%=amount.toLocaleString('th-TH')%></td>
+                  <td class="text-end"><%=price.toLocaleString('th-TH', { minimumFractionDigits: 2 })%> บาท</td>
+                  <td class="text-end"><%=lineTotal.toLocaleString('th-TH', { minimumFractionDigits: 2 })%> บาท</td>
+                </tr>
+              <% }) %>
+            <% } %>
+          </tbody>
+          <tfoot>
+            <tr>
+              <th colspan="4" class="text-end">ยอดรวมทั้งสิ้น</th>
+              <th class="text-end"><%=total.toLocaleString('th-TH', { minimumFractionDigits: 2 })%> บาท</th>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+    </main>
+  </div>
+
+  <div class="no-print">
+    <%-include('../includes/footer')%>
+  </div>
+</body>
+</html>

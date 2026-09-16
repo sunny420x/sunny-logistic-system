@@ -25,6 +25,7 @@ const trucksRoute = require('./routes/trucks')
 const logRoute = require('./routes/logs')
 const installRoute = require('./routes/installation')
 const routineChecksRoute = require('./routes/routine_checks')
+const repairsRoute = require('./routes/repairs')
 
 app.use('/', usersRoute)
 app.use('/', apiRoute)
@@ -34,6 +35,7 @@ app.use('/', trucksRoute)
 app.use('/', logRoute)
 app.use('/', installRoute)
 app.use('/', routineChecksRoute)
+app.use('/', repairsRoute)
 
 // Express Settings
 require('dotenv').config()

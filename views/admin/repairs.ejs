@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>รายการตรวจเช็ครถประจำสัปดาห์ | <%=settings.company_name%></title>
+  <%-include('includes/head')%>
+  <style>
+    #map {
+      width: 100%;
+      height: 70vh;
+      z-index: 1;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <%-include('includes/topbar')%>
+
+  <!-- Desktop Sidebar -->
+  <%-include('includes/desktop-sidebar')%>
+
+  <!-- Mobile Sidebar -->
+  <%-include('includes/mobile-sidebar')%>
+
+  <div class="main-wrapper">
+    <main class="container-fluid p-3 p-lg-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div class="d-flex">
+                <h2 class="fw-bold">รายการซ่อม<% if(locals.license_plate) { %>: <div class="badge bg-primary"><%=locals.license_plate%></div> <% } %></h2>
+            </div>
+            <form action="" method="get" class="d-flex gap-2">
+                <div class="d-flex gap-2">
+                    <input type="date" class="form-control" name="date" id="dateSearch" value="<% if(locals.date) {%><%=date%><%} else {%><%=moment().format('YYYY-MM-DD')%><%}%>">
+                    <button class="btn btn-outline-primary" style="width: 200px;"><i class="bi bi-filter"></i> กรองวันที่</button>
+                </div>
+            </form>
+            <script>
+                document.getElementById('dateSearch').value = getSearchQuery() ?? ''
+
+                function getSearchQuery() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    return urlParams.get('date');
+                }
+            </script>
+        </div>
+        <div class="d-flex">            
+            <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/repairs/add'"><i class="bi bi-file-earmark-plus"></i> เพิ่มข้อมูลซ่อมประจำรถ</button>
+            <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/repair_types'"><i class="bi bi-gear"></i> ประเภทการซ่อม</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ทะเบียนรถ</th>
+                        <th>วันที่ซ่อม</th>
+                        <th>ผู้ส่งซ่อม</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% repairs.forEach(row => { %>
+                        <tr>
+                            <td><%=row.license_plate%></td>
+                            <td><%=moment(row.created_at).format("DD/MM/YYYY HH:mm:ss")%></td>
+                            <td><%=row.created_by_user%></td>
+                            <td>
+                                <button class="btn btn-outline-secondary btn-sm" onclick="window.location.href='/admin/repairs/report/<%=row.id%>'"><i class="bi bi-file-earmark-text"></i> รายงาน</button>
+                                <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/repairs/edit/<%=row.id%>'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
+                                <button class="btn btn-outline-danger btn-sm" onclick="
+                                Swal.fire({
+                                title: 'คุณแน่ใจหรือไม่?',
+                                text: 'คุณต้องการลบข้อมูลนี้ออกจากระบบ',
+                                icon: 'warning',
+                                showCancelButton: true,
+                                confirmButtonColor: '#3085d6',
+                                cancelButtonColor: '#d33',
+                                confirmButtonText: 'ใช่, ลบเลย!',
+                                cancelButtonText: 'ยกเลิก'
+                                }).then((result) => {
+                                if (result.isConfirmed) {
+                                    window.location.href='/admin/repairs/delete/<%=row.id%>'
+                                }
+                                })
+                                "><i class="bi bi-trash3"></i> ลบ</button>
+                            </td>
+                        </tr>
+                    <% }) %>
+                </tbody>
+            </table>
+        </div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
+  </div>
+  <%-include('includes/footer')%>
+</body>
+</html>

@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>แก้ไขประเภทการซ่อมบำรุง | <%=settings.company_name%></title>
+  <%-include('../includes/head')%>
+</head>
+<body>
+  <%-include('../includes/topbar')%>
+
+  <!-- Desktop Sidebar -->
+  <%-include('../includes/desktop-sidebar')%>
+
+  <!-- Mobile Sidebar -->
+  <%-include('../includes/mobile-sidebar')%>
+
+  <div class="main-wrapper">
+    <main class="container-fluid p-3 p-lg-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+          <h2 class="fw-bold mb-3">แก้ไขประเภทการซ่อมบำรุง</h2>
+          <form action="" method="post" style="width: 800px;">
+            <div class="form-group mb-3">
+                <label for="name">ชื่อประเภทการซ่อมบำรุง: </label>
+                <input type="text" name="name" id="name" class="form-control" value="<%=repair_type.name%>" required>
+            </div>
+
+            <p><strong>เพิ่มโดย:</strong> <%=repair_type.created_by_user ?? "-" %><br>
+            <strong>เมื่อ:</strong> <% if(repair_type.created_at) { %><%=moment(repair_type.created_at).format("DD/MM/YYYY HH:mm:ss") %><%} else {%>-<%} %></p>
+
+            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-floppy me-2"></i>บันทึกการเปลี่ยนแปลง</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Container -->
+    </main>
+  </div>
+
+  <%-include('../includes/footer')%>
+</body>
+</html>
