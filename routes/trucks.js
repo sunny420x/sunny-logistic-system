@@ -254,7 +254,7 @@ app.post('/admin/maintenances/add', async(req,res) => {
    
     const truck_id = req.body.truck_id ?? null
     const user_id = auth.user.id
-    const maintenance_type = req.body.truck_id ?? null
+    const maintenance_type = req.body.maintenance_type ?? null
     const note = req.body.note
     const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
 
