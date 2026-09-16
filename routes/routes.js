@@ -177,7 +177,7 @@ app.post('/admin/routes/edit/:id', async(req,res) => {
     editRoute(id, customer_id, billing_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, status, arrival_at_warehouse, round).then(() => {
         res.cookie('alert', 'success')
         addLog('edit', `คิวส่งสินค้าหมายเลข #${id} ถูกแก้ไข โดย #${auth.user.id} - ${auth.user.username}`)
-        res.redirect('/admin/routes/edit/'+id)
+        res.redirect('/admin/routes')
     })
 })
 app.get('/admin/routes/delete/:id', async(req,res) => {

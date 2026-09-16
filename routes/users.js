@@ -125,12 +125,13 @@ app.post('/admin/users/edit/:id', async(req,res) => {
         editUser(id, username, full_name, type_id, phone_number, password_hash).then(() => {
             res.cookie('alert', 'success')
             addLog('edit', `ผู้ใช้ #${id} - ${username} ถูกแก้ไข โดย #${auth.user.id} - ${auth.user.username}`)
-            res.redirect('/admin/users/edit/'+id)
+            res.redirect('/admin/users/')
         })
     } else {
         editUser(id, username, full_name, type_id, phone_number, null).then(() => {
             res.cookie('alert', 'success')
-            res.redirect('/admin/users/edit/'+id)
+            addLog('edit', `ผู้ใช้ #${id} - ${username} ถูกแก้ไข โดย #${auth.user.id} - ${auth.user.username}`)
+            res.redirect('/admin/users/')
         })
     }
 })
@@ -235,7 +236,7 @@ app.post('/admin/user_types/edit/:id', async(req,res) => {
     editUserType(id, user_type, permission, color).then(() => {
         res.cookie('alert', 'success')
         addLog('add', `ประเภทผู้ใช้หมายเลข #${id} - ${user_type} ถูกแก้ไข โดย #${auth.user.id} - ${auth.user.username}`)
-        res.redirect('/admin/user_types/edit/'+id)
+        res.redirect('/admin/user_types')
     })
 })
 

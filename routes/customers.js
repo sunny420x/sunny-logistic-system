@@ -136,7 +136,7 @@ app.post('/admin/customers/edit/:id', async(req,res) => {
     editCustomer(id, customer_name, customer_id, address, location, group_id, phone_number).then(() => {
         res.cookie('alert', 'success')
         addLog('edit', `ลูกค้ารหัส #${id} - ${customer_name} ถูกแก้ไขโดย #${auth.user.id} - ${auth.user.username}`)
-        res.redirect('/admin/customers/edit/'+id)
+        res.redirect('/admin/customers')
     })
 })
 app.get('/admin/customer_groups', async(req,res) => {
@@ -237,7 +237,7 @@ app.post('/admin/customer_groups/edit/:id', async(req,res) => {
     editCustomerGroup(id, name, color).then(() => {
         res.cookie('alert', 'success')
         addLog('edit', `กลุ่มลูกค้า หมายเลข #${id} - ${name} ถูกแก้ไขโดย #${auth.user.id} - ${auth.user.username}`)
-        res.redirect('/admin/customer_groups/edit/'+id)
+        res.redirect('/admin/customer_groups')
     })
 })
 
