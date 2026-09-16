@@ -38,12 +38,13 @@
       <div class="table-responsive">        
         <table class="table text-center">
           <thead>
-            <th style="width: 40px;">#</th>
+            <th>#</th>
             <th style="width: 150px;">ทะเบียนรถ</th>
             <th style="width: 100px;">ยี่ห้อ</th>
             <th style="width: 100px;">รุ่น</th>
-            <th style="width: 150px;">ค่ารอบ</th>
-            <th style="width: 200px;">ข้อมูล</th>
+            <th>ค่ารอบ</th>
+            <th>รอบระยะ</th>
+            <th style="width: 250px;">ข้อมูล</th>
             <th style="width: 200px;">จัดการ</th>
           </thead>
           <tbody>
@@ -54,6 +55,7 @@
               <td><%=row.brand ?? "-"%></td>
               <td><%=row.model ?? "-"%></td>
               <td><%=row.round_cost ?? 0%> บาท/รอบ</td>
+              <td><%= (row.mileage_cycle ?? 0).toLocaleString('us') %> กม.</td>
               <td>
                 <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/trucks/locations/<%=row.id%>'"><i class="bi bi-archive"></i> ดูประวัติ</button>
                 <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/trucks/maintenances/<%=row.id%>'"><i class="bi bi-archive"></i> การบำรุงรักษา</button>
