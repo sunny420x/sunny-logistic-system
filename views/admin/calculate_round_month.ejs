@@ -58,8 +58,8 @@
                         } %>
                         </td>
                         <td><%=row.round_count%> รอบ</td>
-                        <td><%=row.round_cost%> บาท/รอบ</td>
-                        <td><%= parseInt(row.round_count) * parseInt(row.round_cost) %> บาท</td>
+                        <td><%=parseInt(row.round_cost).toLocaleString('us')%> บาท/รอบ</td>
+                        <td><%= (parseInt(row.round_count) * parseInt(row.round_cost)).toLocaleString('us') %> บาท</td>
                         <td>
                             <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/calculate_round_month/report/<%=row.driver_id%>?start_date=' + encodeURIComponent(document.getElementById('startDateSearch').value) + '&end_date=' + encodeURIComponent(document.getElementById('endDateSearch').value)"><i class="bi bi-file-earmark-text"></i> ออกรายงาน</button>
                         </td>

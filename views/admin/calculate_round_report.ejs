@@ -67,11 +67,11 @@
                     </tr>
                     <tr>
                         <th>ค่ารอบ</th>
-                        <td><%=driver.round_cost%> บาท/รอบ</td>
+                        <td><%=driver.round_cost.toLocaleString('us')%> บาท/รอบ</td>
                     </tr>
                     <tr>
                         <th>ค่ารอบรวม</th>
-                        <td class="fw-bold"><%=round_count * driver.round_cost%> บาท</td>
+                        <td class="fw-bold"><%= (round_count * driver.round_cost).toLocaleString('us') %> บาท</td>
                     </tr>
                 </tbody>
             </table>

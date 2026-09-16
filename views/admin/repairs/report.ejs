@@ -93,15 +93,15 @@
               <% details.forEach((detail, index) => {
                 const amount = Number(detail.amount) || 0;
                 const price = Number(detail.price) || 0;
-                const lineTotal = amount * price;
-                total += lineTotal;
+                const lineTotal = (amount * price).toLocaleString('us');
+                total += amount * price;
               %>
                 <tr>
                   <td><%=index + 1%></td>
                   <td><%=detail.detail ?? '-'%></td>
-                  <td class="text-end"><%=amount.toLocaleString('th-TH')%></td>
-                  <td class="text-end"><%=price.toLocaleString('th-TH', { minimumFractionDigits: 2 })%> บาท</td>
-                  <td class="text-end"><%=lineTotal.toLocaleString('th-TH', { minimumFractionDigits: 2 })%> บาท</td>
+                  <td class="text-end"><%=amount.toLocaleString('us')%></td>
+                  <td class="text-end"><%=price.toLocaleString('us', { minimumFractionDigits: 2 })%> บาท</td>
+                  <td class="text-end"><%=lineTotal.toLocaleString('us', { minimumFractionDigits: 2 })%> บาท</td>
                 </tr>
               <% }) %>
             <% } %>
@@ -109,7 +109,7 @@
           <tfoot>
             <tr>
               <th colspan="4" class="text-end">ยอดรวมทั้งสิ้น</th>
-              <th class="text-end"><%=total.toLocaleString('th-TH', { minimumFractionDigits: 2 })%> บาท</th>
+              <th class="text-end"><%=total.toLocaleString('us', { minimumFractionDigits: 2 })%> บาท</th>
             </tr>
           </tfoot>
         </table>

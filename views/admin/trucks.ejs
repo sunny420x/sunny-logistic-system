@@ -54,7 +54,7 @@
               <td><%=row.license_plate%></td>
               <td><%=row.brand ?? "-"%></td>
               <td><%=row.model ?? "-"%></td>
-              <td><%=row.round_cost ?? 0%> บาท/รอบ</td>
+              <td><%= (row.round_cost ?? 0).toLocaleString('us') %> บาท/รอบ</td>
               <td><%= (row.mileage_cycle ?? 0).toLocaleString('us') %> กม.</td>
               <td>
                 <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/trucks/locations/<%=row.id%>'"><i class="bi bi-archive"></i> ดูประวัติ</button>
