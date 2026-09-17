@@ -39,9 +39,15 @@
     const userTypesTable = AdminServerPagination({
       resource: 'user_types', tableBody: 'userTypesTableBody', pagination: 'userTypesPagination', colspan: 5,
       getFilters: () => ({}),
-      renderRow: row => `<tr><td>${row.id}</td><td>${row.name}</td><td><span class="badge bg-${row.color || 'secondary'} fw-normal">${row.color || '-'}</span></td><td>${row.permission || '-'}</td><td><button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/user_types/edit/${row.id}'"><i class="bi bi-pencil-square"></i> แก้ไข</button> <button class="btn btn-outline-danger btn-sm" onclick="window.location.href='/admin/user_types/delete/${row.id}'"><i class="bi bi-trash3"></i> ลบ</button></td></tr>`
+      renderRow: row => `<tr><td>${row.id}</td><td>${row.name}</td><td><span class="badge bg-${row.color || 'secondary'} fw-normal">${row.color || '-'}</span></td><td>${row.permission || '-'}</td><td><button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/user_types/edit/${row.id}'"><i class="bi bi-pencil-square"></i> แก้ไข</button> <button class="btn btn-outline-danger btn-sm" onclick="deleteUserType(${row.id})"><i class="bi bi-trash3"></i> ลบ</button></td></tr>`
     });
     userTypesTable.load();
+
+    function deleteUserType(id) {
+      Swal.fire({ title: 'คุณแน่ใจหรือไม่?', text: 'คุณต้องการลบประเภทผู้ใช้งานนี้ออกจากระบบ', icon: 'warning', showCancelButton: true, confirmButtonText: 'ใช่, ลบเลย!', cancelButtonText: 'ยกเลิก' }).then(result => {
+        if (result.isConfirmed) window.location.href = `/admin/user_types/delete/${id}`;
+      });
+    }
   </script>
 
   <%-include('includes/footer')%>

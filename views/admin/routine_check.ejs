@@ -71,9 +71,28 @@
             const routineChecksTable = AdminServerPagination({
                 resource: 'routine_checks', tableBody: 'routineChecksTableBody', pagination: 'routineChecksPagination', colspan: <%=locals.license_plate ? 5 : 6%>,
                 getFilters: () => ({ date: getSearchQuery(), truck_id: '<%=locals.truck_id || ""%>' }),
-                renderRow: row => `<tr>${routineShowsTruck ? `<td>${row.license_plate || '-'}</td>` : ''}<td>${moment(row.created_at).format('DD/MM/YYYY HH:mm:ss')}</td><td>${row.created_by_user || '-'}</td><td>${row.current_mileage ?? '-'}</td><td>${row.note || '-'}</td><td><button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/routine_check/edit/${row.id}'"><i class="bi bi-pencil-square"></i> แก้ไข</button> <button class="btn btn-outline-danger btn-sm" onclick="window.location.href='/admin/routine_check/delete/${row.id}'"><i class="bi bi-trash3"></i> ลบ</button></td></tr>`
+                renderRow: row => `
+                <tr>${routineShowsTruck ? `
+                    <td>${row.license_plate || '-'}</td>` : ''}
+                    <td>${moment(row.created_at).format('DD/MM/YYYY HH:mm:ss')}</td>
+                    <td>${row.created_by_user || '-'}</td>
+                    <td>${row.current_mileage ?? '-'}</td>
+                    <td>${row.note || '-'}</td>
+                    <td>
+                    <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/routine_check/edit/${row.id}'">
+                    <i class="bi bi-pencil-square"></i> แก้ไข</button>
+                    <button class="btn btn-outline-danger btn-sm" onclick="deleteRoutineCheck(${row.id})">
+                    <i class="bi bi-trash3"></i> ลบ</button>
+                    </td>
+                </tr>`
             });
             routineChecksTable.load();
+
+            function deleteRoutineCheck(id) {
+                Swal.fire({ title: 'คุณแน่ใจหรือไม่?', text: 'คุณต้องการลบข้อมูลตรวจเช็คนี้ออกจากระบบ', icon: 'warning', showCancelButton: true, confirmButtonText: 'ใช่, ลบเลย!', cancelButtonText: 'ยกเลิก' }).then(result => {
+                    if (result.isConfirmed) window.location.href = `/admin/routine_check/delete/${id}`;
+                });
+            }
         </script>
   </div>
   <%-include('includes/footer')%>

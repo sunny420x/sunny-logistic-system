@@ -40,9 +40,15 @@
         const maintenanceTypesTable = AdminServerPagination({
             resource: 'maintenance_types', tableBody: 'maintenanceTypesTableBody', pagination: 'maintenanceTypesPagination', colspan: 3,
             getFilters: () => ({}),
-            renderRow: row => `<tr><td>${moment(row.created_at).format('DD/MM/YYYY HH:mm:ss')}</td><td>${row.name}</td><td><button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/maintenances/types/edit/${row.id}'"><i class="bi bi-pencil-square"></i> แก้ไข</button> <button class="btn btn-outline-danger btn-sm" onclick="window.location.href='/admin/maintenances/types/delete/${row.id}'"><i class="bi bi-trash3"></i> ลบ</button></td></tr>`
+            renderRow: row => `<tr><td>${moment(row.created_at).format('DD/MM/YYYY HH:mm:ss')}</td><td>${row.name}</td><td><button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/maintenances/types/edit/${row.id}'"><i class="bi bi-pencil-square"></i> แก้ไข</button> <button class="btn btn-outline-danger btn-sm" onclick="deleteMaintenanceType(${row.id})"><i class="bi bi-trash3"></i> ลบ</button></td></tr>`
         });
         maintenanceTypesTable.load();
+
+        function deleteMaintenanceType(id) {
+            Swal.fire({ title: 'คุณแน่ใจหรือไม่?', text: 'คุณต้องการลบประเภทการบำรุงรักษานี้ออกจากระบบ', icon: 'warning', showCancelButton: true, confirmButtonText: 'ใช่, ลบเลย!', cancelButtonText: 'ยกเลิก' }).then(result => {
+                if (result.isConfirmed) window.location.href = `/admin/maintenances/types/delete/${id}`;
+            });
+        }
     </script>
   <%-include('includes/footer')%>
 </body>
