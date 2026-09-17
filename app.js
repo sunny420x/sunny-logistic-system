@@ -52,11 +52,13 @@ app.get('/', async(req, res) => {
     if(req.cookies.auth) {
         const auth = await initUserToken(req.cookies.auth)
         if(auth.status == "success") {
-            if(auth.user.type_id.includes((await getUserTypes()).map(type => type.id))) {
-                if(auth.user.type_id == "2") {
-                    res.redirect('/driver/myRoute')
-                } else {
-                    res.redirect('/admin')
+            if(auth.user.type_id) {
+                if(auth.user.type_id.includes((await getUserTypes()).map(type => type.id))) {
+                    if(auth.user.type_id == "2") {
+                        res.redirect('/driver/myRoute')
+                    } else {
+                        res.redirect('/admin')
+                    }
                 }
             }
         }
