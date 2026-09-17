@@ -344,11 +344,13 @@ async function updateMap(options, filters = {}) {
                 lastCustomersFilterKey = filterKey;
                 if ((groupIdFilter || searchFilter) && customerPoints.length > 0) {
                     const extent = ol.extent.boundingExtent(customerPoints);
-                    map.getView().fit(extent, {
-                        padding: [40, 40, 40, 40],
-                        maxZoom: 16,
-                        duration: 800
-                    });
+                    if(map) {
+                        map.getView().fit(extent, {
+                            padding: [40, 40, 40, 40],
+                            maxZoom: 16,
+                            duration: 800
+                        });
+                    }
                 }
             }
         }
