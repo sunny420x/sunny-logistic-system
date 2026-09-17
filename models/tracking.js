@@ -93,13 +93,21 @@ function getAllTruckLocation() {
     })
 }
 
-function getCustomersLocation(group_id = null) {
+function getCustomersLocation(group_id = null, q = null) {
     return new Promise(resolve => {
         let query = `SELECT c.id, c.customer_name, c.customer_id, c.location, c.group_id, cg.name as group_name, cg.color, c.address, c.phone_number FROM customers as c JOIN customer_groups as cg ON cg.id = c.group_id `
         let params = []
+        const conditions = []
         if(group_id != null) {
-            query += `WHERE c.group_id = ?`
+            conditions.push(`c.group_id = ?`)
             params.push(group_id)
+        }
+        if(q != null && q !== '') {
+            conditions.push(`(c.customer_name LIKE ? OR c.customer_id LIKE ?)`)
+            params.push(`%${q}%`, `%${q}%`)
+        }
+        if(conditions.length > 0) {
+            query += `WHERE ` + conditions.join(' AND ')
         }
         db.query(query+` ORDER BY c.id DESC`, params, (err, results) => {
             if(err) {

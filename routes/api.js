@@ -186,7 +186,8 @@ app.get('/api/admin/getCustomersLocation', async(req,res) => {
     if(!auth.user) res.redirect('/logout')
 
     const group_id = req.query.group_id || null
-    const data = await getCustomersLocation(group_id)
+    const q = req.query.q || null
+    const data = await getCustomersLocation(group_id, q)
     res.json(data)
 })
 

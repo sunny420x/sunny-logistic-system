@@ -8,7 +8,7 @@ let orderedStops = null
 let orderedStopsByTruck = {}
 
 let initializeCustomer = false
-let lastCustomersGroupId = undefined
+let lastCustomersFilterKey = undefined
 
 async function initializeMap(zoom = 15) {
     vectorSource = new ol.source.Vector();
@@ -241,8 +241,20 @@ async function updateMap(options, filters = {}) {
             }
         }
         if(options == "customers") {
-            const groupIdParam = filters.group_id ? `?group_id=${encodeURIComponent(filters.group_id)}` : '';
-            const customers = await fetch(`/api/admin/getCustomersLocation${groupIdParam}`);
+            const params = new URLSearchParams();
+
+            Object.entries(filters).forEach(([key, value]) => {
+                if (value !== undefined && value !== null && value !== '') {
+                    params.set(key, value);
+                }
+            });
+
+            const queryString = params.toString();
+            const filterParams = queryString ? `?${queryString}` : '';
+
+            const customers = await fetch(
+                `/api/admin/getCustomersLocation${filterParams}`
+            );
             if (!customers.ok) {
                 throw new Error("ดึงข้อมูล ลูกค้าจากหลังบ้านไม่สำเร็จ");
             }
@@ -326,9 +338,11 @@ async function updateMap(options, filters = {}) {
             });
 
             const groupIdFilter = filters.group_id || null;
-            if (groupIdFilter !== lastCustomersGroupId) {
-                lastCustomersGroupId = groupIdFilter;
-                if (groupIdFilter && customerPoints.length > 0) {
+            const searchFilter = filters.q || null;
+            const filterKey = JSON.stringify({ group_id: groupIdFilter, q: searchFilter });
+            if (filterKey !== lastCustomersFilterKey) {
+                lastCustomersFilterKey = filterKey;
+                if ((groupIdFilter || searchFilter) && customerPoints.length > 0) {
                     const extent = ol.extent.boundingExtent(customerPoints);
                     map.getView().fit(extent, {
                         padding: [40, 40, 40, 40],

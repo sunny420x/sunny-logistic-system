@@ -107,7 +107,7 @@
     const getGroupIdFilter = () => new URLSearchParams(window.location.search).get('group_id');
 
     initializeMap();
-    updateMap('customers', { group_id: getGroupIdFilter() });
+    updateMap('customers', { group_id: getGroupIdFilter(), q: getSearchQuery() });
 
     const customersTable = AdminServerPagination({
       resource: 'customers',
@@ -126,7 +126,7 @@
     customersTable.load();
 
     setInterval(() => {
-        updateMap('customers', { group_id: getGroupIdFilter() });
+        updateMap('customers', { group_id: getGroupIdFilter(), q: getSearchQuery() });
     }, 15000);
   </script>
   <% if(customers.length == 1) { %>
