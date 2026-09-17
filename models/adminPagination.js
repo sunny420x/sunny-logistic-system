@@ -120,6 +120,20 @@ const resourceQueries = {
         },
         order: 'rc.id DESC'
     },
+    following_up: {
+        select: `SELECT fu.*, t.license_plate, u.full_name as created_by_user
+            FROM following_up fu 
+            LEFT JOIN repairs r ON fu.repair_id = r.id
+            LEFT JOIN trucks t ON r.truck_id = t.id
+            LEFT JOIN users u ON fu.created_by = u.id`,
+        where(filters) {
+            const conditions = [];
+            const params = [];
+            if (filters.date) { conditions.push('DATE(fu.created_at) = ?'); params.push(filters.date); }
+            return { conditions, params };
+        },
+        order: 'fu.id DESC'
+    },
     calculate_round: {
         select: `SELECT u.id as driver_id, u.full_name, u.username, DATE(tr.date) as date,
             COUNT(DISTINCT tr.round) AS round_count, t.round_cost

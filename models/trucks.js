@@ -299,6 +299,15 @@ function getCalculateRoundReportByMonth(driver_id, start_date, end_date) {
     })
 }
 
+function getCurrentMileageByTruckIdAndDate(truck_id, date) {
+    return new Promise(resolve => {
+        db.query(`SELECT rc.current_mileage FROM routine_checks as rc WHERE rc.truck_id = ? AND rc.date = ? ORDER BY rc.created_at DESC LIMIT 1`, [truck_id, date], (err, result) => {
+            if(err) console.error(err);
+            resolve(result[0]?.current_mileage ?? 0)
+        })
+    })
+}
+
 module.exports = {
     getTrucks,
     getTruckById,
@@ -321,4 +330,5 @@ module.exports = {
     getCalculateRoundReportByMonth,
     getCalculateRoundByDate,
     getCalculateRoundByMonth,
+    getCurrentMileageByTruckIdAndDate,
 }

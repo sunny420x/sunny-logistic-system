@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>รายการ Follow Up | <%=settings.company_name%></title>
+  <%-include('includes/head')%>
+  <style>
+    #map {
+      width: 100%;
+      height: 70vh;
+      z-index: 1;
+      border-radius: 20px;
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <%-include('includes/topbar')%>
+
+  <!-- Desktop Sidebar -->
+  <%-include('includes/desktop-sidebar')%>
+
+  <!-- Mobile Sidebar -->
+  <%-include('includes/mobile-sidebar')%>
+
+  <div class="main-wrapper">
+    <main class="container-fluid p-3 p-lg-4">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+            <div class="d-flex">
+                <h2 class="fw-bold">รายการ Follow Up</h2>
+            </div>
+            <form action="" method="get" class="d-flex gap-2">
+                <div class="d-flex gap-2">
+                    <input type="date" class="form-control" name="date" id="dateSearch" value="<% if(locals.date) {%><%=date%><%} else {%><%=moment().format('YYYY-MM-DD')%><%}%>">
+                    <button class="btn btn-outline-primary" style="width: 200px;"><i class="bi bi-filter"></i> กรองวันที่</button>
+                </div>
+            </form>
+            <script>
+                document.getElementById('dateSearch').value = getSearchQuery() ?? ''
+
+                function getSearchQuery() {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    return urlParams.get('date');
+                }
+            </script>
+        </div>
+        <div class="d-flex">            
+            <button class="btn btn-outline-primary btn-sm ms-2" onclick="window.location.href='/admin/following_up/add'"><i class="bi bi-file-earmark-plus"></i> เพิ่มข้อมูล Following Up</button>
+        </div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ทะเบียนรถ</th>
+                        <th>วันที่สร้าง</th>
+                        <th>ไมล์เป้าหมาย</th>
+                        <th>ผู้สร้าง</th>
+                        <th>จัดการ</th>
+                    </tr>
+                </thead>
+                <tbody id="followingUpTableBody"><tr class="skeleton-row" aria-hidden="true"><td colspan="6"><span class="skeleton-line"></span></td></tr></tbody>
+            </table>
+        </div>
+        <div id="followingUpPagination" class="mt-3"></div>
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/moment@2.30.1/moment.min.js"></script>
+        <script>
+            const followingUpTable = AdminServerPagination({
+                resource: 'following_up', tableBody: 'followingUpTableBody', pagination: 'followingUpPagination', colspan: 6,
+                getFilters: () => ({ date: getSearchQuery() }),
+                renderRow: row => `
+                <tr>
+                    <td>${row.license_plate || '-'}</td>
+                    <td>${moment(row.created_at).format('DD/MM/YYYY HH:mm:ss')}</td>
+                    <td>${row.target_mileage ?? '-'}</td>
+                    <td>${row.created_by_user || '-'}</td>
+                    <td>
+                        <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/following_up/edit/${row.id}'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
+                        <button class="btn btn-outline-danger btn-sm" onclick="deleteFollowingUp(${row.id})"><i class="bi bi-trash3"></i> ลบ</button>
+                    </td>
+                </tr>`
+            });
+            followingUpTable.load();
+
+            function deleteFollowingUp(id) {
+                Swal.fire({ title: 'คุณแน่ใจหรือไม่?', text: 'คุณต้องการลบข้อมูลติดตามนี้ออกจากระบบ', icon: 'warning', showCancelButton: true, confirmButtonText: 'ใช่, ลบเลย!', cancelButtonText: 'ยกเลิก' }).then(result => {
+                    if (result.isConfirmed) window.location.href = `/admin/following_up/delete/${id}`;
+                });
+            }
+        </script>
+  </div>
+  <%-include('includes/footer')%>
+</body>
+</html>

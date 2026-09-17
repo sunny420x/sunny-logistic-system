@@ -156,6 +156,18 @@ function updateRepairType(id, name) {
     });
 }
 
+function getCurrentMileageByRepairId(repair_id) {
+    return new Promise(resolve => {
+        db.query(`SELECT rc.current_mileage 
+            FROM repairs as r
+            JOIN routine_checks as rc ON rc.truck_id = r.truck_id 
+            WHERE rc.truck_id = (SELECT truck_id FROM repairs WHERE id = ?) ORDER BY rc.created_at DESC LIMIT 1`, [repair_id], (err, result) => {
+            if(err) console.error(err);
+            resolve(result[0]?.current_mileage ?? 0)
+        })
+    })
+}
+
 module.exports = {
     addRepair,
     getRepairs,
@@ -166,5 +178,6 @@ module.exports = {
     addRepairType,
     updateRepairType,
     deleteRepairType,
-    getRepairTypeById
+    getRepairTypeById,
+    getCurrentMileageByRepairId,
 };

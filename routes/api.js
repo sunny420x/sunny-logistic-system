@@ -13,6 +13,7 @@ const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, get
 const { loginUser, initUserToken } = require('../models/users')
 const { getCurrentZone } = require('../models/settings')
 const { getAdminPage } = require('../models/adminPagination')
+const { getCurrentMileageByRepairId } = require('../models/repairs')
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -44,7 +45,7 @@ app.get('/api/admin/page/:resource', async (req, res) => {
     const permissionByResource = {
         customers: 'customers', customer_groups: 'customers',
         trucks: 'trucks', maintenance: 'trucks', maintenance_types: 'trucks',
-        repairs: 'trucks', repair_types: 'trucks', routine_checks: 'trucks',
+        repairs: 'trucks', repair_types: 'trucks', routine_checks: 'trucks', following_up: 'trucks',
         routes: 'routes',
         users: 'users', user_types: 'users', calculate_round: 'users', calculate_round_range: 'users',
         logs: 'dashboard'
@@ -436,6 +437,25 @@ app.get('/api/getCustomers', async (req, res) => {
         return res.json(customers);
     } catch (err) {
         console.error('Error fetching customers:', err);
+        return res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+app.get('/api/repairs/:repair_id/current_mileage', async (req, res) => {
+    try {
+        if (!req.cookies.auth) {
+            return res.status(401).json({ error: 'Unauthorized: Missing token' });
+        }
+        const auth = await initUserToken(req.cookies.auth);
+        if (!auth || !auth.user) {
+            return res.status(401).json({ error: 'Unauthorized: Invalid token' });
+        }
+
+        const repairId = req.params.repair_id;
+        const currentMileage = await getCurrentMileageByRepairId(repairId);
+        return res.json({ current_mileage: currentMileage });
+    } catch (err) {
+        console.error('Error fetching current mileage:', err);
         return res.status(500).json({ error: 'Internal server error' });
     }
 });
