@@ -27,7 +27,8 @@ app.get('/installation', async(req,res) => {
             tables: {
                 ...tableStatus,
                 allInstalled: allInstalled
-            }
+            },
+            updateDatabase: req.query.updateDatabase === "yes" ? true : false
         })
     } else {
         res.send("โปรดสร้างฐานข้อมูลที่ชื่อ "+process.env.DB_NAME+" ก่อน")

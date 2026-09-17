@@ -50,6 +50,7 @@
     </div>
     <script>
     let isAllInstalled = "<%=tables.allInstalled%>" === "true"
+    let updateDatabase = "<%=updateDatabase%>" === "true"
     let step = 1
     let step_content = [
         `<div class="card-header">
@@ -170,7 +171,7 @@
         }
     }
 
-    if(isAllInstalled) {
+    if(isAllInstalled && !updateDatabase) {
         step = 3
         initStep()
     }
