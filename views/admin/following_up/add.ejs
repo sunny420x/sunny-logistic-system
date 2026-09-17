@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <title>เพิ่มข้อมูล Following Up | <%=settings.company_name%></title>
+  <%-include('../includes/head')%>
+</head>
+<body>
+  <%-include('../includes/topbar')%>
+
+  <!-- Desktop Sidebar -->
+  <%-include('../includes/desktop-sidebar')%>
+
+  <!-- Mobile Sidebar -->
+  <%-include('../includes/mobile-sidebar')%>
+
+  <div class="main-wrapper">
+
+    <main class="container-fluid p-3 p-lg-4">
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+          <h2 class="fw-bold mb-3">เพิ่มข้อมูล Following Up</h2>
+          <form action="" method="post" style="width: 800px;">
+            <div class="form-group mb-3">
+                <label for="repair_id">เลือกการซ่อม: </label>
+                <select name="repair_id" id="repair_id" class="form-select" onchange="getCurrentMileage(this.value)">
+                    <% if (repairs && repairs.length > 0) { %>
+                        <% repairs.forEach(repair => { %>
+                        <option value="<%=repair.id%>"><%=repair.license_plate%> - <%=repair.repair_type_name%></option>
+                        <% }) %>
+                    <% } else { %>
+                        <option value="">ไม่มีการซ่อม</option>
+                    <% } %>
+                </select>
+            </div>
+
+            <div class="form-group mb-3">
+              <p>ไมล์ปัจจุบัน: <span id="current_mileage">0</span> km</p>
+            </div>
+
+            <div class="form-group mb-3">
+                <label for="target_mileage">ไมล์ที่ตั้งเป้า: </label>
+                <input type="number" name="target_mileage" id="target_mileage" class="form-control" required>
+            </div>
+
+            <input type="submit" value="เพิ่มข้อมูล Following Up" class="btn btn-primary w-100">
+          </form>
+        </div>
+      </div>
+
+      <!-- Container -->
+    </main>
+  </div>
+
+  <script>
+  function getCurrentMileage(repairId) {
+    fetch('/api/repairs/' + repairId + '/current_mileage')
+      .then(response => response.json())
+      .then(data => {
+        document.getElementById('current_mileage').textContent = data.current_mileage.toLocaleString('us');
+      })
+      .catch(error => {
+        console.error('Error fetching current mileage:', error);
+        document.getElementById('current_mileage').textContent = 0;
+      });
+  }
+
+  getCurrentMileage(document.getElementById('repair_id').value)
+  </script>
+
+  <%-include('../includes/footer')%>
+</body>
+</html>
