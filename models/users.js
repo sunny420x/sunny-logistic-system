@@ -57,7 +57,7 @@ function getUserById(id) {
 
 function registerUser(username, password, full_name, type_id, phone_number, created_at, created_by) {
     return new Promise(resolve => {
-        db.query("INSERT INTO users(username, password, full_name, type_id, phone_number, created_at, created_by) VALUES(?,?,?,?,?,?,?,?)", 
+        db.query("INSERT INTO users(username, password, full_name, type_id, phone_number, created_at, created_by) VALUES(?,?,?,?,?,?,?)", 
         [username, password, full_name, type_id, phone_number, created_at, created_by], (err) => {
             if(err) console.error(err);
             resolve()
