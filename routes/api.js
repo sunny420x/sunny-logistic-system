@@ -8,7 +8,7 @@ const path  = require('path')
 
 const { getCustomers } = require('../models/customers')
 const { getMyRoutes, getRoutes } = require('../models/routes')
-const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getAllCustomersLocation, 
+const { finishDelivery, saveLocation, getAllTruckLocation, getTruckLocation, getCustomersLocation, 
     saveArrivalImageFile, ongoingDrivers, arrivalAtWarehouse, calculateTruckStats, getCurrentRound } = require('../models/tracking')
 const { loginUser, initUserToken } = require('../models/users')
 const { getCurrentZone } = require('../models/settings')
@@ -177,7 +177,7 @@ app.get('/api/driver/ongoingDrivers', async(req,res) => {
     res.json(data)
 })
 
-app.get('/api/admin/getAllCustomersLocation', async(req,res) => {
+app.get('/api/admin/getCustomersLocation', async(req,res) => {
     if(!req.cookies.auth) {
         res.redirect('/login')
         return
@@ -185,7 +185,8 @@ app.get('/api/admin/getAllCustomersLocation', async(req,res) => {
     const auth = await initUserToken(req.cookies.auth)
     if(!auth.user) res.redirect('/logout')
 
-    const data = await getAllCustomersLocation()
+    const group_id = req.query.group_id || null
+    const data = await getCustomersLocation(group_id)
     res.json(data)
 })
 
@@ -216,7 +217,7 @@ app.get('/api/getPointOfInterest/:group_id', async(req,res) => {
         return
     }
 
-    const data = await getAllCustomersLocation(req.params.group_id)
+    const data = await getCustomersLocation(req.params.group_id)
     res.json(data)
 })
 

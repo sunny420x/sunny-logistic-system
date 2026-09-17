@@ -104,15 +104,17 @@
   <script src="https://cdn.jsdelivr.net/npm/ol@v10.10.0/dist/ol.js"></script>
   <script src="/js/admin/map.js"></script>
   <script>
+    const getGroupIdFilter = () => new URLSearchParams(window.location.search).get('group_id');
+
     initializeMap();
-    updateMap('customers');
+    updateMap('customers', { group_id: getGroupIdFilter() });
 
     const customersTable = AdminServerPagination({
       resource: 'customers',
       tableBody: 'customersTableBody',
       pagination: 'customersPagination',
       colspan: 5,
-      getFilters: () => ({ q: getSearchQuery(), group_id: new URLSearchParams(window.location.search).get('group_id') }),
+      getFilters: () => ({ q: getSearchQuery(), group_id: getGroupIdFilter() }),
       renderRow: row => `<tr>
         <td class="text-center">${row.id}</td>
         <td class="text-center"><span class="badge bg-secondary fs-6 fw-normal">${row.customer_id}</span></td>
@@ -124,7 +126,7 @@
     customersTable.load();
 
     setInterval(() => {
-        updateMap('customers');
+        updateMap('customers', { group_id: getGroupIdFilter() });
     }, 15000);
   </script>
   <% if(customers.length == 1) { %>

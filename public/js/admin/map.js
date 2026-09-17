@@ -8,6 +8,7 @@ let orderedStops = null
 let orderedStopsByTruck = {}
 
 let initializeCustomer = false
+let lastCustomersGroupId = undefined
 
 async function initializeMap(zoom = 15) {
     vectorSource = new ol.source.Vector();
@@ -129,7 +130,7 @@ async function drawAssignedRouteFromZone(routes) {
     }));
 }
 
-async function updateMap(options) {
+async function updateMap(options, filters = {}) {
     try {        
         if(options == "route") {
             const res = await fetch(`/api/admin/getCurrentRoutes?date=${date}&search=${search}&status=${status}`);
@@ -240,15 +241,20 @@ async function updateMap(options) {
             }
         }
         if(options == "customers") {
-            const customers = await fetch("/api/admin/getAllCustomersLocation");
+            const groupIdParam = filters.group_id ? `?group_id=${encodeURIComponent(filters.group_id)}` : '';
+            const customers = await fetch(`/api/admin/getCustomersLocation${groupIdParam}`);
             if (!customers.ok) {
                 throw new Error("ดึงข้อมูล ลูกค้าจากหลังบ้านไม่สำเร็จ");
             }
             const customers_data = await customers.json();
+            vectorSource.clear();
+            const customerPoints = [];
             customers_data.locations.forEach(customer => {
                 const [lon, lat] = customer.location.split(',').map(Number);
+                const coordinate = ol.proj.fromLonLat([lon, lat]);
+                customerPoints.push(coordinate);
                 const marker = new ol.Feature({ 
-                    geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat])),
+                    geometry: new ol.geom.Point(coordinate),
                     customerData: customer,
                 });
                 marker.setId(customer.id || customer._id);
@@ -318,6 +324,19 @@ async function updateMap(options) {
                 }
                 groupedCustomers[groupId].push(customer);
             });
+
+            const groupIdFilter = filters.group_id || null;
+            if (groupIdFilter !== lastCustomersGroupId) {
+                lastCustomersGroupId = groupIdFilter;
+                if (groupIdFilter && customerPoints.length > 0) {
+                    const extent = ol.extent.boundingExtent(customerPoints);
+                    map.getView().fit(extent, {
+                        padding: [40, 40, 40, 40],
+                        maxZoom: 16,
+                        duration: 800
+                    });
+                }
+            }
         }
         if(options == "drivers") {
             const drivers = await fetch("/api/driver/getAllTruckLocation");

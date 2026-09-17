@@ -93,7 +93,7 @@ function getAllTruckLocation() {
     })
 }
 
-function getAllCustomersLocation(group_id = null) {
+function getCustomersLocation(group_id = null) {
     return new Promise(resolve => {
         let query = `SELECT c.id, c.customer_name, c.customer_id, c.location, c.group_id, cg.name as group_name, cg.color, c.address, c.phone_number FROM customers as c JOIN customer_groups as cg ON cg.id = c.group_id `
         let params = []
@@ -311,7 +311,7 @@ module.exports = {
     saveLocation,
     getAllTruckLocation,
     getTruckLocation,
-    getAllCustomersLocation,
+    getCustomersLocation,
     ongoingDrivers,
     saveArrivalImageFile,
     arrivalAtWarehouse,
