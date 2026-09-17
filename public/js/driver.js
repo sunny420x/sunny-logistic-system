@@ -409,6 +409,11 @@ function updateRouteTable() {
             <tr>
                 <td colspan="3" class="text-success text-center">🎉 ส่งงานทั้งหมดเรียบร้อยแล้ว</td>
             </tr>`;
+
+            // ส่งงานครบและกลับถึงโกดังแล้ว ไม่ต้องขอ/ส่งตำแหน่งอีกต่อไป
+            if (typeof stopLocationTracking === 'function') {
+                stopLocationTracking();
+            }
         }
         return;
     }

@@ -3,6 +3,7 @@ let position_longitude;
 let watchId = null;
 let locationIntervalId = null;
 let serverSyncIntervalId = null; // เพิ่มตัวแปรสำหรับเก็บ ID ของ Interval ตัวใหม่
+let trackingStopped = false; // กันไม่ให้ start ใหม่หลังจากถูกสั่งหยุดแล้ว (เช่น งานหมดแล้ว)
 
 async function handleNewPosition(lat, lon) {
   if (position_latitude !== lat || position_longitude !== lon) {
@@ -20,6 +21,11 @@ async function handleNewPosition(lat, lon) {
 
 function startLocationTracking() {
 
+  if (trackingStopped) {
+    console.log('⚠️ Location tracking was stopped, not restarting.');
+    return;
+  }
+
   if (locationIntervalId || watchId) {
     console.log('⚠️ Location tracking already started');
     return;
@@ -35,7 +41,7 @@ function startLocationTracking() {
         window.LocationChannel.postMessage('requestLocation');
         console.log('[+] Requesting Location From Mobile App.');
       }
-    }, 15000);
+    }, 60000);
 
   } 
   else if (navigator.geolocation) {
@@ -69,6 +75,28 @@ function startLocationTracking() {
       }
     }, 60000); //ส่งข้อมูลตำแหน่งไปที่ Server ทุก ๆ 1 นาที
   }
+}
+
+// หยุดการขอ/ส่งตำแหน่งทั้งหมด ใช้ตอนคนขับส่งงานครบและกลับถึงโกดังแล้ว จะได้ไม่ยิงขอตำแหน่งค้างไว้ถ้าลืมปิดแอพ
+function stopLocationTracking() {
+  trackingStopped = true;
+
+  if (watchId !== null && navigator.geolocation) {
+    navigator.geolocation.clearWatch(watchId);
+    watchId = null;
+  }
+
+  if (locationIntervalId !== null) {
+    clearInterval(locationIntervalId);
+    locationIntervalId = null;
+  }
+
+  if (serverSyncIntervalId !== null) {
+    clearInterval(serverSyncIntervalId);
+    serverSyncIntervalId = null;
+  }
+
+  console.log('🛑 Location tracking stopped: no more deliveries left.');
 }
 
 function sendLocationToServer(lat, lon) {
