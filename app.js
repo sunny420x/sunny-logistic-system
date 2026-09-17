@@ -53,7 +53,7 @@ app.get('/', async(req, res) => {
         const auth = await initUserToken(req.cookies.auth)
         if(auth.status == "success") {
             if(auth.user.type_id) {
-                if(auth.user.type_id.includes((await getUserTypes()).map(type => type.id))) {
+                if((await getUserTypes()).map(type => type.id).includes(auth.user.type_id)) {
                     if(auth.user.type_id == "2") {
                         res.redirect('/driver/myRoute')
                     } else {
