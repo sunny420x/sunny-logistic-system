@@ -31,6 +31,10 @@
                 </select>
             </div>
             <div class="form-group mb-3">
+                <label for="next_maintenance_date">วันที่บำรุงรักษาครั้งถัดไป:</label>
+                <input type="date" name="next_maintenance_date" id="next_maintenance_date" class="form-control" value="<%=moment(maintenance.next_maintenance_date).format('YYYY-MM-DD')%>" required>
+            </div>
+            <div class="form-group mb-3">
                 <label for="note">หมายเหตุ (รายละเอียดการบำรุงรักษา): </label>
                 <textarea name="note" id="note" class="form-control"><%=maintenance.note%></textarea>
             </div>

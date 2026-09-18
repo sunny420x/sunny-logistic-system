@@ -154,6 +154,7 @@ CREATE TABLE IF NOT EXISTS `truck_maintenance` (
   `truck_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
   `maintenance_type` int(11) NOT NULL,
+  `next_maintenance_date` DATE DEFAULT NULL,
   `note` text NOT NULL,
   `created_at` datetime NOT NULL,
   `updated_at` datetime DEFAULT NULL
@@ -163,6 +164,7 @@ ALTER TABLE `truck_maintenance`
   ADD COLUMN IF NOT EXISTS `truck_id` int(11) NOT NULL DEFAULT 0,
   ADD COLUMN IF NOT EXISTS `user_id` int(11) NOT NULL DEFAULT 0,
   ADD COLUMN IF NOT EXISTS `maintenance_type` int(11) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS `next_maintenance_date` DATE DEFAULT NULL,
   ADD COLUMN IF NOT EXISTS `note` text DEFAULT NULL,
   ADD COLUMN IF NOT EXISTS `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   ADD COLUMN IF NOT EXISTS `updated_at` datetime DEFAULT NULL;

@@ -94,7 +94,8 @@ function getMaintenanceTypeById(id) {
 function getMaintenanceByTruckId(id = null, date = null) {
     return new Promise(resolve => {
         let params = []
-        let query = `SELECT t.license_plate, u.full_name, u.id, mt.name as maintenace_name, m.note, m.created_at, m.updated_at, m.id, m.truck_id, m.maintenance_type 
+        let query = `SELECT t.license_plate, u.full_name, u.id, mt.name as maintenace_name, m.note, 
+        m.created_at, m.updated_at, m.id, m.truck_id, m.maintenance_type, m.next_maintenance_date
             FROM truck_maintenance as m 
             JOIN maintenance_type as mt ON mt.id = m.maintenance_type 
             JOIN trucks as t ON t.id = m.truck_id 
@@ -125,7 +126,8 @@ function getMaintenanceByTruckId(id = null, date = null) {
 
 function getMaintenanceById(id = null) {
     return new Promise(resolve => {
-        db.query(`SELECT u.full_name, u.id, mt.name as maintenace_name, m.note, m.created_at, m.updated_at, m.id, m.truck_id, m.maintenance_type
+        db.query(`SELECT u.full_name, u.id, mt.name as maintenace_name, m.note, m.created_at, 
+            m.updated_at, m.id, m.truck_id, m.maintenance_type, m.next_maintenance_date 
             FROM truck_maintenance as m 
             JOIN maintenance_type as mt ON mt.id = m.maintenance_type
             JOIN users as u ON u.id = m.user_id 
@@ -136,18 +138,18 @@ function getMaintenanceById(id = null) {
     })
 }
 
-function addMaintenance(truck_id, user_id, maintenance_type, note, created_at) {
+function addMaintenance(truck_id, user_id, maintenance_type, next_maintenance_date, note, created_at) {
     return new Promise(resolve => {
-        db.query(`INSERT INTO truck_maintenance(truck_id, user_id, maintenance_type, note, created_at) VALUES(?,?,?,?,?)`, [truck_id, user_id, maintenance_type, note, created_at], (err) => {
+        db.query(`INSERT INTO truck_maintenance(truck_id, user_id, maintenance_type, next_maintenance_date, note, created_at) VALUES(?,?,?,?,?,?)`, [truck_id, user_id, maintenance_type, next_maintenance_date, note, created_at], (err) => {
             if(err) console.error(err);
             resolve()
         })
     })
 }
 
-function saveMaintenance(id, truck_id, maintenance_type, note, updated_at) {
+function saveMaintenance(id, truck_id, maintenance_type, next_maintenance_date, note, updated_at) {
     return new Promise(resolve => {
-        db.query(`UPDATE truck_maintenance SET truck_id = ?, maintenance_type = ?, note = ?, updated_at = ? WHERE id = ?`, [truck_id, maintenance_type, note, updated_at, id], (err) => {
+        db.query(`UPDATE truck_maintenance SET truck_id = ?, maintenance_type = ?, next_maintenance_date = ?, note = ?, updated_at = ? WHERE id = ?`, [truck_id, maintenance_type, next_maintenance_date, note, updated_at, id], (err) => {
             if(err) console.error(err);
             resolve()
         })

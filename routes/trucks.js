@@ -255,10 +255,11 @@ app.post('/admin/maintenances/add', async(req,res) => {
     const truck_id = req.body.truck_id ?? null
     const user_id = auth.user.id
     const maintenance_type = req.body.maintenance_type ?? null
+    const next_maintenance_date = req.body.next_maintenance_date ?? null
     const note = req.body.note
     const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
 
-    addMaintenance(truck_id, user_id, maintenance_type, note, created_at).then(() => {
+    addMaintenance(truck_id, user_id, maintenance_type, next_maintenance_date, note, created_at).then(() => {
         res.cookie('alert', 'success')
         addLog('add', `ข้อมูลการบำรุงรักษารถส่งสินค้าถูกเพิ่มเข้ามาในระบบ โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/trucks/maintenances/'+truck_id)
@@ -302,10 +303,11 @@ app.post('/admin/maintenances/edit/:id', async(req,res) => {
     const id = req.params.id ?? null
     const truck_id = req.body.truck_id ?? null
     const maintenance_type = req.body.maintenance_type  ?? null
+    const next_maintenance_date = req.body.next_maintenance_date  ?? null
     const note = req.body.note
     const updated_at = moment().format("YYYY-MM-DD HH:mm:ss")
 
-    saveMaintenance(id, truck_id, maintenance_type, note, updated_at).then(() => {
+    saveMaintenance(id, truck_id, maintenance_type, next_maintenance_date, note, updated_at).then(() => {
         res.cookie('alert', 'success')
         addLog('edit', `ข้อมูลการบำรุงรักษารถส่งสินค้า หมายเลข #${id} ถูกแก้ไขแล้ว โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/trucks/maintenances/'+truck_id)
@@ -324,10 +326,10 @@ app.get('/admin/maintenances/delete/:id', async(req,res) => {
    
     const id = req.params.id ?? null
 
-    deleteMaintenance(id).then(() => {
+    deleteMaintenance(id).then(async() => {
         res.cookie('alert', 'delete_success')
         addLog('delete', `ข้อมูลการบำรุงรักษารถส่งสินค้า หมายเลข #${id} ถูกลบออกจากระบบ โดย #${auth.user.id} - ${auth.user.username}`)
-        res.redirect('/admin/trucks/maintenances/'+truck_id)
+        res.redirect('/admin/trucks/maintenances/'+(await getMaintenanceById(id)).truck_id)
     })
 })
 
