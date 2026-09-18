@@ -117,6 +117,7 @@ function initRoute() {
             location_note: route.location_note,
             driver_note: route.driver_note,
             arrival_at_warehouse: route.arrival_at_warehouse,
+            attachment_files: route.attachment_files,
             coords: [lon, lat],
             distanceFromMe: null // เพิ่มตัวแปรเก็บระยะทาง
         };
@@ -375,8 +376,8 @@ function updateRouteTable() {
                 ${route.customerId} ${route.customerName}<br>${distText}${badge} <span class="badge bg-secondary fw-normal">${route.time}</span>
                 </td>
                 <td>
-                    <a href="https://map.google.co.th/?q=${route.coords[1]},${route.coords[0]}" class="btn btn-light" target="_blank">📍 แผนที่</a>
-                    <button class="btn btn-light" onclick="uploadArrivalImage('${route.id}')">✅ ส่งแล้ว</button>
+                    <button class="btn btn-outline-primary w-100" style="text-align: center;" onclick="showDetails('${route.id}')">รายละเอียด</button>
+                    <button class="btn btn-outline-success w-100" style="text-align: center;" onclick="uploadArrivalImage('${route.id}')">✅ ส่งแล้ว</button>
                 </td>
             </tr>
             `;
@@ -417,6 +418,45 @@ function updateRouteTable() {
         }
         return;
     }
+}
+
+function showDetails(route_id) {
+    const route = allRoutes.find(r => String(r.id) === String(route_id));
+    if (!route) return;
+
+    document.getElementById('routeDetailsTitle').innerText = `${route.customerId} ${route.customerName}`;
+    document.getElementById('routeDetailsMapLink').href = `https://map.google.co.th/?q=${route.coords[1]},${route.coords[0]}`;
+    document.getElementById('routeDetailsLocationNote').innerText = route.location_note || '-';
+    document.getElementById('routeDetailsDriverNote').innerText = route.driver_note || '-';
+
+    const attachmentsContainer = document.getElementById('routeDetailsAttachments');
+    attachmentsContainer.innerHTML = '';
+    const files = route.attachment_files ? route.attachment_files.split(',').filter(Boolean) : [];
+    if (files.length === 0) {
+        attachmentsContainer.innerHTML = '<p class="text-muted mb-0">ไม่มีไฟล์แนบ</p>';
+    } else {
+        files.forEach(file => {
+            const link = document.createElement('a');
+            link.href = `/uploads/routes/${file}`;
+            link.target = '_blank';
+            link.className = 'd-inline-block me-2 mb-2 text-decoration-none';
+            if (/\.(png|jpe?g|gif|webp)$/i.test(file)) {
+                const img = document.createElement('img');
+                img.src = `/uploads/routes/${file}`;
+                img.style.width = '100px';
+                img.style.height = '100px';
+                img.style.objectFit = 'cover';
+                img.style.borderRadius = '8px';
+                link.appendChild(img);
+            } else {
+                link.innerText = `📎 ${file}`;
+            }
+            attachmentsContainer.appendChild(link);
+        });
+    }
+
+    const modal = bootstrap.Modal.getOrCreateInstance(document.getElementById('routeDetailsModal'));
+    modal.show();
 }
 
 // Initialize

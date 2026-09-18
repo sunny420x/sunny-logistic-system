@@ -98,7 +98,7 @@
             flex-direction: column;
             height: 100%;
             width: 100%;
-            overflow: hidden;
+            overflow: auto;
         }
 
         .driver-header-card {
@@ -175,7 +175,6 @@
             font-size: 0.8rem;
             border-radius: 8px;
             font-weight: 500;
-            display: inline-flex;
             align-items: center;
             gap: 0.3rem;
             transition: all 0.15s ease;
@@ -290,6 +289,11 @@
                 height: calc(100vh - 56px);
             }
 
+            .statusContainer {
+                height: 50vh;
+                overflow: auto;
+            }
+
             #mapWrapper {
                 height: 42vh;
                 min-height: 240px;
@@ -366,9 +370,9 @@
                             <table class="table align-middle">
                                 <thead>
                                     <tr>
-                                        <th style="width: 50px;" class="text-center">รอบ</th>
+                                        <th class="text-center">รอบ</th>
                                         <th>รายละเอียดลูกค้า</th>
-                                        <th style="width: 140px;" class="text-end">จัดการ</th>
+                                        <th style="width: 120px;" class="text-end">จัดการ</th>
                                     </tr>
                                 </thead>
                                 <tbody id="statusBarBody">
@@ -500,6 +504,27 @@
                 <div id="map"></div>
                 <button class="followToggle" id="followToggleBtn" onclick="toggleFollowMode()" title="โหมดติดตามอัตโนมัติ"><i class="fa-solid fa-location-crosshairs"></i></button>
                 <button class="setCenter" onclick="setCenter()" title="จัดกึ่งกลางตำแหน่ง"><i class="fa-solid fa-arrow-up"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="routeDetailsModal" tabindex="-1" aria-labelledby="routeDetailsTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="routeDetailsTitle">รายละเอียดจุดส่งของ</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p><strong>หมายเหตุสถานที่:</strong> <span id="routeDetailsLocationNote">-</span></p>
+                    <p><strong>หมายเหตุคนส่งของ:</strong> <span id="routeDetailsDriverNote">-</span></p>
+                    <p class="mb-2"><strong>ไฟล์แนบ:</strong></p>
+                    <div id="routeDetailsAttachments"></div>
+                </div>
+                <div class="modal-footer">
+                    <a id="routeDetailsMapLink" href="#" target="_blank" class="btn btn-outline-primary">แผนที่</a>
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">ปิด</button>
+                </div>
             </div>
         </div>
     </div>
