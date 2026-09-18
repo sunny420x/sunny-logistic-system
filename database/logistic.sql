@@ -104,6 +104,7 @@ CREATE TABLE IF NOT EXISTS `transition_records` (
   `location_note` varchar(200) DEFAULT NULL,
   `arrival_at_warehouse` datetime DEFAULT NULL,
   `round` int(11) DEFAULT 1,
+  `attachment_files` mediumtext DEFAULT NULL,
   `created_at` datetime DEFAULT NULL,
   `created_by` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
@@ -118,6 +119,7 @@ ALTER TABLE `transition_records`
   ADD COLUMN IF NOT EXISTS `truck_id` int(11) DEFAULT NULL,
   ADD COLUMN IF NOT EXISTS `driver_id` int(11) DEFAULT NULL,
   ADD COLUMN IF NOT EXISTS `weight` int(11) DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS `attachment_files` mediumtext DEFAULT NULL,
   ADD COLUMN IF NOT EXISTS `arrivalImage` mediumtext DEFAULT NULL,
   ADD COLUMN IF NOT EXISTS `temporary_location` varchar(100) DEFAULT NULL,
   ADD COLUMN IF NOT EXISTS `driver_note` varchar(200) DEFAULT NULL,

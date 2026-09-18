@@ -225,6 +225,23 @@
                     <textarea name="location_note" maxlength="200" placeholder="เช่น ตำแหน่งของจุดรับของเพิ่มเติม เลขที่อาคาร เลขที่บ้าน" <% if(route.status == 1) { %>readonly<%}%> class="form-control" style="height: 100px;"><%=route.location_note%></textarea>
                 </div>
 
+                <div class="form-group mb-3">
+                  <label for="attachment_files"><strong>ไฟล์แนบ: </strong></label>
+                  <% if(route.attachment_files) { %>
+                    <ul>
+                      <% if(route.attachment_files.includes(",")) { %>
+                      <% route.attachment_files.split(",").forEach(file => { %>
+                        <li><a href="/uploads/routes/<%=file%>" target="_blank"><%=file%></a></li>
+                      <% }) %>
+                      <% } else { %>
+                        <li><a href="/uploads/routes/<%=route.attachment_files%>" target="_blank"><%=route.attachment_files%></a></li>
+                      <% } %>
+                    </ul>
+                  <% } else { %>
+                    <p>ไม่มีไฟล์แนบ</p>
+                  <% } %>
+                </div>
+
                 <p><strong>เพิ่มโดย:</strong> <%=route.created_by_user ?? "-" %><br>
                 <strong>เมื่อ:</strong> <% if(route.created_at) { %><%=moment(route.created_at).format("DD/MM/YYYY HH:mm:ss") %><%} else {%>-<%} %></p>
 

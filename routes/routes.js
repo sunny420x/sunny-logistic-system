@@ -2,6 +2,9 @@ const express = require('express');
 const app = express.Router();
 const moment = require('moment');
 const cookieParser = require('cookie-parser');
+const multer = require('multer');
+const path = require('path');
+const fs = require('fs');
 
 const { getRoutes, getRouteById, addRoute, editRoute, deleteRouteById } = require('../models/routes')
 const { addLog } = require('../models/logs')
@@ -13,6 +16,20 @@ const { getSettings } = require('../models/settings')
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser())
+
+const uploadDir = path.join(__dirname, '..', 'public', 'uploads', 'routes');
+fs.mkdirSync(uploadDir, { recursive: true });
+
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        const ext = path.extname(file.originalname);
+        cb(null, `route-${Date.now()}-${Math.round(Math.random() * 1e9)}${ext}`);
+    }
+});
+const upload = multer({ storage: storage });
 
 app.get('/admin/routes', async(req,res) => {
     if(!req.cookies.auth) {
@@ -84,7 +101,15 @@ app.get('/admin/routes/add', async(req,res) => {
         page: 'routes'
     })
 })
-app.post('/admin/routes/add', async(req,res) => {
+app.post('/admin/routes/add', (req, res, next) => {
+    upload.array('attachment_files')(req, res, (err) => {
+        if (err) {
+            console.error('Multer upload error:', err);
+            return res.status(400).send('อัพโหลดไฟล์ไม่สำเร็จ: ' + err.message)
+        }
+        next();
+    });
+}, async(req,res) => {
     if(!req.cookies.auth) {
         res.redirect('/login')
         return
@@ -105,11 +130,12 @@ app.post('/admin/routes/add', async(req,res) => {
     const driver_note = req.body.driver_note
     const temporary_location = req.body.temporary_location
     const round = req.body.round
+    const attachment_files = req.files && req.files.length > 0 ? req.files.map(file => file.filename).join(",") : null
 
     const created_at = moment().format("YYYY-MM-DD HH:mm:ss")
     const created_by = auth.user.id
 
-    addRoute(customer_id, billing_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, round, created_at, created_by).then(() => {
+    addRoute(customer_id, billing_id, truck_id, driver_id, date, time_start, weight, location_note, driver_note, temporary_location, round, attachment_files, created_at, created_by).then(() => {
         res.cookie('alert', 'success')
         addLog('add', `คิวส่งของใหม่สำหรับลูกค้าหมายเลข #${customer_id} รหัสบิล ${billing_id} ถูกเพิ่มเข้าสู่ระบบ โดย #${auth.user.id} - ${auth.user.username}`)
         res.redirect('/admin/routes/?date='+moment().format('YYYY-MM-DD'))
