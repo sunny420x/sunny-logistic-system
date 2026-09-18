@@ -199,9 +199,13 @@ function getMaintenanceAlerts() {
             mt.name,
             t.license_plate,
             DATEDIFF(
+                m.next_maintenance_date,
+                NOW()
+            ) AS days_left_until_next_maintenance,
+            DATEDIFF(
                 m.created_at + INTERVAL mt.round DAY,
                 NOW()
-            ) AS days_left
+            ) AS days_left_until_next_round
         FROM (
             SELECT 
                 m.*,
@@ -216,7 +220,7 @@ function getMaintenanceAlerts() {
         JOIN trucks AS t 
             ON m.truck_id = t.id
         WHERE m.rn = 1
-        AND DATEDIFF(m.created_at + INTERVAL mt.round DAY, NOW()) < 30
+        AND DATEDIFF(m.next_maintenance_date, NOW()) < 30
         ORDER BY m.id DESC`, (err, results) => {
             if(err) console.error(err);
             resolve(results)
