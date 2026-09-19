@@ -53,12 +53,13 @@
                 <thead>
                     <tr>
                         <th>ทะเบียนรถ</th>
+                        <th>ชื่อบริษัท/อู่ซ่อม</th>
                         <th>วันที่ซ่อม</th>
                         <th>ผู้ส่งซ่อม</th>
                         <th>จัดการ</th>
                     </tr>
                 </thead>
-                <tbody id="repairsTableBody"><tr class="skeleton-row" aria-hidden="true"><td colspan="4"><span class="skeleton-line"></span></td></tr></tbody>
+                <tbody id="repairsTableBody"><tr class="skeleton-row" aria-hidden="true"><td colspan="5"><span class="skeleton-line"></span></td></tr></tbody>
             </table>
         </div>
         <div id="repairsPagination" class="mt-3"></div>
@@ -68,9 +69,19 @@
   <%-include('includes/footer')%>
     <script>
         const repairsTable = AdminServerPagination({
-            resource: 'repairs', tableBody: 'repairsTableBody', pagination: 'repairsPagination', colspan: 4,
+            resource: 'repairs', tableBody: 'repairsTableBody', pagination: 'repairsPagination', colspan: 5,
             getFilters: () => ({}),
-            renderRow: row => `<tr><td>${row.license_plate || '-'}</td><td>${moment(row.created_at).format('DD/MM/YYYY HH:mm:ss')}</td><td>${row.created_by_user || '-'}</td><td><button class="btn btn-outline-secondary btn-sm" onclick="window.location.href='/admin/repairs/report/${row.id}'"><i class="bi bi-file-earmark-text"></i> รายงาน</button> <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/repairs/edit/${row.id}'"><i class="bi bi-pencil-square"></i> แก้ไข</button> <button class="btn btn-outline-danger btn-sm" onclick="deleteRepair(${row.id})"><i class="bi bi-trash3"></i> ลบ</button></td></tr>`
+            renderRow: row => `
+            <tr>
+                <td>${row.license_plate || '-'}</td>
+                <td>${row.company_name || '-'}</td>
+                <td>${moment(row.created_at).format('DD/MM/YYYY HH:mm:ss')}</td>
+                <td>${row.created_by_user || '-'}</td>
+                <td><button class="btn btn-outline-secondary btn-sm" onclick="window.location.href='/admin/repairs/report/${row.id}'"><i class="bi bi-file-earmark-text"></i> รายงาน</button>
+                <button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/repairs/edit/${row.id}'"><i class="bi bi-pencil-square"></i> แก้ไข</button>
+                <button class="btn btn-outline-danger btn-sm" onclick="deleteRepair(${row.id})"><i class="bi bi-trash3"></i> ลบ</button>
+                </td>
+            </tr>`
         });
         repairsTable.load();
 

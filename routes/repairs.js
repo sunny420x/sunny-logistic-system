@@ -104,9 +104,9 @@ app.post('/admin/repairs/edit/:id', async (req, res) => {
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
 
-    const { truck_id, repair_type, details, notes } = req.body;
+    const { truck_id, repair_type, details, notes, company_name } = req.body;
     
-    await updateRepair(req.params.id, truck_id, repair_type, notes, details);
+    await updateRepair(req.params.id, truck_id, repair_type, notes, details, company_name);
     res.redirect('/admin/repairs'); 
 })
 
@@ -143,11 +143,27 @@ app.post('/admin/repairs/add', async (req, res) => {
     if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
     if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
 
-    const { truck_id, repair_type, details, notes } = req.body;
+    const { truck_id, repair_type, details, notes, company_name } = req.body;
     
-    await addRepair( truck_id, repair_type, details, notes, moment().format('YYYY-MM-DD HH:mm:ss'), auth.user.id );
+    await addRepair( truck_id, repair_type, details, notes, company_name, moment().format('YYYY-MM-DD HH:mm:ss'), auth.user.id );
     res.redirect('/admin/repairs'); 
 })   
+
+app.get('/admin/repairs/delete/:id', async (req, res) => {
+    if(!req.cookies.auth) {
+        res.redirect('/login')
+        return
+    }
+    const auth = await initUserToken(req.cookies.auth)
+    if(!auth.user) res.redirect('/logout')
+    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
+    if(!auth.user.permission.split(',').includes('trucks')) res.end("Permission denial") //Check Permission
+
+    await deleteRepair(req.params.id);
+    addLog('delete', `การซ่อมบำรุง #${req.params.id} ถูกลบออกจากระบบโดย #${auth.user.id} - ${auth.user.username}`)
+    res.cookie('alert', 'success')
+    res.redirect('/admin/repairs'); 
+});
 
 app.get('/admin/repair_types', async (req, res) => {
     if(!req.cookies.auth) {

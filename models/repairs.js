@@ -1,12 +1,12 @@
 const db = require('../database');
 
-function addRepair( truck_id, repair_type, details, notes, created_at, created_by ) {
+function addRepair( truck_id, repair_type, details, notes, company_name, created_at, created_by ) {
     return new Promise((resolve, reject) => {
         const query = `
-            INSERT INTO repairs (truck_id, repair_type, details, note, created_at, created_by)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO repairs (truck_id, repair_type, details, note, company_name, created_at, created_by)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         `;
-        db.query(query, [truck_id, repair_type, details, notes, created_at, created_by], (err) => {
+        db.query(query, [truck_id, repair_type, details, notes, company_name, created_at, created_by], (err) => {
             if (err) {
                 console.error(err);
                 reject(err);
@@ -38,7 +38,7 @@ function getRepairs() {
 
 function getRepairById(id) {
     return new Promise((resolve, reject) => {
-        const query = `SELECT r.*, rt.name as repair_type_name, t.license_plate, u.full_name as created_by_user FROM repairs as r 
+        const query = `SELECT r.*, rt.name as repair_type_name, t.license_plate, r.company_name, u.full_name as created_by_user FROM repairs as r 
         LEFT JOIN repair_types as rt ON r.repair_type = rt.id
         JOIN trucks as t ON r.truck_id = t.id 
         LEFT JOIN users as u ON r.created_by = u.id 
@@ -54,14 +54,14 @@ function getRepairById(id) {
     });
 }
 
-function updateRepair(id, truck_id, repair_type, note, details) {
+function updateRepair(id, truck_id, repair_type, note, details, company_name) {
     return new Promise((resolve, reject) => {
         const query = `
             UPDATE repairs
-            SET truck_id = ?, repair_type = ?, note = ?, details = ?
+            SET truck_id = ?, repair_type = ?, note = ?, details = ?, company_name = ?
             WHERE id = ?
         `;
-        db.query(query, [truck_id, repair_type, note, details, id], (err, results) => {
+        db.query(query, [truck_id, repair_type, note, details, company_name, id], (err, results) => {
             if (err) {
                 console.error(err);
                 reject(err);
