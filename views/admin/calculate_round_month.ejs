@@ -50,7 +50,7 @@
         const calculateRoundMonthTable = AdminServerPagination({
             resource: 'calculate_round_range', tableBody: 'calculateRoundMonthTableBody', pagination: 'calculateRoundMonthPagination', colspan: 5,
             getFilters: () => ({ start_date: document.getElementById('startDateSearch').value, end_date: document.getElementById('endDateSearch').value }),
-            renderRow: row => `<tr><td>${row.full_name || '-'}</td><td>${row.round_count} รอบ</td><td>${Number(row.round_cost).toLocaleString('en-US')} บาท/รอบ</td><td>${(Number(row.round_count) * Number(row.round_cost)).toLocaleString('en-US')} บาท</td><td><button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/calculate_round_month/report/${row.driver_id}?start_date=' + encodeURIComponent(document.getElementById('startDateSearch').value) + '&end_date=' + encodeURIComponent(document.getElementById('endDateSearch').value)"><i class="bi bi-file-earmark-text"></i> ออกรายงาน</button></td></tr>`
+            renderRow: row => `<tr><td>${row.full_name || '-'}</td><td>${row.round_count} รอบ</td><td>${Number(row.round_cost_total / row.round_count).toLocaleString('en-US')} บาท/รอบ</td><td>${Number(row.round_cost_total).toLocaleString('en-US')} บาท</td><td><button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/calculate_round_month/report/${row.driver_id}?start_date=' + encodeURIComponent(document.getElementById('startDateSearch').value) + '&end_date=' + encodeURIComponent(document.getElementById('endDateSearch').value)"><i class="bi bi-file-earmark-text"></i> ออกรายงาน</button></td></tr>`
         });
         calculateRoundMonthTable.load();
     </script>

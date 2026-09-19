@@ -67,7 +67,7 @@
             const calculateRoundTable = AdminServerPagination({
                 resource: 'calculate_round', tableBody: 'calculateRoundTableBody', pagination: 'calculateRoundPagination', colspan: 6,
                 getFilters: () => ({ date: getSearchQuery() }),
-                renderRow: row => `<tr><td>${moment(row.date).format('DD/MM/YYYY')}</td><td>${row.full_name || '-'}</td><td>${row.round_count} รอบ</td><td>${Number(row.round_cost).toLocaleString('en-US')} บาท/รอบ</td><td>${(Number(row.round_count) * Number(row.round_cost)).toLocaleString('en-US')} บาท</td><td><button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/calculate_round/report/${row.driver_id}?date=${moment(row.date).format('YYYY-MM-DD')}'"><i class="bi bi-file-earmark-text"></i> ออกรายงาน</button></td></tr>`
+                renderRow: row => `<tr><td>${moment(row.date).format('DD/MM/YYYY')}</td><td>${row.full_name || '-'}</td><td>${row.round_count} รอบ</td><td>${Number(row.round_cost_total / row.round_count).toLocaleString('en-US')} บาท/รอบ</td><td>${Number(row.round_cost_total).toLocaleString('en-US')} บาท</td><td><button class="btn btn-outline-primary btn-sm" onclick="window.location.href='/admin/calculate_round/report/${row.driver_id}?date=${moment(row.date).format('YYYY-MM-DD')}'"><i class="bi bi-file-earmark-text"></i> ออกรายงาน</button></td></tr>`
             });
             calculateRoundTable.load();
         </script>

@@ -281,12 +281,19 @@ app.get('/admin/calculate_round/report/:driver_id', async(req,res) => {
         return;
     }
 
-    const round_count = new Set(rows.map(row => row.round).filter(round => round !== null)).size;
+    // sum each unique round's own truck round_cost rather than assuming one rate for the whole day
+    const roundCostByRound = new Map();
+    rows.filter(row => row.round !== null).forEach(row => {
+        if (!roundCostByRound.has(row.round)) roundCostByRound.set(row.round, row.round_cost);
+    });
+    const round_count = roundCostByRound.size;
+    const round_cost_total = [...roundCostByRound.values()].reduce((a, b) => a + Number(b), 0);
 
     res.render('admin/calculate_round_report', {
         driver: rows[0],
         rows: rows,
         round_count: round_count,
+        round_cost_total: round_cost_total,
         date: date,
         auth: auth,
         settings: await getSettings(),
@@ -348,23 +355,28 @@ app.get('/admin/calculate_round_month/report/:driver_id', async(req,res) => {
         return groups;
     }, {});
 
-    // สรุปจำนวนรอบและค่ารอบรวมของแต่ละวัน
+    // สรุปจำนวนรอบและค่ารอบรวมของแต่ละวัน (รวมค่ารอบจริงของแต่ละรอบ เผื่อรองรับกรณีเปลี่ยนรถ/อัตรากลางคัน)
     const dailyTotals = Object.fromEntries(
         Object.entries(rowsByDate).map(([dateKey, dailyRows]) => {
-            const dailyRoundCount = new Set(dailyRows.map(row => row.round).filter(round => round !== null)).size;
+            const roundCostByRound = new Map();
+            dailyRows.filter(row => row.round !== null).forEach(row => {
+                if (!roundCostByRound.has(row.round)) roundCostByRound.set(row.round, row.round_cost);
+            });
             return [dateKey, {
-                round_count: dailyRoundCount,
-                round_cost: dailyRoundCount * dailyRows[0].round_cost,
+                round_count: roundCostByRound.size,
+                round_cost: [...roundCostByRound.values()].reduce((a, b) => a + Number(b), 0),
                 license_plate: dailyRows[0].license_plate
             }];
         })
     );
+    const round_cost_total = Object.values(dailyTotals).reduce((sum, day) => sum + day.round_cost, 0);
 
     res.render('admin/calculate_round_report_month', {
         driver: rows[0],
         rowsByDate: rowsByDate,
         dailyTotals: dailyTotals,
         round_count: round_count,
+        round_cost_total: round_cost_total,
         start_date: start_date,
         end_date: end_date,
         auth: auth,
