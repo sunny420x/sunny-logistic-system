@@ -10,8 +10,8 @@ const { getCustomers, getCustomerGroups } = require('./models/customers')
 const { getDashboardAllPackages, getDashboardCustomers, getDashboardDelivered, getDashboardUsers } = require('./models/dashboard')
 const { getMaintenanceAlerts } = require('./models/trucks')
 const { ongoingDrivers } = require('./models/tracking')
-const { getSettings, saveSettings } = require('./models/settings')
-const { initUserToken, changeAccountPassword, getUserTypes } = require('./models/users')
+const { getSettings, } = require('./models/settings')
+const { initUserToken, getUserTypes } = require('./models/users')
 const { addLog } = require('./models/logs')
 
 app.set('trust proxy', 1)
@@ -27,6 +27,7 @@ const installRoute = require('./routes/installation')
 const routineChecksRoute = require('./routes/routine_checks')
 const repairsRoute = require('./routes/repairs')
 const followingUpRoute = require('./routes/followUp')
+const accountSettingsRoute = require('./routes/settings')
 
 app.use('/', usersRoute)
 app.use('/', apiRoute)
@@ -38,6 +39,7 @@ app.use('/', installRoute)
 app.use('/', routineChecksRoute)
 app.use('/', repairsRoute)
 app.use('/', followingUpRoute)
+app.use('/', accountSettingsRoute)
 
 // Express Settings
 require('dotenv').config()
@@ -156,114 +158,6 @@ app.get('/admin/help', async(req,res) => {
         page: 'help',
         moment: moment,
         settings: await getSettings(),
-    })
-})
-
-app.get('/admin/settings', async(req,res) => {
-    if(!req.cookies.auth) {
-        res.redirect('/login')
-        return
-    }
-    const auth = await initUserToken(req.cookies.auth)
-    if(!auth.user) res.redirect('/logout')
-    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
-    if(!auth.user.permission.split(',').includes('settings')) res.end("Permission denial") //Check Permission
-   
-    res.render('admin/settings', {
-        auth: auth,
-        settings: await getSettings(),
-        moment: moment,
-        page: 'settings'
-    })
-})
-
-app.post('/admin/settings', async(req,res) => {
-    if(!req.cookies.auth) {
-        res.redirect('/login')
-        return
-    }
-    const auth = await initUserToken(req.cookies.auth)
-    if(!auth.user) res.redirect('/logout')
-    if(auth.user.permission.split(',').length < 2) res.end("Permission denial") //Check Permission
-    if(!auth.user.permission.split(',').includes('settings')) res.end("Permission denial") //Check Permission
-
-    const company_name = req.body.company_name
-    const company_logo = req.body.company_logo
-    const company_banner = req.body.company_banner
-    const zone = req.body.company_zone
-
-    saveSettings(company_name, company_logo, company_banner, zone).then(() => {
-        res.redirect('/admin/settings')
-    })
-})
-
-app.get('/admin/account/settings', async(req,res) => {
-    if(!req.cookies.auth) {
-        res.redirect('/login')
-        return
-    }
-    const auth = await initUserToken(req.cookies.auth)
-    if(!auth.user) res.redirect('/logout')
-   
-    res.render('admin/account_settings', {
-        auth: auth,
-        settings: await getSettings(),
-        moment: moment,
-        page: 'account_settings'
-    })
-})
-
-app.post('/admin/account/settings', async(req,res) => {
-    if(!req.cookies.auth) {
-        res.redirect('/login')
-        return
-    }
-    const auth = await initUserToken(req.cookies.auth)
-    if(!auth.user) res.redirect('/logout')
-
-    const username = req.body.username
-    const full_name = req.body.full_name
-    const phone_number = req.body.phone_number
-
-    saveAccountSettings(auth.user.id, username, full_name, phone_number).then(() => {
-        res.redirect('/admin/settings')
-    })
-})
-
-app.get('/admin/account/settings/updatePassword', async(req,res) => {
-    if(!req.cookies.auth) {
-        res.redirect('/login')
-        return
-    }
-    const auth = await initUserToken(req.cookies.auth)
-    if(!auth.user) res.redirect('/logout')
-   
-    res.render('admin/account_update_password', {
-        auth: auth,
-        settings: await getSettings(),
-        moment: moment,
-        page: 'account_settings'
-    })
-})
-
-app.post('/admin/account/settings/updatePassword', async(req,res) => {
-    if(!req.cookies.auth) {
-        res.redirect('/login')
-        return
-    }
-    const auth = await initUserToken(req.cookies.auth)
-    if(!auth.user) res.redirect('/logout')
-
-    const currentPassword = crypto.createHash('sha256').update(req.body.currentPassword).digest('hex');
-    const newPassword = crypto.createHash('sha256').update(req.body.newPassword).digest('hex');
-
-    changeAccountPassword(auth.user.id, currentPassword, newPassword).then((result) => {
-        if(result.status == "success") {
-            addLog('edit', `#${auth.user.id} - ${auth.user.username} ได้เปลี่ยนรหัสผ่านบัญชีของตนเอง`)
-            res.redirect('/logout')
-        } else {
-            res.redirect('/admin/account/settings/updatePassword?alert=currentPasswordNotMatch')
-        }
     })
 })
 
