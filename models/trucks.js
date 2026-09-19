@@ -280,7 +280,7 @@ function getCalculateRoundReport(driver_id, date) {
             FROM transition_records as tr
             JOIN users as u ON u.id = tr.driver_id
             JOIN trucks as t ON t.id = tr.truck_id
-            JOIN customers as c ON c.id = tr.customer_id
+            LEFT JOIN customers as c ON c.id = tr.customer_id
             WHERE tr.driver_id = ? AND DATE(tr.date) = ?
             ORDER BY tr.round ASC, tr.time ASC`, [driver_id, date], (err, result) => {
             if(err) console.error(err);
@@ -296,7 +296,7 @@ function getCalculateRoundReportByMonth(driver_id, start_date, end_date) {
             FROM transition_records as tr
             JOIN users as u ON u.id = tr.driver_id
             JOIN trucks as t ON t.id = tr.truck_id
-            JOIN customers as c ON c.id = tr.customer_id
+            LEFT JOIN customers as c ON c.id = tr.customer_id
             WHERE tr.driver_id = ? AND DATE(tr.date) BETWEEN ? AND ?
             ORDER BY tr.date ASC, tr.round ASC, tr.time ASC`, [driver_id, start_date, end_date], (err, result) => {
             if(err) console.error(err);
