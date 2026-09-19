@@ -275,7 +275,7 @@ function getCalculateRoundByMonth(start_date, end_date) {
 
 function getCalculateRoundReport(driver_id, date) {
     return new Promise(resolve => {
-        db.query(`SELECT u.full_name, u.username, t.round_cost, tr.round, tr.time, tr.status, tr.finish_at,
+        db.query(`SELECT tr.id, u.full_name, u.username, t.round_cost, tr.round, tr.time, tr.status, tr.finish_at,
             c.customer_name, c.customer_id
             FROM transition_records as tr
             JOIN users as u ON u.id = tr.driver_id
@@ -291,7 +291,7 @@ function getCalculateRoundReport(driver_id, date) {
 
 function getCalculateRoundReportByMonth(driver_id, start_date, end_date) {
     return new Promise(resolve => {
-        db.query(`SELECT u.full_name, u.username, t.round_cost, t.license_plate, tr.date, tr.round, tr.time, tr.status, tr.finish_at,
+        db.query(`SELECT tr.id, u.full_name, u.username, t.round_cost, t.license_plate, tr.date, tr.round, tr.time, tr.status, tr.finish_at,
             c.customer_name, c.customer_id
             FROM transition_records as tr
             JOIN users as u ON u.id = tr.driver_id

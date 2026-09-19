@@ -281,13 +281,14 @@ app.get('/admin/calculate_round/report/:driver_id', async(req,res) => {
         return;
     }
 
-    // sum each unique round's own truck round_cost rather than assuming one rate for the whole day
+    // ของแต่ละรอบใช้ round_cost จากเรคอร์ที่บันทึกก่อนสุด (id น้อยสุด) เพื่อให้ตรงกับหน้าตารางสรุป
     const roundCostByRound = new Map();
     rows.filter(row => row.round !== null).forEach(row => {
-        if (!roundCostByRound.has(row.round)) roundCostByRound.set(row.round, row.round_cost);
+        const existing = roundCostByRound.get(row.round);
+        if (!existing || row.id < existing.id) roundCostByRound.set(row.round, row);
     });
     const round_count = roundCostByRound.size;
-    const round_cost_total = [...roundCostByRound.values()].reduce((a, b) => a + Number(b), 0);
+    const round_cost_total = [...roundCostByRound.values()].reduce((sum, row) => sum + Number(row.round_cost), 0);
 
     res.render('admin/calculate_round_report', {
         driver: rows[0],
@@ -355,16 +356,17 @@ app.get('/admin/calculate_round_month/report/:driver_id', async(req,res) => {
         return groups;
     }, {});
 
-    // สรุปจำนวนรอบและค่ารอบรวมของแต่ละวัน (รวมค่ารอบจริงของแต่ละรอบ เผื่อรองรับกรณีเปลี่ยนรถ/อัตรากลางคัน)
+    // สรุปจำนวนรอบและค่ารอบรวมของแต่ละวัน (ใช้ round_cost ของเรคอร์ที่บันทึกก่อนสุดต่อรอบ ตรงกับหน้าตารางสรุป)
     const dailyTotals = Object.fromEntries(
         Object.entries(rowsByDate).map(([dateKey, dailyRows]) => {
             const roundCostByRound = new Map();
             dailyRows.filter(row => row.round !== null).forEach(row => {
-                if (!roundCostByRound.has(row.round)) roundCostByRound.set(row.round, row.round_cost);
+                const existing = roundCostByRound.get(row.round);
+                if (!existing || row.id < existing.id) roundCostByRound.set(row.round, row);
             });
             return [dateKey, {
                 round_count: roundCostByRound.size,
-                round_cost: [...roundCostByRound.values()].reduce((a, b) => a + Number(b), 0),
+                round_cost: [...roundCostByRound.values()].reduce((sum, row) => sum + Number(row.round_cost), 0),
                 license_plate: dailyRows[0].license_plate
             }];
         })

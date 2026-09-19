@@ -135,12 +135,15 @@ const resourceQueries = {
         order: 'fu.id DESC'
     },
     calculate_round: {
-        // one row per (driver, round) so a driver switching trucks/rates mid-day is still counted once per round
+        // one row per (driver, round); round_cost comes from the earliest-inserted record for that round
         select: `SELECT driver_id, full_name, username, date, COUNT(*) AS round_count, SUM(round_cost) AS round_cost_total
             FROM (
-                SELECT u.id AS driver_id, u.full_name, u.username, DATE(tr.date) AS date, tr.round, MAX(t.round_cost) AS round_cost
-                FROM transition_records tr JOIN users u ON u.id = tr.driver_id
-                JOIN trucks t ON t.id = tr.truck_id`,
+                SELECT x.driver_id, x.full_name, x.username, x.date, x.round, x.round_cost
+                FROM (
+                    SELECT u.id AS driver_id, u.full_name, u.username, DATE(tr.date) AS date, tr.round, t.round_cost,
+                        ROW_NUMBER() OVER (PARTITION BY u.id, DATE(tr.date), tr.round ORDER BY tr.id ASC) AS rn
+                    FROM transition_records tr JOIN users u ON u.id = tr.driver_id
+                    JOIN trucks t ON t.id = tr.truck_id`,
         where(filters) {
             const conditions = ['tr.round IS NOT NULL'];
             const params = [];
@@ -148,17 +151,20 @@ const resourceQueries = {
             return { conditions, params };
         },
         order: 'date DESC, driver_id ASC',
-        group: ` GROUP BY u.id, DATE(tr.date), tr.round
+        group: ` ) x WHERE x.rn = 1
             ) rounds
             GROUP BY driver_id, full_name, username, date`
     },
     calculate_round_range: {
-        // aggregate per driver across the whole range, summing each round's own truck round_cost
+        // aggregate per driver across the whole range; round_cost comes from the earliest-inserted record for that round
         select: `SELECT driver_id, full_name, username, COUNT(*) AS round_count, SUM(round_cost) AS round_cost_total
             FROM (
-                SELECT u.id AS driver_id, u.full_name, u.username, DATE(tr.date) AS tx_date, tr.round, MAX(t.round_cost) AS round_cost
-                FROM transition_records tr JOIN users u ON u.id = tr.driver_id
-                JOIN trucks t ON t.id = tr.truck_id`,
+                SELECT x.driver_id, x.full_name, x.username, x.round, x.round_cost
+                FROM (
+                    SELECT u.id AS driver_id, u.full_name, u.username, DATE(tr.date) AS tx_date, tr.round, t.round_cost,
+                        ROW_NUMBER() OVER (PARTITION BY u.id, DATE(tr.date), tr.round ORDER BY tr.id ASC) AS rn
+                    FROM transition_records tr JOIN users u ON u.id = tr.driver_id
+                    JOIN trucks t ON t.id = tr.truck_id`,
         where(filters) {
             const conditions = ['tr.round IS NOT NULL'];
             const params = [];
@@ -167,7 +173,7 @@ const resourceQueries = {
             return { conditions, params };
         },
         order: 'driver_id ASC',
-        group: ` GROUP BY u.id, DATE(tr.date), tr.round
+        group: ` ) x WHERE x.rn = 1
             ) rounds
             GROUP BY driver_id, full_name, username`
     }
